@@ -1,0 +1,27 @@
+name: Deploy site to Cloudflare
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Navigate to repo
+        run: cd $GITHUB_WORKSPACE
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - name: Install deps
+        run: npm install
+      - name: Build site
+        run: npm run build
+      - name: Publish to Cloudflare
+        uses: cloudflare/wrangler-action@1.1.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          environment: "production"
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
