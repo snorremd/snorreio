@@ -1,12 +1,17 @@
 import React from "react"
 import { graphql } from "gatsby"
 
+
+import { defineCustomElements as deckDeckGoHighlightElement } from '@deckdeckgo/highlight-code/dist/loader';
+deckDeckGoHighlightElement();
+
 import tw from "twin.macro"
 import { Global, css } from "@emotion/core"
 
 import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
+
 
 export default function Template({
   data, // this prop will be injected by the GraphQL query below.
