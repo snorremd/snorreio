@@ -31,16 +31,19 @@ const Layout = ({ children }) => {
         styles={css({
           all: "box-sizing: border-box",
           body: tw`bg-gray-900 text-gray-200 max-w-full`,
-          h1: tw`text-green-300 my-4`,
+          h1: tw`text-green-300 mb-3 text-lg md:text-xl lg:text-2xl`,
+          h2: tw`text-green-300 mt-3 mb-3  md:text-lg lg:text-xl`,
           a: tw`text-green-300 underline`,
-          p: tw`text-gray-300 my-6 text-justify`,
+          p: tw`text-gray-300 mb-2 text-justify`,
           blockQuote: tw`border-l-2 border-green-300 pl-4 my-2`,
+          ul: tw`mb-2 list-inside list-inside`,
+          hr: tw`border-green-300 my-8 py-0`
         })}
       />
       <Header siteTitle={data.site.siteMetadata.title} />
       <div tw="flex flex-col items-center">
-        <div tw="py-4 px-4" css={{ maxWidth: "960px" }}>
-          <main>{children}</main>
+        <div tw=" w-full py-4 px-4" css={{ maxWidth: "960px" }}>
+          <main tw="w-full">{children}</main>
           <footer tw="mt-4 py-4 border-t-2 border-gray-800 text-center">
             © {new Date().getFullYear()} Snorre Magnus Davøen. Built with
             {` `}
