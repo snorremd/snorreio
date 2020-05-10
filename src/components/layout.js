@@ -29,15 +29,16 @@ const Layout = ({ children }) => {
     <>
       <Global
         styles={css({
-          all: "box-sizing: border-box",
+          all: tw`box-border font-sans text-left`,
           body: tw`bg-gray-900 text-gray-200 max-w-full`,
-          h1: tw`text-green-300 mb-3 text-lg md:text-xl lg:text-2xl`,
-          h2: tw`text-green-300 mt-3 mb-3  md:text-lg lg:text-xl`,
+          h1: tw`text-green-300 mt-8 mb-6 text-lg md:text-xl lg:text-2xl`,
+          h2: tw`text-green-300 mt-6 mb-4  md:text-lg lg:text-xl`,
           a: tw`text-green-300 underline`,
-          p: tw`text-gray-300 mb-2 text-justify`,
+          p: tw`text-gray-300 mt-4 mb-2 leading-tight`,
           blockQuote: tw`border-l-2 border-green-300 pl-4 my-2`,
           ul: tw`mb-2 list-inside list-inside`,
-          hr: tw`border-green-300 my-8 py-0`
+          hr: tw`border-green-300 my-8 py-0`,
+          img: tw`py-4`
         })}
       />
       <Header siteTitle={data.site.siteMetadata.title} />
