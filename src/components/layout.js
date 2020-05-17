@@ -38,7 +38,7 @@ const Layout = ({ children }) => {
           blockQuote: tw`border-l-2 border-green-300 pl-4 my-2`,
           ul: tw`mb-2 list-inside list-inside`,
           hr: tw`border-green-300 my-8 py-0`,
-          img: tw`py-4`
+          img: tw`py-4`,
         })}
       />
       <Header siteTitle={data.site.siteMetadata.title} />
@@ -50,7 +50,10 @@ const Layout = ({ children }) => {
             {` `}
             <a href="https://www.gatsbyjs.org">Gatsby</a>. Hosted by
             {` `}
-            <a href="https://workers.cloudflare.com/">Cloudflare</a>.
+            <a href="https://workers.cloudflare.com/">Cloudflare</a>. This page
+            is opensource. Its source code is available on
+            {" "}
+            <a href="https://github.com/snorremd/snorreio">GitHub</a>.
           </footer>
         </div>
       </div>
