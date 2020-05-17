@@ -1,5 +1,6 @@
 import React from "react"
 import { graphql } from "gatsby"
+import { MDXRenderer } from "gatsby-plugin-mdx"
 
 
 import { defineCustomElements as deckDeckGoHighlightElement } from '@deckdeckgo/highlight-code/dist/loader';
@@ -16,8 +17,8 @@ import SEO from "../components/seo"
 export default function Template({
   data, // this prop will be injected by the GraphQL query below.
 }) {
-  const { markdownRemark } = data // data.markdownRemark holds your post data
-  const { frontmatter, html } = markdownRemark
+  const { mdx } = data // data.markdownRemark holds your post data
+  const { frontmatter, body } = mdx
   return (
     <Layout>
       <Global
@@ -28,10 +29,7 @@ export default function Template({
         <div className="blog-post">
           <h1>{frontmatter.title}</h1>
           <h2>{frontmatter.date_published}</h2>
-          <div
-            className="blog-post-content"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+          <MDXRenderer>{body}</MDXRenderer>
         </div>
       </div>
     </Layout>
@@ -39,13 +37,19 @@ export default function Template({
 }
 
 export const pageQuery = graphql`
-  query($path: String!) {
-    markdownRemark(frontmatter: { path: { eq: $path } }) {
-      html
-      frontmatter {
-        date_published(formatString: "MMMM DD, YYYY")
-        path
+  query BlogPostBySlug($slug: String!) {
+    site {
+      siteMetadata {
         title
+      }
+    }
+    mdx(fields: { slug: { eq: $slug } }) {
+      id
+      excerpt(pruneLength: 160)
+      body
+      frontmatter {
+        title
+        date_published(formatString: "MMMM DD, YYYY")
       }
     }
   }

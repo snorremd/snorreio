@@ -4,6 +4,7 @@ import { Global, css } from "@emotion/core"
 import { Controlled as CodeMirror } from "react-codemirror2"
 import { useDebounce } from "@react-hook/debounce"
 import { evaluate } from "../../sci/sci"
+import Loadable from "@loadable/component"
 
 import "codemirror/mode/clojure/clojure.js"
 import "codemirror/lib/codemirror.css"
@@ -12,7 +13,7 @@ import "./clojure-editor.css"
 
 const ClojureEditor = ({ snippet }) => {
   const [code, updateCode] = useState(snippet)
-  const [result, updateResult] = useDebounce("", 500)
+  const [result, updateResult] = useDebounce(evaluate(snippet), 500)
 
   return (
     <div tw="mb-8 flex flex-col">
@@ -42,4 +43,5 @@ const ClojureEditor = ({ snippet }) => {
     </div>
   )
 }
+
 export default ClojureEditor

@@ -13,6 +13,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: "10.x"
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '13'
       - name: Install deps
         run: npm install
       - name: Build site

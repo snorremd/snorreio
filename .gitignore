@@ -72,4 +72,4 @@ dist
 
 # ClojureScript files
 .shadow-cljs/
-sci
+sci/

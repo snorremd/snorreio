@@ -8,7 +8,7 @@ import PostLink from "../components/post-link"
 
 const IndexPage = ({
   data: {
-    allMarkdownRemark: { edges },
+    allMdx: { edges },
   },
 }) => (
   <Layout>
@@ -25,11 +25,12 @@ export default IndexPage
 
 export const pageQuery = graphql`
   query {
-    allMarkdownRemark(sort: { order: DESC, fields: [frontmatter___date_published] }) {
+    allMdx(sort: { order: DESC, fields: [frontmatter___date_published] }) {
       edges {
         node {
           id
           excerpt(pruneLength: 250)
+          
           frontmatter {
             date_published(formatString: "MMMM DD, YYYY")
             path
