@@ -1,4 +1,4 @@
-(ns sci
+(ns cljs.sci-wrapper
   (:require [sci.core :as sci]
             [clojure.pprint :as pprint]))
 

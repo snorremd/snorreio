@@ -1,10 +1,12 @@
 import React, { useState } from "react"
+
 import tw from "twin.macro"
 import { Global, css } from "@emotion/core"
 import { Controlled as CodeMirror } from "react-codemirror2"
 import { useDebounce } from "@react-hook/debounce"
-import { evaluate } from "../../sci/sci"
-import Loadable from "@loadable/component"
+
+// import { evaluate } from "../../out/sci_wrapper/sci"
+
 
 import "codemirror/mode/clojure/clojure.js"
 import "codemirror/lib/codemirror.css"
@@ -12,8 +14,9 @@ import "codemirror/theme/material.css"
 import "./clojure-editor.css"
 
 const ClojureEditor = ({ snippet }) => {
+
   const [code, updateCode] = useState(snippet)
-  const [result, updateResult] = useDebounce(evaluate(snippet), 500)
+  const [result, updateResult] = useDebounce(cljs.sci_wrapper.evaluate(snippet), 500)
 
   return (
     <div tw="mb-8 flex flex-col">
@@ -24,11 +27,11 @@ const ClojureEditor = ({ snippet }) => {
           options={{ theme: "material", mode: "clojure"}}
           onBeforeChange={(editor, data, value) => {
             updateCode(value)
-            updateResult(evaluate(value))
+            updateResult(cljs.sci_wrapper.evaluate(value))
           }}
           onChange={(editor, data, value) => {
             updateCode(value)
-            updateResult(evaluate(value))
+            updateResult(cljs.sci_wrapper.evaluate(value))
           }}
         />
       </div>

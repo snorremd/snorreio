@@ -71,5 +71,7 @@ yarn-error.log
 dist
 
 # ClojureScript files
+.cpcache
 .shadow-cljs/
-sci/
+/cljs
+static/cljs/*
