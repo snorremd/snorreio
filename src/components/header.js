@@ -7,7 +7,7 @@ import css from "@emotion/core"
 const Header = ({ siteTitle }) => (
   <header tw="flex flex-row justify-center border-b-2 border-green-400 text-green-400 shadow">
     <div
-      tw="py-4 pl-4 flex flex-row justify-between items-center"
+      tw="py-4 pl-4 pr-4 flex flex-row justify-between items-center"
       css={{ maxWidth: "960px", width: "100%" }}
     >
       <div>
