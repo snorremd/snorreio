@@ -8,11 +8,17 @@
 
 (defn run-cljs
   [code]
-  (try
-    (with-out-str
-      (pprint/pprint
-       (sci/eval-string code options)))
-    (catch js/Error e (.-message e))))
+  (let [sb (goog.string/StringBuffer.)]
+    (sci/binding [sci/out sb]
+      (try
+        #js {:result (with-out-str
+                       (pprint/pprint
+                        (sci/eval-string code options)))
+             :out (str sb)}
+        
+        (catch js/Error e (.-message e))))))
+    
+  
 
 (defn ^:export evaluate
   [code]

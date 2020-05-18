@@ -41,10 +41,9 @@ The code is evaluated shortly after you stop typing for immediate feedback.
 No warranties provided, you may end up locking your browser thread with an infinite sequence or something similar.
 Preventing this is on my roadmap as it is built into sci and should be easy to activate.
 
-export const snippet = `
-(->> (range 100)
-     (map (fn [num] [num (mod num 2)]))
-     (into {}))
+export const snippet = `(println "Before computation")
+(->> (range 10)
+     (map (fn [num] [num (mod num 2)])))
 `
 
 <ClojureSnippet snippet={snippet} />

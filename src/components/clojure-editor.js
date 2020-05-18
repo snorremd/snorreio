@@ -18,9 +18,11 @@ const ClojureEditor = ({ snippet }) => {
   const [code, updateCode] = useState(snippet)
   const [result, updateResult] = useDebounce(cljs.sci_wrapper.evaluate(snippet), 500)
 
+  const output = `${result.result}\nLog:\n${result.out}`
+
   return (
     <div tw="mb-8 flex flex-col">
-      <div tw="h-32 flex flex-col w-full mb-2">
+      <div tw="w-full h-32 mb-2">
         <CodeMirror
           style={{ height: "100%", width: "100%" }}
           value={code}
@@ -35,11 +37,10 @@ const ClojureEditor = ({ snippet }) => {
           }}
         />
       </div>
-      {"=>"}
-      <div tw="h-32">
+      <div tw="w-full h-32">
         <CodeMirror
           height={1}
-          value={result}
+          value={output}
           options={{ theme: "material", mode: "clojure", readOnly: true }}
         />
       </div>
