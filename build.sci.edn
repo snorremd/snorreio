@@ -1,5 +1,5 @@
 ;; Graciously borrowed with much appreciation from https://github.com/borkdude/sci/blob/master/min.js.edn
-{:output-to "static/cljs/sci.js"
+{:output-to "cljs/sci.js"
  :output-dir "cljs/sci_wrapper"
  :optimizations :advanced
  :main "cljs.sci-wrapper"

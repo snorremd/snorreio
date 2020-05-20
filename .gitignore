@@ -74,4 +74,3 @@ dist
 .cpcache
 .shadow-cljs/
 /cljs
-static/cljs/*

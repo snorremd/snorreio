@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react"
 import { Helmet } from "react-helmet"
-import { withPrefix, Link } from "gatsby"
+import { withPrefix, Link, useStaticQuery, graphql } from "gatsby"
 
 const ClientSideOnlyLazy = React.lazy(() => import("./clojure-editor"))
 
 const ClojureSnippet = ({ snippet }) => {
+  const { file } = useStaticQuery(
+    graphql`
+      query {
+        file(name:{eq:"sci"}) {
+          publicURL
+        }
+      }
+    `
+  )
+  
   const isSSR = typeof window === "undefined"
   const [loaded, error] = useScript(
-    withPrefix("cljs/sci.js")
+    withPrefix(file.publicURL)
   );
 
   return (
