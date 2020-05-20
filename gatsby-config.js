@@ -3,6 +3,7 @@ module.exports = {
     title: `snorre.io`,
     description: `Thoughts about technology and other things.`,
     author: `Snorre Magnus Davøen`,
+    siteUrl: `https://snorre.io`,
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
@@ -49,9 +50,8 @@ module.exports = {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `cljs`,
-        path: `${__dirname}/cljs`
-      }
-
+        path: `${__dirname}/cljs`,
+      },
     },
     {
       resolve: `gatsby-plugin-mdx`,
@@ -68,8 +68,61 @@ module.exports = {
             },
           },
           {
-            resolve: `gatsby-remark-highlight-code`
+            resolve: `gatsby-remark-highlight-code`,
+          },
+        ],
+      },
+    },
+    {
+      resolve: `gatsby-plugin-feed`,
+      options: {
+        query: `
+          {
+            site {
+              siteMetadata {
+                title
+                description
+                siteUrl
+                site_url: siteUrl
+              }
+            }
           }
+        `,
+        feeds: [
+          {
+            serialize: ({ query: { site, allMdx } }) => {
+              return allMdx.edges.map(edge => {
+                return Object.assign({}, edge.node.frontmatter, {
+                  description: edge.node.excerpt,
+                  date: edge.node.frontmatter.date,
+                  url: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                  guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
+                  custom_elements: [{ "content:encoded": edge.node.html }],
+                })
+              })
+            },
+            query: `
+              {
+                allMdx(
+                  sort: { order: DESC, fields: [frontmatter___date_published] },
+                ) {
+                  edges {
+                    node {
+                      excerpt
+                      html
+                      fields { slug }
+                      frontmatter {
+                        title
+                        date_published
+                      }
+                    }
+                  }
+                }
+              }
+            `,
+            output: "/rss.xml",
+            title: "Snorre.io - Thoughts and Technology",
+          },
         ],
       },
     },
