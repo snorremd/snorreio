@@ -23,7 +23,9 @@ Today I changed how I embed the Coral Talk comment system in my blog posts. Prev
     "></script>
     
 
-![](/content/images/2018/08/ghost-code-injection.png)Code Injection Footer settings screen capture
+*Removed image*
+
+Code Injection Footer settings screen capture
 So essentially I now first get all elements in the dom with the class name "post-full post". Only if such an element is found do I create a div to mount Coral in and render Coral. As long as the Casper theme developers don't change the class names for the article element on the post page this script will continue to do its job.
 
 This embed will only work for Ghost themes using the "post-full post" class name the same way Casper does you would need to change the script to fit your needs.

@@ -83,7 +83,6 @@ module.exports = {
                 title
                 description
                 siteUrl
-                site_url: siteUrl
               }
             }
           }
@@ -92,9 +91,10 @@ module.exports = {
           {
             serialize: ({ query: { site, allMdx } }) => {
               return allMdx.edges.map(edge => {
+                console.log(edge.node.html)
                 return Object.assign({}, edge.node.frontmatter, {
                   description: edge.node.excerpt,
-                  date: edge.node.frontmatter.date,
+                  date: edge.node.frontmatter.date_published,
                   url: site.siteMetadata.siteUrl + edge.node.fields.slug,
                   guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
                   custom_elements: [{ "content:encoded": edge.node.html }],
@@ -122,6 +122,7 @@ module.exports = {
             `,
             output: "/rss.xml",
             title: "Snorre.io - Thoughts and Technology",
+            site_url: `https://snorre.io`
           },
         ],
       },

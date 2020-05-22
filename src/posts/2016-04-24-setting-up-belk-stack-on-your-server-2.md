@@ -154,11 +154,11 @@ You can now repeat these steps for PacketBeat and TopBeat. Note that you may wan
 
 If everything worked out okay you should now be able to go to Kibana and add your indices. Go to [localhost:5601](http://localhost:5601) and click the `Settings` tab. You should be presented with a screen where you can configure an index pattern. Thanks to our Logstash configuration an new index will be created each day for each of our Beat loggers. Our pattern should thus match the configuration `"%{[@metadata][beat]}-%{+YYYY.MM.dd}"` (from the Logstash config). So to get each of the three index types into Kibana we simply add them as `filebeat-*`, etc. If your index pattern is matched Kibana should show a green `Create` button as in the screenshot below.
 
-![alt](/content/images/2016/04/kibanascreenshot.png)
+*Removed*
 
 After adding the index pattern you should be able to go to the `Discover` tab and view and search your logs.
 
-![alt](/content/images/2016/04/kibanascreenshotdiscover.png)
+*Removed*
 
 You can now create your own visualizations over the indexed logs or you can download some of the visualizations and dashboards already created by the Kibana team. You can read more about that [here](https://www.elastic.co/guide/en/kibana/current/dashboard.html) and [here](https://www.elastic.co/guide/en/beats/libbeat/current/load-kibana-dashboards.html).
 

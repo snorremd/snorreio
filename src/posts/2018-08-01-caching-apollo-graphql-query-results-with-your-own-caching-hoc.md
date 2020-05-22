@@ -11,7 +11,7 @@ The search app so far is pretty simple. It uses [apollo link state](https://www.
 
 The relevant part of the React component tree looks something like this:
 
-![search-comps](/content/images/2018/07/search-comps.png)
+*Removed image*
 
 The `search state hoc` graphql component queries the local app state to fetch the user's current search. Any time this state changes, the hoc will re-render the `search results hoc` with new properties (the search to perform).
 

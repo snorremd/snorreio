@@ -10,7 +10,8 @@ I have been thinking for some time about picking up Clojure, a functional progra
 My five year long education and short few months of work have so far been spent programming Java, Python and a bit of JavaScript and CoffeeScript. I shared a brief semester struggling with Prolog, a language inspired by first order logic, but never took the scenic route through the backroads of the varying Lisp dialects. It is about time I took the plunge into the vast sea of functional programming.
 
 To that end I bought [Clojure Programming](http://shop.oreilly.com/product/0636920013754.do) and set to it. This blog post will not discuss the book, but it might be the topic of a future post.
-![Cover of Clojure Programming book](/content/images/2014/Aug/clojureprogramming.jpg)
+
+*Removed image*
 
 In what might become a blog series I will attempt to document my journey with Clojure. Without further ado let's get on with it.
 
@@ -38,6 +39,6 @@ While writing and testing Clojure in the OS X terminal in a REPL environment wor
 
 I found that it kickstarted me on my way to Clojure comprehension quite soon as its documentation suggested I try its feature instarepl. Instarepl appears to be a pseudo-repl environment that does not conform to the repl loop of read, evaluate, print, loop. Instead the editor provides a window in which you can enter and edit code at will; The code is interpreted on the fly. Next to each line of code Light Table shows you the data value or values being used. This amazing feature quickly tells you what the input to, and output of a given expression is.
 
-![Light Table's instarepl function](/content/images/2014/Aug/Screen-Shot-2014-08-24-at-18-04-15.png)
+*Removed image*
 
 I will end the blog post before it becomes a Clojure book. Fare well, and keep on coding.
