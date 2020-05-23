@@ -1,6 +1,5 @@
 ---
 title: Shared mutable app state in Actix Web
-path: /blog/shared-mutable-cache-in-actix-web
 date_published: 2018-08-23T14:32:06.000Z
 date_updated: 2018-08-23T19:34:17.000Z
 ---

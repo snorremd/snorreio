@@ -1,6 +1,5 @@
 ---
 title: Embedding Coral Talk in your Ghost Blog
-path: /blog/embedding-coral-talk-in-your-ghost-blog
 date_published: 2018-08-23T05:50:15.000Z
 date_updated: 2018-08-23T07:11:34.000Z
 ---

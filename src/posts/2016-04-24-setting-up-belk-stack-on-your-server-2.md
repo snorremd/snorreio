@@ -1,6 +1,5 @@
 ---
 title: Setting up (B)ELK stack on your server
-path: /blog/setting-up-belk-stack-on-your-server-2
 date_published: 2016-04-24T17:14:57.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

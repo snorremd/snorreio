@@ -24,7 +24,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
             }
             frontmatter {
               title
-              path
+              date_published
             }
           }
         }
@@ -38,7 +38,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   }
   result.data.allMdx.edges.forEach(({ node }) => {
     createPage({
-      path: node.frontmatter.path,
+      path: node.fields.slug,
       component: blogPostTemplate,
       context: {
         slug: node.fields.slug,
@@ -51,11 +51,11 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
   const { createNodeField } = actions
 
   if (node.internal.type === `Mdx`) {
-    const value = createFilePath({ node, getNode })
+    const slug = `/blog${createFilePath({ node, getNode })}`
     createNodeField({
       name: `slug`,
       node,
-      value,
+      value: slug,
     })
   }
 }

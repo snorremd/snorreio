@@ -1,6 +1,5 @@
 ---
 title: isso - a lightweight privacy minded comment system
-path: /blog/isso-a-lightweight-privacy-minded-comment-system
 date_published: 2016-05-03T19:35:57.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

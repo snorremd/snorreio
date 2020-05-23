@@ -1,5 +1,4 @@
 ---
-path: "/blog/new-homepage-gatsbyjs-cloudflare-workers"
 date_published: "2020-05-03"
 title: "New homepage with Gatsby.js hosted with Cloudflare Workers"
 ---

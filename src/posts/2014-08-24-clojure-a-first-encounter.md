@@ -1,6 +1,5 @@
 ---
 title: Clojure - A first encounter
-path: /blog/clojure-a-first-encounter
 date_published: 2014-08-24T16:32:17.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

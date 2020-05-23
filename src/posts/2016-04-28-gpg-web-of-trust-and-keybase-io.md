@@ -1,6 +1,5 @@
 ---
 title: GPG, Web of Trust, and Keybase.io
-path: /blog/gpg-web-of-trust-and-keybase-io
 date_published: 2016-04-28T15:51:47.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

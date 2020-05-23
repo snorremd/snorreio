@@ -1,6 +1,5 @@
 ---
 title: Jalopy (game) - A trip through Eastern Europe in a Lada
-path: /blog/jalopy-game-a-trip-through-eastern-europe-in-a-lada
 date_published: 2016-07-26T10:22:00.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

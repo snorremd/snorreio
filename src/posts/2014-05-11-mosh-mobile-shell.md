@@ -1,6 +1,5 @@
 ---
 title: Mosh (mobile shell)
-path: /blog/mosh-mobile-shell
 date_published: 2014-05-11T21:03:18.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

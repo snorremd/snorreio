@@ -1,6 +1,5 @@
 ---
 title: A privacy respecting talk gravatar plugin
-path: /blog/a-privacy-respecting-talk-gravatar-plugin
 date_published: 2018-04-25T15:01:44.000Z
 date_updated: 2018-04-25T19:32:05.000Z
 ---

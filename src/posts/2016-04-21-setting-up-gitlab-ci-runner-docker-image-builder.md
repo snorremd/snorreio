@@ -1,6 +1,5 @@
 ---
 title: Setting up a  Docker image builder with Gitlab CI Runner
-path: /blog/setting-up-gitlab-ci-runner-docker-image-builder
 date_published: 2016-04-21T19:05:40.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

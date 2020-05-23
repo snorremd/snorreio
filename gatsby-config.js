@@ -91,7 +91,6 @@ module.exports = {
           {
             serialize: ({ query: { site, allMdx } }) => {
               return allMdx.edges.map(edge => {
-                console.log(edge.node.html)
                 return Object.assign({}, edge.node.frontmatter, {
                   description: edge.node.excerpt,
                   date: edge.node.frontmatter.date_published,
@@ -108,6 +107,9 @@ module.exports = {
                 ) {
                   edges {
                     node {
+                      fields {
+                        slug
+                      }
                       excerpt
                       html
                       fields { slug }

@@ -1,6 +1,5 @@
 ---
 title: Caching apollo graphql query results with your own caching hoc
-path: /blog/caching-apollo-graphql-query-results-with-your-own-caching-hoc
 date_published: 2018-08-01T06:53:16.000Z
 date_updated: 2018-08-01T06:59:29.000Z
 ---

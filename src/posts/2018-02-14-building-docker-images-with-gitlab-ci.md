@@ -1,6 +1,5 @@
 ---
 title: Building Docker images with Gitlab CI
-path: /blog/building-docker-images-with-gitlab-ci
 date_published: 2018-02-14T09:30:12.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

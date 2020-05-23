@@ -47,6 +47,9 @@ export const pageQuery = graphql`
       id
       excerpt(pruneLength: 160)
       body
+      fields {
+        slug
+      }
       frontmatter {
         title
         date_published(formatString: "MMMM DD, YYYY")

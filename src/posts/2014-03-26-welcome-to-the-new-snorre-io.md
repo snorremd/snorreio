@@ -1,6 +1,5 @@
 ---
 title: Welcome to the new Snorre.io
-path: /blog/welcome-to-the-new-snorre-io
 date_published: 2014-03-26T12:12:27.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

@@ -1,6 +1,5 @@
 ---
 title: Coral Talk - An open source comment system from Mozilla
-path: /blog/setting-up-coral-talk
 date_published: 2018-01-27T22:41:21.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

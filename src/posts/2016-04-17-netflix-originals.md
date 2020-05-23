@@ -1,6 +1,5 @@
 ---
 title: Netflix launches second round of kimmification
-path: /blog/netflix-originals
 date_published: 2016-04-17T16:22:06.000Z
 date_updated: 2018-04-02T10:50:49.000Z
 ---

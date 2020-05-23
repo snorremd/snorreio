@@ -30,10 +30,11 @@ export const pageQuery = graphql`
         node {
           id
           excerpt(pruneLength: 250)
-          
+          fields {
+            slug
+          }
           frontmatter {
             date_published(formatString: "MMMM DD, YYYY")
-            path
             title
           }
         }
