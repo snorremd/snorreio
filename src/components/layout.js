@@ -39,6 +39,8 @@ const Layout = ({ children }) => {
           ul: tw`mb-2 list-inside list-inside`,
           hr: tw`border-green-300 my-8 py-0`,
           img: tw`py-4`,
+          code: tw`text-green-300 font-mono`,
+          sup: tw`text-green-300`
         })}
       />
       <Header siteTitle={data.site.siteMetadata.title} />
