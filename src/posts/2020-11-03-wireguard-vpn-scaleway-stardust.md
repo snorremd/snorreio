@@ -4,6 +4,7 @@ title: "Running Wireguard on Scaleway Stardust"
 ---
 
 ![star-dust](../images/star-dust.jpg)
+[<small>Photo by Nasa</small>](https://unsplash.com/photos/-hI5dX2ObAs)
 
 [Scaleway](https://scaleway.com) just (3rd of November 2020) released their [new tiny cloud instance offering aptly named Stardust](https://blog.scaleway.com/a-star-is-born-as-scaleway-launches-stardust-the-worlds-most-cost-effective-cloud-instance/).
 As exploding stars launch tiny atoms into space so does Cloudflare launch tiny instances into the cloud space.
