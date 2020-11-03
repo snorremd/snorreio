@@ -16,14 +16,16 @@ Safe to say Stardust is a pretty sweet deal, but is limited to 1 per region per 
 So what can you do with something small like the Stardust instance?
 Well according to the blog post users can
 > [...] deploy Stardust instances for use cases such as creating their own workers free from vendor lock-in, configuring triggers and daemons, as well as small Load-Balanced LAMP websites, VPN or Network Bastions.
+VPN networks they say?
 
 ## Wireguard
 
 I had always wanted to set up a personal [Wireguard VPN server](https://www.wireguard.com/).
 A VPN is typically used to secure your network traffic when on untrusted networks like at cafés and hotels.
-While I had considered subscribing to a commercially hosted Wireguard host, the Scaleway Stardust launch gave me an excellent excuse to try to host it myself.
+Wireguard is a modern VPN implementation implemented largely in kernel space to provide speed and security.
+While I had originally considered subscribing to a commercially hosted Wireguard host, the Scaleway Stardust launch gave me an excellent excuse to try to host it myself.
 
-[The setup](https://www.scaleway.com/en/docs/installing-wireguard-vpn-linux/) proved to be complicated at all.
+[The setup](https://www.scaleway.com/en/docs/installing-wireguard-vpn-linux/) proved to be not so complicated at all.
 I will not repeat the setup instructions here, but you should be aware that Wireguard now ships in Ubuntu's own repositories so no PPA is required.
 The most complex configuration in the setup was the post up and post down settings to make sure the correct `iptables` commands were run.
 While  they are documented and working it is always a good idea to understand what is going on.
