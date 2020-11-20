@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - fix/setup-clojure
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,7 +17,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '13'
-      - uses: DeLaGuardo/setup-clojure@2.0
+      - uses: DeLaGuardo/setup-clojure@master
         with:
           tools-deps: '1.10.1.536'
       - name: Install deps
