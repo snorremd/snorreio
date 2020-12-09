@@ -61,6 +61,11 @@ const Layout = ({ children }) => {
             <a href="https://github.com/snorremd/snorreio">GitHub</a>.
           </footer>
         </div>
+        <script
+          defer
+          src='https://static.cloudflareinsights.com/beacon.min.js'
+          data-cf-beacon='{"token": "cdfa10166a6f421a9070c040e610afcd"}'>
+        </script>
       </div>
     </>
   )
