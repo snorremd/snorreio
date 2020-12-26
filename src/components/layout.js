@@ -8,6 +8,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import { useStaticQuery, graphql } from "gatsby"
+import { Helmet } from "react-helmet"
 import tw from "twin.macro"
 import { Global, css } from "@emotion/react"
 
@@ -27,6 +28,13 @@ const Layout = ({ children }) => {
 
   return (
     <>
+      <Helmet>
+      <script
+          defer
+          src='https://static.cloudflareinsights.com/beacon.min.js'
+          data-cf-beacon='{"token": "cdfa10166a6f421a9070c040e610afcd"}'>
+        </script>
+      </Helmet>
       <Global
         styles={css({
           all: tw`box-border font-sans text-left`,
@@ -61,11 +69,6 @@ const Layout = ({ children }) => {
             <a href="https://github.com/snorremd/snorreio">GitHub</a>.
           </footer>
         </div>
-        <script
-          defer
-          src='https://static.cloudflareinsights.com/beacon.min.js'
-          data-cf-beacon='{"token": "cdfa10166a6f421a9070c040e610afcd"}'>
-        </script>
       </div>
     </>
   )
