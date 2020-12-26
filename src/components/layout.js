@@ -42,8 +42,8 @@ const Layout = ({ children }) => {
           code: tw`text-green-300 font-mono`,
           sup: tw`text-green-300`,
           table: tw`table-auto`,
-          th: tw`px-4 py-2`,
-          td: tw`border  border-green-900 px-4 py-2`
+          th: tw`border-b-2  border-green-500 px-4 py-2`,
+          td: tw`border-b  border-green-500 px-4 py-2`
         })}
       />
       <Header siteTitle={data.site.siteMetadata.title} />
@@ -61,6 +61,11 @@ const Layout = ({ children }) => {
             <a href="https://github.com/snorremd/snorreio">GitHub</a>.
           </footer>
         </div>
+        <script
+          defer
+          src='https://static.cloudflareinsights.com/beacon.min.js'
+          data-cf-beacon='{"token": "cdfa10166a6f421a9070c040e610afcd"}'>
+        </script>
       </div>
     </>
   )
