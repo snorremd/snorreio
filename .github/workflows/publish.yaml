@@ -13,7 +13,7 @@ jobs:
         run: cd $GITHUB_WORKSPACE
       - uses: actions/setup-node@v1
         with:
-          node-version: "10.x"
+          node-version: "14.x"
       - uses: actions/setup-java@v1
         with:
           java-version: '13'
