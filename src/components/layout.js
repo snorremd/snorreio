@@ -9,7 +9,7 @@ import React from "react"
 import PropTypes from "prop-types"
 import { useStaticQuery, graphql } from "gatsby"
 import tw from "twin.macro"
-import { Global, css } from "@emotion/core"
+import { Global, css } from "@emotion/react"
 
 import Header from "./header"
 //import "./layout.css"

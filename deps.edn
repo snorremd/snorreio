@@ -1,4 +1,4 @@
 {:paths ["src"]
- :deps {borkdude/sci {:mvn/version "0.0.13-alpha.22"}}
+ :deps {borkdude/sci {:mvn/version "0.1.0"}}
  :aliases {:cljs-build {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.758"}}
                         :main-opts ["-m" "cljs.main" "-co" "build.sci.edn" "-c"]}}}

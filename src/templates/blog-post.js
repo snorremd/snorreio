@@ -7,7 +7,7 @@ import { defineCustomElements as deckDeckGoHighlightElement } from '@deckdeckgo/
 deckDeckGoHighlightElement();
 
 import tw from "twin.macro"
-import { Global, css } from "@emotion/core"
+import { Global, css } from "@emotion/react"
 
 import Layout from "../components/layout"
 import Image from "../components/image"

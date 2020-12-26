@@ -2,7 +2,7 @@ import { Link } from "gatsby"
 import PropTypes from "prop-types"
 import React from "react"
 import tw from "twin.macro"
-import css from "@emotion/core"
+import css from "@emotion/react"
 
 const Header = ({ siteTitle }) => (
   <header tw="flex flex-row justify-center border-b-2 border-green-400 text-green-400 shadow">

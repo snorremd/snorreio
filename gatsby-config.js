@@ -9,7 +9,17 @@ module.exports = {
     `gatsby-plugin-react-helmet`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
-    `gatsby-plugin-emotion`,
+    {
+      resolve: `gatsby-plugin-emotion`,
+      options: {
+        // Accepts the following options, all of which are defined by `@emotion/babel-plugin` plugin.
+        // The values for each key in this example are the defaults the plugin uses.
+        sourceMap: true,
+        autoLabel: "dev-only",
+        labelFormat: `[local]`,
+        cssPropOptimization: true,
+      },
+    },
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
@@ -66,6 +76,9 @@ module.exports = {
               // base for generating different widths of each image.
               maxWidth: 960,
             },
+          },
+          {
+            resolve: 'gatsby-remark-static-images'
           },
           {
             resolve: `gatsby-remark-highlight-code`,
