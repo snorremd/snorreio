@@ -72,5 +72,6 @@ dist
 
 # ClojureScript files
 .cpcache
+.lsp
 .shadow-cljs/
 /cljs
