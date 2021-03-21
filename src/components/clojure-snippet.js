@@ -1,35 +1,7 @@
 import React, { useState, useEffect } from "react"
-import { Helmet } from "react-helmet"
-import { withPrefix, Link, useStaticQuery, graphql } from "gatsby"
+import { withPrefix, useStaticQuery, graphql, StaticQuery } from "gatsby"
 
 const ClientSideOnlyLazy = React.lazy(() => import("./clojure-editor"))
-
-const ClojureSnippet = ({ snippet }) => {
-  const { file } = useStaticQuery(
-    graphql`
-      query {
-        file(name:{eq:"sci"}) {
-          publicURL
-        }
-      }
-    `
-  )
-  
-  const isSSR = typeof window === "undefined"
-  const [loaded, error] = useScript(
-    withPrefix(file.publicURL)
-  );
-
-  return (
-    <>
-      {loaded && !error && !isSSR && (
-        <React.Suspense fallback={<div />}>
-          <ClientSideOnlyLazy snippet={snippet} />
-        </React.Suspense>
-      )}
-    </>
-  )
-}
 
 // Hook from https://usehooks.com/useScript/
 let cachedScripts = []
@@ -94,4 +66,33 @@ function useScript(src) {
   return [state.loaded, state.error]
 }
 
-export default ClojureSnippet
+const ClojureSnippetInner = ({ snippet, file }) => {
+
+  const isSSR = typeof window === "undefined"
+  const [loaded, error] = useScript(withPrefix(file.publicURL))
+
+  return (
+    <>
+      {loaded && !error && !isSSR && (
+        <React.Suspense fallback={<div />}>
+          <ClientSideOnlyLazy snippet={snippet} />
+        </React.Suspense>
+      )}
+    </>
+  )
+}
+
+export default function ClojureSnippet(props) {
+  return (
+    <StaticQuery
+      query={graphql`
+        query {
+          file(name: { eq: "sci" }) {
+            publicURL
+          }
+        }
+      `}
+      render={data => <ClojureSnippetInner {...props} file={data.file} />}
+    />
+  )
+}
