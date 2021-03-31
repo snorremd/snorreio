@@ -81,6 +81,12 @@ module.exports = {
             resolve: 'gatsby-remark-static-images'
           },
           {
+            resolve: `gatsby-remark-mermaid`,
+            options: {
+              theme: 'dark'
+            }
+          },
+          {
             resolve: `gatsby-remark-highlight-code`,
           },
         ],
