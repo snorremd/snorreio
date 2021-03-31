@@ -69,7 +69,7 @@ The load balancer is then configured to proxy the request to the domain that was
 So in the example Traefik resolves `bobs-mbp` to the Tailscale network IP address of the other device and performs a request with that IP.
 The Tailscale daemon then handles tunneling that request over its udp tunnel to Bob's MacBook Pro to the web service you're running.
 
-When running Traefik inside a docker container you might create a rule such as this:
+When running Traefik on your VPS you might create a rule such as this:
 
 ```toml
 # http routing section
