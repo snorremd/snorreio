@@ -30,6 +30,7 @@ export default function Template({
           <h1>{frontmatter.title}</h1>
           <h2>{frontmatter.date_published}</h2>
           <MDXRenderer>{body}</MDXRenderer>
+          <p>Any questions or comments. Feel free to send me an email at <a href={`mailto:contact@snorre.io?subject=${frontmatter.title}`}>contact@snorre.io</a>.</p>
         </div>
       </div>
     </Layout>
