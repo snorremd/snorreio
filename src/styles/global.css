@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'VoyagerGrotesque';
+  src:
+    url('/fonts/vger/voyager-grotesque-regular.woff2') format('woff2'),
+    url('/fonts/vger/voyager-grotesque-light.woff2') format('woff2'),
+    url('/fonts/vger/voyager-grotesque-bold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+@layer base {
+  body {
+    @apply bg-stone-100 dark:bg-stone-800;
+    @apply text-stone-900 dark:text-stone-50;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: 'VoyagerGrotesque';
+    @apply font-extrabold;
+    @apply text-transparent bg-clip-text bg-gradient-to-r;
+    @apply from-teal-800 to-fuchsia-800;
+    @apply dark:from-teal-400 dark:to-fuchsia-400;
+  }
+
+  a {
+    @apply text-fuchsia-800 dark:text-fuchsia-300;
+    @apply active:underline;
+  }
+
+ 
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+
+}
+
+/* TODO: Implement cool looking animated borders? 
+https://codepen.io/MauriciAbad/pen/WNrpmPr
+*/

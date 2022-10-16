@@ -1,0 +1,91 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+export interface Props {
+  content: {
+    title: string;
+    description: string;
+    pubDate: string;
+    modDate?: string;
+    heroImage?: string;
+  };
+}
+
+const {
+  content: { title, description, pubDate, modDate, heroImage },
+} = Astro.props;
+
+const dateFormatConfig = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
+---
+
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+    <style>
+      @tailwind base;
+      .title {
+        font-size: 2em;
+        margin: 0.25em 0 0;
+      }
+
+      @layer base {
+        hr {
+          @apply border-teal-600 border my-4;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="w-full">
+    <div class="w-full flex flex-col items-center ">
+      <Header />
+      <main>
+        <article class="opacity-100">
+          {heroImage && <img width={720} height={360} src={heroImage} alt="" />}
+          <h1 class="title text-center">{title}</h1>
+          {
+            pubDate && (
+              <time>
+                {new Date(pubDate).toLocaleDateString("en-us", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </time>
+            )
+          }
+          {
+            modDate && (
+              <div>
+                Last updated on{" "}
+                <time>
+                  {new Date(modDate).toLocaleDateString("en-us", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </time>
+              </div>
+            )
+          }
+          <div class={`
+            mt-12
+            max-w-4xl
+            p-8
+            backdrop-blur-lg bg-opacity-40
+            shadow-lg shadow-stone-400 dark:shadow-stone-700
+            bg-sky-300 dark:bg-sky-800`}>
+            <slot />
+          </div>
+        </article>
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>
