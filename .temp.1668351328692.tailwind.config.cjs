@@ -7,12 +7,12 @@ module.exports = {
       "nanum": ["nanum-pen-script"]
     },
     extend: {
+      backgroundImage: {
+        'hero-pattern': "url('/img/hero-pattern.svg')",
+        'footer-texture': "url('/img/footer-texture.png')",
+      }
       animation: {
         "gradient-bg": "spin linear 5s infinite",
-      },
-      backgroundImage: {
-        'layered-waves-light': "url('/graphics/layered-waves-light.svg')",
-        'layered-waves-dark': "url('/graphics/layered-waves-dark.svg')",
       },
       colors: {
         "neon-gray": {

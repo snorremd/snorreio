@@ -6,7 +6,7 @@ import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 import profileImg from "../assets/images/profile.png";
 
-import "../styles/global.css";
+import FrontPageFeatured from "../components/FrontPageFeatured.astro";
 ---
 
 <!DOCTYPE html>
@@ -15,66 +15,86 @@ import "../styles/global.css";
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
   </head>
 
-  <body class="grid grid-cols-1 grid-rows-[auto_1fr_auto] min-h-full">
-    <Header />
-    <main class="">
-    <div class={`
-      py-20 w=1/8 flex flex-row justify-around
-      bg-gradient-to-br from-teal-700 to-fuchsia-700
-    `}>
-      <div class="flex flex-col-reverse items-center">
-        <h1 class="text-6xl uppercase pt-4 text-stone-50 font-shadow">Snorre.io</h1>
-        <Picture
-          src={profileImg}
-          alt="Profile picture of me, Snorre"
-          widths={[400, 600, 800]}
-          sizes="(max-width: 800px) 100vw, 800px"
+  <body class="grid grid-cols-1 grid-rows-[auto_1fr_auto] min-h-full ">
+    <Header class="" />
+    <main class="bg-stone-50 dark:bg-stone-900">
+      <div
+        class={`
+          flex flex-row justify-center
+          bg-layered-waves-light dark:bg-layered-waves-dark
+          bg-no-repeat bg-bottom
+          pb-24
+        `}
+      >
+        <div
           class={`
-            [&>img]:rounded-full
-            [&>img]:w-64
-            [&>img]:h-64
-            [&>img]:object-cover
-            [&>img]:shadow-2xl
-            [&>img]:border-4
-            [&>img]:border-stone-50
-            [&>img]:border-opacity-20
+          flex lg:flex-row flex-col
+          w-full max-w-6xl justify-between
+          pb-24`}
+        >
+          <div class="flex flex-col items-center 
+          pb-8">
+            <h1 class="hidden">Snorre.io</h1>
+            <Picture
+              src={profileImg}
+              alt="Profile picture of me, Snorre"
+              widths={[400, 600, 800]}
+              sizes="(max-width: 800px) 100vw, 800px"
+              class={`
+                grayscale
+                opacity-80
+                rounded-full
+                w-64
+                h-64
+                object-cover
           `}
-        />
+            />
+          </div>
+          <div
+            class={`
+              w-full lg:w-1/2 text-center lg:text-start flex flex-col justify-center text-xl text-stone-900 dark:text-stone-50
+              px-8 lg:px-0
+            `}
+          >
+            <p class="pb-4">
+              Welcome to <em class="font-nanum">Snorre.io</em> - a personal website
+              by Snorre Magnus Davøen.
+            </p>
+            <p>
+              I'm a software developer from Norway that focus on frontend and
+              devops. On this website you can find my blog, projects and contact
+              information. I write about web development, devops, and other
+              things I find interesting.
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="w-1/2 flex flex-col justify-center text-2xl text-stone-50">
-        <p class="pb-4">
-          Welcome to <em
-            class="font-[VoyagerGrotesque] uppercase not-italic text-xl"
-            >Snorre.io</em
-          > - a personal website by Snorre Magnus Davøen.
-        </p>
-        <p>I'm a software developer from Norway that focus on frontend and devops.
-          On this website you can find my blog, projects and contact information.
-          I write about web development, devops, and other things I find interesting.
-        </p>
+      <div class="flex flex-row justify-center px-8 bg-stone-200 dark:bg-stone-800">
+        <div
+          class="w-full max-w-6xl grid grid-flow-row lg:grid-flow-col auto-cols-fr gap-8 -mt-16"
+        >
+          <FrontPageFeatured
+            title="Blog"
+            description="I write about web development, devops, and other things I find interesting."
+            href="/blog"
+          />
+          <FrontPageFeatured
+            title="Projects"
+            description="I have a few projects I'm working on. Some are open source and some are not."
+            href="/blog"
+          />
+          <FrontPageFeatured
+            title="Contact"
+            description="Where you might locate me"
+            href="/blog"
+          />
+          <FrontPageFeatured
+            title="About"
+            description="I write about web development, devops, and other things I find interesting."
+            href="/blog"
+          />
+        </div>
       </div>
-    </div>
-    <div class=" pt-16 flex flex-row gap-8 px-8">
-      <div class="border p-8 w-1/4 rounded bg-stone-100 dark:bg-stone-900">
-        <h2 class="text-4xl uppercase pt-4 text-stone-50 font-shadow">Blog</h2>
-        <p>Read about my adventures in programming, technology and just random musings.</p>
-      </div>
-
-      <div class="p-8 w-1/4 rounded bg-stone-100 dark:bg-stone-900">
-        <h2 class="text-4xl uppercase pt-4 text-stone-50 font-shadow">Projects</h2>
-        <p>What in the heck am I working on</p>
-      </div>
-
-      <div class="p-8 w-1/4 rounded bg-stone-100 dark:bg-stone-900">
-        <h2 class="text-4xl uppercase pt-4 text-stone-50 font-shadow">Social</h2>
-        <p>Where in the heck can you engage me</p>
-      </div>
-
-      <div class="p-8 w-1/4 rounded bg-stone-100 dark:bg-stone-900">
-        <h2 class="text-4xl uppercase pt-4 text-stone-50 font-shadow">Social</h2>
-        <p>Where in the heck can you engage me</p>
-      </div>
-    </div>
     </main>
     <Footer />
   </body>

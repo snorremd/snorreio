@@ -6,15 +6,26 @@ import { SITE_TITLE } from '../config';
 <header class={`
   bg-stone-50
   dark:bg-stone-900
-  w-full flex flex-row justify-between items-center px-8 py-4`}>
-	<h2 class="center text-2xl uppercase">
-		{SITE_TITLE}
-	</h2>
-	<nav class="flex flex-row gap-8 text-xl">
-		<HeaderLink href="/">Home</HeaderLink>
-		<HeaderLink href="/blog">Blog</HeaderLink>
-		<HeaderLink href="/about">About</HeaderLink>
-		<HeaderLink href="https://twitter.com/astrodotbuild" target="_blank">Twitter</HeaderLink>
-		<HeaderLink href="https://github.com/withastro/astro" target="_blank">GitHub</HeaderLink>
-	</nav>
+  w-full
+  flex flex-row
+  justify-center
+  px-8 py-4 lg:py-8`}>
+  <div class={`
+    w-full
+    max-w-6xl
+    flex lg:flex-row flex-col
+    justify-between items-center 
+  `}>
+    <a href="/"><h2 class="center text-4xl">
+      {SITE_TITLE}
+    </h2>
+    </a>
+    <nav class="flex flex-row gap-8 font-nanum text-2xl">
+      <HeaderLink href="/">Home</HeaderLink>
+      <HeaderLink href="/blog">Blog</HeaderLink>
+      <HeaderLink href="/about">About</HeaderLink>
+      <HeaderLink href="https://twitter.com/snorremd" target="_blank">Twitter</HeaderLink>
+      <HeaderLink href="https://github.com/snorremd" target="_blank">GitHub</HeaderLink>
+    </nav>
+  </div>
 </header>

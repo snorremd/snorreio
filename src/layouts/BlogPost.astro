@@ -24,31 +24,23 @@ const dateFormatConfig = {
 };
 ---
 
+
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} />
-    <style>
-      @tailwind base;
-      .title {
-        font-size: 2em;
-        margin: 0.25em 0 0;
-      }
 
-      @layer base {
-        hr {
-          @apply border-teal-600 border my-4;
-        }
-      }
-    </style>
   </head>
 
-  <body class="w-full">
-    <div class="w-full flex flex-col items-center ">
+  <body class="min-w-full">
+    <div class="min-w-full flex flex-col items-center ">
       <Header />
-      <main>
-        <article class="opacity-100">
+      <main class="flex flex-col items-center w-full bg-stone-50 dark:bg-stone-900">
+        <article class="min-w-full">
+          <header class={`
+          min-w-full bg-layered-waves-light dark:bg-layered-waves-dark bg-no-repeat bg-bottom pt-8 px-8 pb-52 w-full text-center flex flex-col items-center
+          `}>
           {heroImage && <img width={720} height={360} src={heroImage} alt="" />}
-          <h1 class="title text-center">{title}</h1>
+          <h1 class="title text-center text-6xl">{title}</h1>
           {
             pubDate && (
               <time>
@@ -74,18 +66,31 @@ const dateFormatConfig = {
               </div>
             )
           }
+          </header>
+          <div class={`bg-stone-200 dark:bg-stone-800
+          flex flex-col items-center`}>
           <div class={`
-            mt-12
             max-w-4xl
-            p-8
-            backdrop-blur-lg bg-opacity-40
-            shadow-lg shadow-stone-400 dark:shadow-stone-700
-            bg-sky-300 dark:bg-sky-800`}>
+            px-8`}>
             <slot />
+          </div>
           </div>
         </article>
       </main>
       <Footer />
     </div>
+
   </body>
+  
 </html>
+
+<style>
+  :global(a) {
+      @apply underline underline-offset-2;
+  }
+
+  :global(img) {
+    @apply rounded-lg;
+  }
+
+</style>
