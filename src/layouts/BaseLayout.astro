@@ -1,0 +1,48 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+const { title, description, dir = 'ltr' } = Astro.props;
+---
+
+<html lang="en" class='min-h-full'>
+  <head>
+    <BaseHead title={title} description={description} />
+    <slot name="styles" />
+  </head>
+  <body class={`
+    min-h-screen
+  bg-stone-200 dark:bg-stone-800
+    grid grid-cols-1
+    grid-rows-[auto_1fr_auto]`}>
+    <Header />
+    <main class="bg-stone-50 dark:bg-stone-900 h-full flex flex-col">
+      <div
+        class={`
+          flex flex-row justify-center
+          bg-layered-waves-light dark:bg-layered-waves-dark
+          bg-no-repeat bg-bottom
+          pb-24
+        `}
+      >
+        <div
+          class={`
+          flex
+          w-full max-w-6xl
+          pb-24`}
+        >
+          <slot name="top" />
+        </div>
+      </div>
+      <div class="flex flex-row grow justify-center px-8 bg-stone-200 dark:bg-stone-800">
+        <div
+          class="w-full max-w-6xl"
+        >
+          <slot name="content" />
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

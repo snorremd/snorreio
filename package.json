@@ -1,69 +1,29 @@
 {
-  "name": "gatsby-starter-default",
+  "name": "@example/blog",
+  "type": "module",
+  "version": "0.0.1",
   "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
-  "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
-  "devDependencies": {
-    "@deckdeckgo/highlight-code": "^2.5.1",
-    "@emotion/core": "^11.0.0",
-    "@emotion/react": "^11.1.5",
-    "@emotion/styled": "^11.1.5",
-    "@loadable/component": "^5.14.1",
-    "@mdx-js/mdx": "^1.6.22",
-    "@mdx-js/react": "^1.6.22",
-    "@react-hook/debounce": "^3.0.0",
-    "codemirror": "^5.60.0",
-    "eslint-plugin-emotion": "^11.0.0",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "gatsby": "^3.1.1",
-    "gatsby-image": "^3.1.0",
-    "gatsby-plugin-emotion": "^6.1.0",
-    "gatsby-plugin-feed": "^3.1.0",
-    "gatsby-plugin-feed-mdx": "^1.1.0",
-    "gatsby-plugin-manifest": "^3.1.0",
-    "gatsby-plugin-mdx": "^2.1.0",
-    "gatsby-plugin-offline": "^4.1.0",
-    "gatsby-plugin-react-helmet": "^4.1.0",
-    "gatsby-plugin-sharp": "^3.1.1",
-    "gatsby-remark-highlight-code": "^2.2.0",
-    "gatsby-remark-images": "^4.1.0",
-    "gatsby-remark-mermaid": "^2.1.0",
-    "gatsby-remark-static-images": "^1.2.1",
-    "gatsby-source-filesystem": "^3.1.0",
-    "gatsby-transformer-remark": "^3.2.0",
-    "gatsby-transformer-sharp": "^3.1.0",
-    "prettier": "2.2.1",
-    "prop-types": "^15.7.2",
-    "puppeteer": "^8.0.0",
-    "react": "^17.0.1",
-    "react-codemirror2": "^7.2.1",
-    "react-dom": "^17.0.1",
-    "react-helmet": "^6.1.0",
-    "shadow-cljs": "^2.11.23",
-    "tailwindcss": "^2.0.4",
-    "twin.macro": "^2.3.0"
-  },
-  "keywords": [
-    "gatsby"
-  ],
-  "license": "MIT",
   "scripts": {
-    "build:gatsby": "gatsby build",
-    "build:cljs": "clojure -A:cljs-build",
-    "build": "npm run build:cljs && npm run build:gatsby",
-    "develop": "gatsby develop",
-    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "start": "npm run develop",
-    "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+  "dependencies": {
+    "@astrojs/image": "^0.11.4",
+    "@astrojs/mdx": "^0.11.6",
+    "@astrojs/rss": "^1.0.3",
+    "@astrojs/sitemap": "^1.0.0",
+    "@astrojs/tailwind": "^2.1.2",
+    "@fontsource/orbitron": "^4.5.10",
+    "astro": "^1.6.8",
+    "rehype-infer-description-meta": "^1.1.0",
+    "sharp": "^0.31.2",
+    "tailwindcss": "^3.2.4"
   },
-  "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
+  "devDependencies": {
+    "prettier": "^2.7.1",
+    "prettier-plugin-tailwindcss": "^0.1.13"
   }
 }

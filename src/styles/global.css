@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'nanum-pen-script';
+  src:
+    url('/fonts/nanum-pen-script-regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Box sizing border box all containers */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+

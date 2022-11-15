@@ -1,0 +1,119 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+export interface Props {
+  content: {
+    title: string;
+    description: string;
+    pubDate: string;
+    modDate?: string;
+    heroImage?: string;
+  };
+}
+
+const {
+  content: { title, description, pubDate, modDate, heroImage },
+} = Astro.props;
+
+const dateFormatConfig = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
+---
+
+<BaseLayout title={title} description={description}>
+    <section
+      slot="top"
+      class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+    >
+      <h1 class="pb-4 text-6xl font-nanum max-w-[35ch]">{title}</h1>
+      {
+        pubDate && (
+          <time class="text-stone-600 dark:text-stone-400">
+            {new Date(pubDate).toLocaleDateString("en-us", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </time>
+        )
+      }
+      {
+        modDate && (
+          <div>
+            Last updated on{" "}
+            <time>
+              {new Date(modDate).toLocaleDateString("en-us", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </time>
+          </div>
+        )
+      }
+    </section>
+    <article slot="content" id="blog-post" class="flex flex-col items-center">
+      <slot>
+
+      </slot> 
+    </article>
+</BaseLayout>
+
+<style is:global>
+  #blog-post {
+    @apply text-stone-900 dark:text-stone-50;
+    
+    h1, h2, h3, h4, h5, h6 {
+      @apply font-nanum;
+      margin: 1em 0 0.5em;
+    }
+
+    h2 {
+      @apply text-4xl;
+    }
+
+    h3 {
+      @apply text-3xl;
+    }
+
+    h4 {
+      @apply text-2xl;
+    }
+
+    h5 {
+      @apply text-xl;
+    }
+
+    p {
+      margin: 1em 0 0.5em;
+      max-width: 70ch;
+    }
+
+    pre {
+      @apply rounded-lg my-4 p-8 drop-shadow;
+      
+    }
+
+    img {
+      @apply rounded-lg drop-shadow;
+    }
+
+    a {
+      @apply underline underline-offset-2;
+    }
+
+
+    ul {
+      max-width: 70ch;
+      @apply ml-8;
+    }
+
+    li {
+      @apply list-disc ml-4;
+    }
+
+
+  }
+</style>

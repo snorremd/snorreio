@@ -1,0 +1,45 @@
+---
+layout: "../layouts/BlogPost.astro"
+title: "About me"
+description: "Short description about who I am"
+updatedDate: "August 08 2022"
+heroImage: "/placeholder-about.jpg"
+---
+
+import { Picture } from "@astrojs/image/components";
+import profileImg from "../assets/images/profile.png";
+
+
+<Picture
+  src={profileImg}
+  alt="Profile picture of me, Snorre"
+  widths={[400, 600, 800]}
+  sizes="(max-width: 800px) 100vw, 800px"
+  class={`
+  grayscale
+  opacity-80
+  rounded-full
+  w-64
+  h-64
+  object-cover
+  `}
+/>
+
+I hail from Bergen, Norway a small city on the west coast of Norway.
+Between 2008 and 2014 I studies various subjects at the University of Bergen.
+Eventually I graduated with a masters degree in information science.
+From 2014 to 2020 I worked as a developer at the [Norwegian centre for research data](https://nsd.no).
+I learnt a lot among other things the beauty of functional programming with Clojure.
+Later I joined [Adventure Tech](https://adventuretech.no) where I build solutions for the travel industry.
+
+In my free time I enjoy playing video games, playing synths, and working on side projects.
+This is one of them.
+I have been looking at [Astro](https://astro.build), a new static site generator, for a while now.
+This web site is my first attempt at using it.
+Other projects include [Ajanottaja](https://ajanottaja.app) a time tracking app for my own work needs.
+
+Like many other developers I also brew beer.
+I have been brewing for about 10 years now.
+Nothing beats a good belgian trappist style beer.
+
+You can find me on [Twitter](https://twitter.com/snorremd), [GitHub](https://github.com/snorremd) and other places.
