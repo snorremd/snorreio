@@ -6,7 +6,10 @@ import { SITE_TITLE } from '../config';
 <header class={`
   bg-stone-50
   dark:bg-stone-900
+  text-stone-900
+  dark:text-stone-50
   w-full
+  font-nanum
   flex flex-row
   justify-center
   px-8 py-4 lg:py-8`}>
@@ -16,7 +19,7 @@ import { SITE_TITLE } from '../config';
     flex lg:flex-row flex-col
     justify-between items-center 
   `}>
-    <a href="/"><h2 class="center text-4xl">
+    <a href="/" class="no-underline focus:underline"><h2 class="center text-4xl">
       {SITE_TITLE}
     </h2>
     </a>

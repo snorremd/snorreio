@@ -1,7 +1,5 @@
 ---
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import BaseLayout from "./BaseLayout.astro";
 
 export interface Props {
   content: {
@@ -24,73 +22,98 @@ const dateFormatConfig = {
 };
 ---
 
-
-<html lang="en">
-  <head>
-    <BaseHead title={title} description={description} />
-
-  </head>
-
-  <body class="min-w-full">
-    <div class="min-w-full flex flex-col items-center ">
-      <Header />
-      <main class="flex flex-col items-center w-full bg-stone-50 dark:bg-stone-900">
-        <article class="min-w-full">
-          <header class={`
-          min-w-full bg-layered-waves-light dark:bg-layered-waves-dark bg-no-repeat bg-bottom pt-8 px-8 pb-52 w-full text-center flex flex-col items-center
-          `}>
-          {heroImage && <img width={720} height={360} src={heroImage} alt="" />}
-          <h1 class="title text-center text-6xl">{title}</h1>
-          {
-            pubDate && (
-              <time>
-                {new Date(pubDate).toLocaleDateString("en-us", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </time>
-            )
-          }
-          {
-            modDate && (
-              <div>
-                Last updated on{" "}
-                <time>
-                  {new Date(modDate).toLocaleDateString("en-us", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </time>
-              </div>
-            )
-          }
-          </header>
-          <div class={`bg-stone-200 dark:bg-stone-800
-          flex flex-col items-center`}>
-          <div class={`
-            max-w-4xl
-            px-8`}>
-            <slot />
+<BaseLayout title={title} description={description}>
+    <section
+      slot="top"
+      class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+    >
+      <h1 class="pb-4 text-6xl font-nanum max-w-[35ch]">{title}</h1>
+      {
+        pubDate && (
+          <time class="text-stone-600 dark:text-stone-400">
+            {new Date(pubDate).toLocaleDateString("en-us", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </time>
+        )
+      }
+      {
+        modDate && (
+          <div>
+            Last updated on{" "}
+            <time>
+              {new Date(modDate).toLocaleDateString("en-us", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </time>
           </div>
-          </div>
-        </article>
-      </main>
-      <Footer />
-    </div>
+        )
+      }
+    </section>
+    <article slot="content" id="blog-post" class="flex flex-col items-center">
+      <slot>
 
-  </body>
-  
-</html>
+      </slot> 
+    </article>
+</BaseLayout>
 
-<style>
-  :global(a) {
+<style is:global>
+  #blog-post {
+    @apply text-stone-900 dark:text-stone-50;
+    
+    h1, h2, h3, h4, h5, h6 {
+      @apply font-nanum;
+      margin: 1em 0 0.5em;
+    }
+
+    h2 {
+      @apply text-4xl;
+    }
+
+    h3 {
+      @apply text-3xl;
+    }
+
+    h4 {
+      @apply text-2xl;
+    }
+
+    h5 {
+      @apply text-xl;
+    }
+
+    p {
+      margin: 1em 0 0.5em;
+      max-width: 70ch;
+    }
+
+    pre {
+      @apply rounded-lg my-4 p-8 drop-shadow;
+      
+    }
+
+    img {
+      @apply rounded-lg drop-shadow;
+    }
+
+    a {
       @apply underline underline-offset-2;
-  }
+    }
 
-  :global(img) {
-    @apply rounded-lg;
-  }
 
+    ul {
+      max-width: 70ch;
+      @apply ml-8;
+    }
+
+    li {
+      @apply list-disc ml-4;
+    }
+
+
+  }
 </style>

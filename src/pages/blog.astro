@@ -1,7 +1,5 @@
 ---
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
@@ -12,76 +10,64 @@ const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
 );
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body>
-    <Header />
-    <main
-      class="flex flex-col items-center w-full bg-stone-50 dark:bg-stone-900"
-    >
-      <section
-        class="bg-layered-waves-light dark:bg-layered-waves-dark bg-no-repeat bg-bottom pt-8 px-8 pb-52 w-full text-center flex flex-col items-center"
-      >
-        <h1
-          class="pb-4 text-4xl font-bold text-center text-gray-900 dark:text-gray-100"
-        >
-          Blog
-        </h1>
-        <p class="max-w-2xl">
-          I tend to write about programming and information technology. The blog
-          is not updated all too often, but I try to write every now and then.
-          Enjoy!
-        </p>
-      </section>
-      <section
-        class="w-full bg-stone-200 dark:bg-stone-800 flex flex-col items-center"
-      >
-        <ul class="grid gap-2 max-w-6xl">
-          {
-            posts.map((post) => (
-              <li
-                class={`
-              
-              `}
+<BaseLayout title={`Blog - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+  <section
+    slot="top"
+    class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+  >
+    <h1 class="pb-4 text-6xl font-nanum">Blog</h1>
+    <p class="max-w-2xl">
+      I tend to write about programming and information technology. The blog is
+      not updated all too often, but I try to write every now and then. Enjoy!
+    </p>
+  </section>
+  <section
+    slot="content"
+    class="w-full bg-stone-200 dark:bg-stone-800 flex flex-col items-center"
+  >
+    <ul class="grid gap-2 max-w-6xl">
+      {
+        posts.map((post) => (
+          <li
+            class={``}
+          >
+            <a
+              href={post.url}
+              class={`
+                flex
+                min-w-full
+                flex-col
+                rounded-lg p-4
+                no-underline
+                focus:outline-none
+                [&>h2]:focus:underline`}
+            >
+              <h2 class={`
+                text-4xl font-nanum
+                text-stone-900 dark:text-stone-50
+                underline-stone-900 dark:underline-stone-50`}>
+                {post.frontmatter.title}
+              </h2>
+              <time
+                datetime={post.frontmatter.pubDate}
+                class="text-stone-700 dark:text-stone-300"
               >
-                <a
-                  href={post.url}
-                  class={`
-					flex
-					min-w-full
-					flex-col
-					rounded-lg p-4
-					no-underline ring-stone-400 focus:shadow-lg
-				  focus:shadow-stone-900 focus:outline-none
-					focus:ring-1 dark:ring-stone-500`}
-                >
-                  <h2 class="text-2xl">{post.frontmatter.title}</h2>
-                  <time
-                    datetime={post.frontmatter.pubDate}
-                    class="text-stone-600 dark:text-stone-400"
-                  >
-                    {new Date(post.frontmatter.pubDate).toLocaleDateString(
-                      "en-us",
-                      {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      }
-                    )}
-                  </time>
-                  <p class="text-stone-600 dark:text-stone-400">
-                    {post.frontmatter.description}
-                  </p>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-    </main>
-    <Footer />
-  </body>
-</html>
+                {new Date(post.frontmatter.pubDate).toLocaleDateString(
+                  "en-us",
+                  {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  }
+                )}
+              </time>
+              <p class="text-stone-800 dark:text-stone-100 max-w-[70ch]">
+                {post.frontmatter.description}
+              </p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

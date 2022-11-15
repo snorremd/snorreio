@@ -13,9 +13,20 @@ const { title, description, href } = Astro.props;
   href={href}
   class={`
   p-8
+  text-stone-900
+  dark:text-stone-50
+  outline-none
+  ring-0
+  [&>h2]:focus:underline
   `}
 >
-  <h2 class="text-4xl py-4 text-stone-900 dark:text-stone-50 font-shadow">{title}</h2>
+  <h2 class={`
+    text-4xl
+    py-4
+    font-shadow
+    font-nanum
+    underline-stone-900 dark:underline-stone-50
+  `}>{title}</h2>
   <p>
     {description}
   </p>

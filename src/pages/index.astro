@@ -1,101 +1,77 @@
 ---
 import { Image, Picture } from "@astrojs/image/components";
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 import profileImg from "../assets/images/profile.png";
 
+import BaseLayout from "../layouts/BaseLayout.astro";
 import FrontPageFeatured from "../components/FrontPageFeatured.astro";
 ---
 
-<!DOCTYPE html>
-<html lang="en" class="h-full">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-
-  <body class="grid grid-cols-1 grid-rows-[auto_1fr_auto] min-h-full ">
-    <Header class="" />
-    <main class="bg-stone-50 dark:bg-stone-900">
-      <div
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} >
+  <div
+    slot="top"
+    class={`
+  flex lg:flex-row flex-col
+  w-full justify-between`}
+  >
+    <div class="flex flex-col items-center pb-8">
+      <h1 class="hidden">Snorre.io</h1>
+      <Picture
+        src={profileImg}
+        alt="Profile picture of me, Snorre"
+        widths={[400, 600, 800]}
+        sizes="(max-width: 800px) 100vw, 800px"
         class={`
-          flex flex-row justify-center
-          bg-layered-waves-light dark:bg-layered-waves-dark
-          bg-no-repeat bg-bottom
-          pb-24
+        grayscale
+        opacity-80
+        rounded-full
+        w-64
+        h-64
+        object-cover
         `}
-      >
-        <div
-          class={`
-          flex lg:flex-row flex-col
-          w-full max-w-6xl justify-between
-          pb-24`}
-        >
-          <div class="flex flex-col items-center 
-          pb-8">
-            <h1 class="hidden">Snorre.io</h1>
-            <Picture
-              src={profileImg}
-              alt="Profile picture of me, Snorre"
-              widths={[400, 600, 800]}
-              sizes="(max-width: 800px) 100vw, 800px"
-              class={`
-                grayscale
-                opacity-80
-                rounded-full
-                w-64
-                h-64
-                object-cover
-          `}
-            />
-          </div>
-          <div
-            class={`
-              w-full lg:w-1/2 text-center lg:text-start flex flex-col justify-center text-xl text-stone-900 dark:text-stone-50
-              px-8 lg:px-0
-            `}
-          >
-            <p class="pb-4">
-              Welcome to <em class="font-nanum">Snorre.io</em> - a personal website
-              by Snorre Magnus Davøen.
-            </p>
-            <p>
-              I'm a software developer from Norway that focus on frontend and
-              devops. On this website you can find my blog, projects and contact
-              information. I write about web development, devops, and other
-              things I find interesting.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-row justify-center px-8 bg-stone-200 dark:bg-stone-800">
-        <div
-          class="w-full max-w-6xl grid grid-flow-row lg:grid-flow-col auto-cols-fr gap-8 -mt-16"
-        >
-          <FrontPageFeatured
-            title="Blog"
-            description="I write about web development, devops, and other things I find interesting."
-            href="/blog"
-          />
-          <FrontPageFeatured
-            title="Projects"
-            description="I have a few projects I'm working on. Some are open source and some are not."
-            href="/blog"
-          />
-          <FrontPageFeatured
-            title="Contact"
-            description="Where you might locate me"
-            href="/blog"
-          />
-          <FrontPageFeatured
-            title="About"
-            description="I write about web development, devops, and other things I find interesting."
-            href="/blog"
-          />
-        </div>
-      </div>
-    </main>
-    <Footer />
-  </body>
-</html>
+      />
+    </div>
+    <div
+      class={`
+      w-full lg:w-1/2 text-center lg:text-start flex flex-col justify-center text-xl text-stone-900 dark:text-stone-50
+      px-8 lg:px-0
+    `}
+    >
+      <p class="pb-4">
+        Welcome to <em class="font-nanum">Snorre.io</em> - a personal website by
+        Snorre Magnus Davøen.
+      </p>
+      <p>
+        I'm a software developer from Norway that focus on frontend and devops.
+        On this website you can find my blog, projects and contact information.
+        I write about web development, devops, and other things I find
+        interesting.
+      </p>
+    </div>
+  </div>
+  <div
+    slot="content"
+    class="w-full max-w-6xl grid grid-flow-row lg:grid-flow-col auto-cols-fr gap-8 -mt-16"
+  >
+    <FrontPageFeatured
+      title="Blog"
+      description="I write about web development, devops, and other things I find interesting."
+      href="/blog"
+    />
+    <FrontPageFeatured
+      title="Projects"
+      description="I have a few projects I'm working on. Some are open source and some are not."
+      href="/blog"
+    />
+    <FrontPageFeatured
+      title="Contact"
+      description="Where you might locate me"
+      href="/blog"
+    />
+    <FrontPageFeatured
+      title="About"
+      description="I write about web development, devops, and other things I find interesting."
+      href="/blog"
+    />
+  </div>
+</BaseLayout>
