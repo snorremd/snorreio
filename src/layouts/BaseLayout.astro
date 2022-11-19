@@ -9,7 +9,7 @@ const { title, description, dir = 'ltr' } = Astro.props;
 <html lang="en" class='min-h-full'>
   <head>
     <BaseHead title={title} description={description} />
-    <slot name="styles" />
+    <slot name="head" />
   </head>
   <body class={`
     min-h-screen
