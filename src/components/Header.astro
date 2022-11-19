@@ -1,6 +1,7 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../config';
+import { Icon } from 'astro-icon'
 ---
 
 <header class={`
@@ -23,12 +24,13 @@ import { SITE_TITLE } from '../config';
       {SITE_TITLE}
     </h2>
     </a>
-    <nav class="flex flex-row gap-8 font-nanum text-2xl">
+    <nav class="flex flex-row flex-wrap justify-center items-center gap-x-6 md:gap-x-8 gap-y-4 font-nanum text-2xl">
       <HeaderLink href="/">Home</HeaderLink>
       <HeaderLink href="/blog">Blog</HeaderLink>
+      <HeaderLink href="/projects">Projects</HeaderLink>
       <HeaderLink href="/about">About</HeaderLink>
-      <HeaderLink href="https://twitter.com/snorremd" target="_blank">Twitter</HeaderLink>
-      <HeaderLink href="https://github.com/snorremd" target="_blank">GitHub</HeaderLink>
+      <HeaderLink href="https://twitter.com/snorremd" title="Twitter" target="_blank"><Icon class="-mx-2 w-[1em]" name="mdi:twitter" /></HeaderLink>
+      <HeaderLink href="https://github.com/snorremd" title="GitHub" target="_blank" ><Icon class="-mx-2 w-[1em]" name="mdi:github" /></HeaderLink>
     </nav>
   </div>
 </header>
