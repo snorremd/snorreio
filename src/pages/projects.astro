@@ -16,7 +16,7 @@ const projects = (await Astro.glob("../projects/*.mdx")).sort(
     slot="top"
     class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
   >
-    <h1 class="pb-4 text-6xl font-nanum">Projects</h1>
+    <h1 class="pb-4 text-6xl font-shortstack">Projects</h1>
     <p class="max-w-2xl">
       I have worked on various projects at work and in my free time. Here are
       some of them.
@@ -32,7 +32,7 @@ const projects = (await Astro.glob("../projects/*.mdx")).sort(
           <li class={`max-w-2xl text-stone-900 dark:text-stone-50`}>
             <h2
               class={`
-                font-nanum underline-stone-900
+                font-shortstack underline-stone-900
                 dark:underline-stone-50 text-4xl
                 `}
             >
@@ -94,7 +94,7 @@ const projects = (await Astro.glob("../projects/*.mdx")).sort(
     h4,
     h5,
     h6 {
-      @apply font-nanum;
+      @apply font-shortstack;
       margin: 1em 0 0.5em;
     }
 

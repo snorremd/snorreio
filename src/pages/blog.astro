@@ -15,7 +15,7 @@ const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
     slot="top"
     class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
   >
-    <h1 class="pb-4 text-6xl font-nanum">Blog</h1>
+    <h1 class="pb-4 text-5xl font-shortstack">Blog</h1>
     <p class="max-w-2xl">
       I tend to write about programming and information technology. The blog is
       not updated all too often, but I try to write every now and then. Enjoy!
@@ -43,7 +43,7 @@ const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
                 [&>h2]:focus:underline`}
             >
               <h2 class={`
-                text-4xl font-nanum
+                text-2xl font-shortstack
                 text-stone-900 dark:text-stone-50
                 underline-stone-900 dark:underline-stone-50`}>
                 {post.frontmatter.title}

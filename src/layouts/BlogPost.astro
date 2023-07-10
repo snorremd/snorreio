@@ -1,4 +1,5 @@
 ---
+import { Comments } from "../components/comments/Comments";
 import BaseLayout from "./BaseLayout.astro";
 
 export interface Props {
@@ -8,11 +9,12 @@ export interface Props {
     pubDate: string;
     modDate?: string;
     heroImage?: string;
+    atprotoDID: string;
   };
 }
 
 const {
-  content: { title, description, pubDate, modDate, heroImage },
+  content: { title, description, pubDate, modDate, heroImage, atprotoDID },
 } = Astro.props;
 
 const dateFormatConfig = {
@@ -27,7 +29,7 @@ const dateFormatConfig = {
       slot="top"
       class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
     >
-      <h1 class="pb-4 text-6xl font-nanum max-w-[35ch]">{title}</h1>
+      <h1 class="pb-4 text-5xl font-shortstack max-w-[35ch]">{title}</h1>
       {
         pubDate && (
           <time class="text-stone-600 dark:text-stone-400">
@@ -56,9 +58,17 @@ const dateFormatConfig = {
     </section>
     <article slot="content" id="blog-post" class="grid auto-cols-fr justify-start w-full max-w-3xl">
       <slot>
-
       </slot> 
     </article>
+    {atprotoDID && <div 
+      slot="content"
+      class="grid auto-cols-fr justify-start w-full max-w-3xl mt-8">
+      <Comments
+        client:load
+        client:only
+        handle="snorre.io"
+        postId="foo" />
+      </div>}
 </BaseLayout>
 
 <style is:global>
@@ -66,24 +76,24 @@ const dateFormatConfig = {
     @apply text-stone-900 dark:text-stone-50 w-full;
     
     h1, h2, h3, h4, h5, h6 {
-      @apply font-nanum;
+      @apply font-shortstack;
       margin: 1em 0 0.5em;
     }
 
     h2 {
-      @apply text-4xl;
-    }
-
-    h3 {
       @apply text-3xl;
     }
 
-    h4 {
+    h3 {
       @apply text-2xl;
     }
 
-    h5 {
+    h4 {
       @apply text-xl;
+    }
+
+    h5 {
+      @apply text-lg;
     }
 
     p {

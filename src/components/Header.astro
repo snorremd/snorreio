@@ -10,7 +10,7 @@ import { Icon } from 'astro-icon'
   text-stone-900
   dark:text-stone-50
   w-full
-  font-nanum
+  font-shortstack
   flex flex-row
   justify-center
   px-8 py-4 lg:py-8`}>
@@ -20,15 +20,16 @@ import { Icon } from 'astro-icon'
     flex lg:flex-row flex-col
     justify-between items-center 
   `}>
-    <a href="/" class="no-underline focus:underline"><h2 class="center text-4xl">
+    <a href="/" class="no-underline focus:underline"><h2 class="center text-xl">
       {SITE_TITLE}
     </h2>
     </a>
-    <nav class="flex flex-row flex-wrap justify-center items-center gap-x-6 md:gap-x-8 gap-y-4 font-nanum text-2xl">
+    <nav class="flex flex-row flex-wrap justify-center items-center gap-x-6 md:gap-x-8 gap-y-4 font-shortstack text-xl">
       <HeaderLink href="/">Home</HeaderLink>
       <HeaderLink href="/blog">Blog</HeaderLink>
       <HeaderLink href="/projects">Projects</HeaderLink>
       <HeaderLink href="/about">About</HeaderLink>
+      <HeaderLink href="/privacy">Privacy</HeaderLink>
       <HeaderLink href="https://twitter.com/snorremd" title="Twitter" target="_blank"><Icon class="-mx-2 w-[1em]" name="mdi:twitter" /></HeaderLink>
       <HeaderLink href="https://github.com/snorremd" title="GitHub" target="_blank" ><Icon class="-mx-2 w-[1em]" name="mdi:github" /></HeaderLink>
     </nav>
