@@ -46,6 +46,9 @@ export const Comments: Component<CommentsProps> = ({ postId, handle }) => {
     }
   });
 
+  console.log("Rendering Comments.tsx")
+  
+
   return (
     <div class="w-full text-stone-900 dark:text-stone-100 flex flex-col gap-8">
       <Header agent={agent} session={session} signOut={() => {

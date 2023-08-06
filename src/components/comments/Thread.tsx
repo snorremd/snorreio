@@ -7,11 +7,13 @@ import {
   createSignal,
   type Accessor,
   type Component,
-  onMount,
   createEffect,
-  on,
   Setter,
+  createResource,
+  For,
 } from "solid-js";
+import { formatRelative,formatDistance, sub } from "date-fns"
+import { VsComment, VsHeart, VsHeartFilled } from "solid-icons/vs"
 
 interface ThreadProps {
   agent: Accessor<BskyAgent | undefined>;
@@ -21,64 +23,99 @@ interface ThreadProps {
 
 export const Thread: Component<ThreadProps> = ({ postId, handle, agent }) => {
   const [post, setPost] = createSignal<string>();
-  const [thread, setThread] = createSignal<ThreadViewPost>();
 
-  createEffect(async () => {
-    post() // Force update
+  const [thread, { mutate, refetch }] = createResource<ThreadViewPost | undefined, true>(async () => {
     if (agent()) {
       const threadResult = await agent()!.getPostThread({
         uri: `at://did:plc:o34f4av7ed7szx24dqm4x3g6/app.bsky.feed.post/3jzrrunu4c22b`,
       });
 
-      if (threadResult.success) {
-        setThread(threadResult.data.thread as ThreadViewPost);
-      }
+      return threadResult.data.thread as ThreadViewPost;
     }
+    return undefined;
   });
 
   return (
-    <div>
-      {thread()
-        ? thread()!
-            .replies!.filter(
+    <>
+    {thread.loading && <p>Loading...</p>}
+    {thread.error && <p>Error: {thread.error.message}</p>}
+    {thread() && (
+    <ul>
+      <For each={thread()?.replies?.filter(
               (reply): reply is ThreadViewPost =>
                 reply.$type === "app.bsky.feed.defs#threadViewPost",
-            )
-            .map((reply) => <Post setPost={setPost} agent={agent} post={reply} />)
-        : null}
-    </div>
+            )}>
+        {(reply) => (
+          <Post setPost={setPost} agent={agent} post={reply} refetch={refetch} />
+        )}
+        </For>
+    </ul>
+    )}
+  </>
+
   );
 };
 
 const Post = ({
   agent,
   post,
-  setPost
+  setPost,
+  refetch
 }: {
   agent: Accessor<BskyAgent | undefined>;
   post: ThreadViewPost;
   setPost: Setter<string | undefined>;
+  refetch: (info?: true | undefined) => ThreadViewPost | Promise<ThreadViewPost | undefined> | null | undefined
 }) => {
   const [showEditor, setShowEditor] = createSignal(false);
   const [editorText, setEditorText] = createSignal<RichText>(
     new RichText({ text: "" }),
   );
+
+
+
+  const hasReplies = post.replies?.length ?? 0 > 0;
+
   return (
     <li class="flex flex-col">
-      <div class="flex flex-row gap-4 items-start">
-        <div class="flex flex-col justify-center items-center">
-          <img class="rounded-full w-8 pb-2" src={post.post.author.avatar} />
-          <span class="font-shortstack text-xs">
+      <div class="flex flex-col items-start">
+        <div class="flex flex-row items-center justify-center gap-2">
+          <img class="rounded-full w-12" src={post.post.author.avatar} />
+          <span class="font-shortstack text-lg">
             {post.post.author.displayName}
           </span>
+          <span class="text-xs text-stone-300">
+            @{post.post.author.handle}
+          </span>
+          <time class="text-xs text-stone-300" dateTime={post.post.record.createdAt}>
+            {formatDistance(new Date(post.post.record.createdAt), new Date())}
+          </time>
         </div>
-        <div class="flex flex-col w-full">
-          <p>{(post.post.record as { text: string }).text}</p>
-          {!showEditor() ? (
-            <div class="flex flex-row gap-4 justify-end">
-              <button onClick={() => setShowEditor(true)}>Reply</button>
-            </div>
-          ) : null}
+        <div class={`flex flex-col gap-2 pb-4 w-full ${hasReplies ? 'border-l-2' : ""} border-stone-600 ml-6 pl-6`}>
+          <p class="mt-0">{(post.post.record as { text: string }).text}</p>
+          <div class="flex flex-row gap-4 text-stone-400">
+            <button class="flex flex-row items-center" onClick={() => setShowEditor(!showEditor())} aria-label={`Reply to ${post.post.author.displayName}`}>
+              <VsComment />
+              <span class="ml-1 text-sm">
+              {post.replies?.length ?? 0}
+              </span>
+            </button>
+            <button class="flex flex-row items-center" aria-label="Like" onClick={async () => {
+              if(post.post.viewer?.like) {
+                await agent()!.deleteLike(post.post.viewer.like)
+                await refetch()
+              } else {
+                await agent()!.like(post.post.uri, post.post.cid)
+                await refetch()
+              }
+            }}>
+              {post.post.viewer?.like ? <VsHeartFilled /> : <VsHeart />}
+              <span class="ml-1 text-sm">
+                {post.post.likeCount}
+              </span>
+            </button>
+          </div>
+          
           {showEditor() ? (
             <form
               class="mt-4 flex flex-col items-end"
@@ -117,14 +154,13 @@ const Post = ({
           ) : null}
         </div>
       </div>
-      <ul class="flex flex-col ml-8 pt-8">
         {post.replies
           ?.filter(
             (reply): reply is ThreadViewPost =>
               reply.$type === "app.bsky.feed.defs#threadViewPost",
           )
+          .slice(0, 1)
           .map((reply) => <Post setPost={setPost} agent={agent} post={reply} />)}
-      </ul>
     </li>
   );
 };
