@@ -3,13 +3,19 @@ import type { Accessor, Component } from "solid-js";
 
 interface LoginFormProps {
   agent: Accessor<BskyAgent | undefined>;
+  handle: string;
+  postId: string;
 }
 
-export const LoginForm: Component<LoginFormProps> = ({ agent }) => {
+export const LoginForm: Component<LoginFormProps> = ({ agent, handle, postId, }) => {
   return (
     <div class="flex flex-col items-center justify-center">
-      <p class="font-bold pb-4">
-        Login to comment, or go to <a href="">bsky.app</a>.
+      <p class="pb-4">
+        Login or go to{' '}
+        <a href={`https://bsky.app/profile/${handle}/post/${postId}`}>
+          Bsky.app
+        </a>{' '}
+        to comment.
       </p>
       <form
         class="flex flex-col items-center justify-center w-full"

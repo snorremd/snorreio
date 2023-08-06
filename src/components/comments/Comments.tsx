@@ -1,21 +1,14 @@
 import {
-  Accessor,
   Component,
   createEffect,
   createSignal,
   onMount,
 } from "solid-js";
 import {
-  AppBskyActorProfile,
   AtpSessionData,
-  BskyAgent,
-  RichText,
+  BskyAgent
 } from "@atproto/api";
 
-import { Popover } from "@kobalte/core";
-
-import { createStoredSignal } from "./hooks";
-import type { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import { Header } from "./Header";
 import { LoginForm } from "./LoginForm";
 import { Thread } from "./Thread";
@@ -54,7 +47,7 @@ export const Comments: Component<CommentsProps> = ({ postId, handle }) => {
   });
 
   return (
-    <div class="w-full text-stone-900 dark:text-stone-100">
+    <div class="w-full text-stone-900 dark:text-stone-100 flex flex-col gap-8">
       <Header agent={agent} session={session} signOut={() => {
         if (agent()) {
           setSession(undefined);
@@ -64,7 +57,7 @@ export const Comments: Component<CommentsProps> = ({ postId, handle }) => {
       <main>
         {!session() ? (
           // User is not logged in, show login form
-          <LoginForm agent={agent} />
+          <LoginForm agent={agent} handle={handle} postId={postId} />
         ) : null}
         {session() ? (
           <Thread agent={agent} postId={postId} handle={handle} />

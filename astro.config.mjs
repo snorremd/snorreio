@@ -8,12 +8,13 @@ import robotsTxt from 'astro-robots-txt';
 import rehypeInferDescriptionMeta from 'rehype-infer-description-meta';
 import { descriptionRemarkPlugin } from './src/plugins/description-remark-plugin.mjs';
 import prefetch from "@astrojs/prefetch";
-
-import solidJs from "@astrojs/solid-js";
+import analyze from "rollup-plugin-analyzer";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://snorre.io',
+  vite: { plugins: [analyze(), visualizer()] },
   integrations: [sitemap({}), robotsTxt({}), tailwind(), solid(), mdx({
     rehypePlugins: [rehypeInferDescriptionMeta, descriptionRemarkPlugin]
   }), image({
@@ -21,5 +22,5 @@ export default defineConfig({
   }), prefetch()],
   markdown: {
     rehypePlugins: [rehypeInferDescriptionMeta, descriptionRemarkPlugin]
-  }
+  },
 });
