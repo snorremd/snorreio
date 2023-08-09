@@ -14,6 +14,7 @@ import {
 } from "solid-js";
 import { formatRelative,formatDistance, sub } from "date-fns"
 import { VsComment, VsHeart, VsHeartFilled } from "solid-icons/vs"
+import { flatten } from "./utils";
 
 interface ThreadProps {
   agent: Accessor<BskyAgent | undefined>;
@@ -27,18 +28,20 @@ export const Thread: Component<ThreadProps> = ({ postId, handle, agent }) => {
   const [thread, { mutate, refetch }] = createResource<ThreadViewPost | undefined, true>(async () => {
     if (agent()) {
       const threadResult = await agent()!.getPostThread({
-        uri: `at://did:plc:o34f4av7ed7szx24dqm4x3g6/app.bsky.feed.post/3jzrrunu4c22b`,
+        uri: `at://did:plc:o34f4av7ed7szx24dqm4x3g6/app.bsky.feed.post/3jzrrunu4c22b`,        
       });
 
-      return threadResult.data.thread as ThreadViewPost;
+      const thread = threadResult.data.thread as ThreadViewPost;
+      console.log('Thread: ', [...flatten(thread)]);
+      return thread
     }
     return undefined;
   });
 
   return (
     <>
-    {thread.loading && <p>Loading...</p>}
-    {thread.error && <p>Error: {thread.error.message}</p>}
+    {thread.state === 'pending' && <p>Loading...</p>}
+    {thread.state === 'errored' && <p>Error: {thread.error.message}</p>}
     {thread() && (
     <ul>
       <For each={thread()?.replies?.filter(
@@ -46,7 +49,7 @@ export const Thread: Component<ThreadProps> = ({ postId, handle, agent }) => {
                 reply.$type === "app.bsky.feed.defs#threadViewPost",
             )}>
         {(reply) => (
-          <Post setPost={setPost} agent={agent} post={reply} refetch={refetch} />
+          <Post setPost={setPost} agent={agent} post={reply} refetch={() => refetch()} />
         )}
         </For>
     </ul>
@@ -65,14 +68,13 @@ const Post = ({
   agent: Accessor<BskyAgent | undefined>;
   post: ThreadViewPost;
   setPost: Setter<string | undefined>;
-  refetch: (info?: true | undefined) => ThreadViewPost | Promise<ThreadViewPost | undefined> | null | undefined
+  refetch: () => void
 }) => {
+
   const [showEditor, setShowEditor] = createSignal(false);
   const [editorText, setEditorText] = createSignal<RichText>(
     new RichText({ text: "" }),
   );
-
-
 
   const hasReplies = post.replies?.length ?? 0 > 0;
 
@@ -154,13 +156,13 @@ const Post = ({
           ) : null}
         </div>
       </div>
-        {post.replies
+        <For each={post.replies
           ?.filter(
             (reply): reply is ThreadViewPost =>
               reply.$type === "app.bsky.feed.defs#threadViewPost",
-          )
-          .slice(0, 1)
-          .map((reply) => <Post setPost={setPost} agent={agent} post={reply} />)}
+          )} >
+          {(reply) => (<Post setPost={setPost} agent={agent} post={reply} refetch={refetch} />)}
+        </For>
     </li>
   );
 };
