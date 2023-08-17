@@ -16,4 +16,13 @@
   box-sizing: border-box;
 }
 
+@layer utilities {
+  .drawn-radius {
+    border-radius: 95% 4% 92% 5%/4% 95% 6% 95%;
+  }
+
+  .drawn-radius-sm {
+    border-radius: 64% 4% 32% 5%/4% 15% 6% 15%;
+  }
+}
 

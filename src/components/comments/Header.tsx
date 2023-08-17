@@ -11,7 +11,7 @@ interface HeaderProps {
 
 
 export const Header: Component<HeaderProps> = ({ agent, session, signOut }) => {
-  console.log("Agent", agent);
+
   const [profile, setProfile] = createSignal<ProfileViewDetailed>();
   createEffect(async () => {
     if (agent() && session()) {
@@ -23,19 +23,19 @@ export const Header: Component<HeaderProps> = ({ agent, session, signOut }) => {
       setProfile(undefined);
     }
   });
+
   return (
     <header class="w-full flex flex-row justify-between">
       <h2 class="pb-4 text-3xl font-shortstack">Comments</h2>
-      {profile() ? (
         <div>
           <Popover.Root>
             <Popover.Trigger class="ui-disabled:bg-slate-100">
               <img class="w-16 rounded-full" src={profile()?.avatar} />
-              
             </Popover.Trigger>
             <Popover.Content class={`
-            ui-expanded:shadow-md
-            bg-stone-700
+            ui-expanded:shadow-lg
+            bg-stone-200
+            dark:bg-stone-700
             mt-4 p-4
             rounded
             flex flex-col gap-2
@@ -49,7 +49,6 @@ export const Header: Component<HeaderProps> = ({ agent, session, signOut }) => {
             </Popover.Content>
           </Popover.Root>
         </div>
-      ) : null}
     </header>
   );
 };

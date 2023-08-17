@@ -9,6 +9,9 @@ import {
   BskyAgent
 } from "@atproto/api";
 
+import 'solid-devtools'
+
+
 import { Header } from "./Header";
 import { LoginForm } from "./LoginForm";
 import { Thread } from "./Thread";
