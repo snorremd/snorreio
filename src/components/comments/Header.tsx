@@ -36,8 +36,10 @@ export const Header: Component<HeaderProps> = ({ agent, session, signOut }) => {
             ui-expanded:shadow-lg
             bg-stone-200
             dark:bg-stone-700
+            shadow
+            dark:shadow-stone-100
             mt-4 p-4
-            rounded
+            rounded-drawn-sm
             flex flex-col gap-2
             `}>
               <span class="font-shortstack">

@@ -27,9 +27,9 @@ const dateFormatConfig = {
 <BaseLayout title={title} description={description}>
     <section
       slot="top"
-      class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+      class="pt-24 w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
     >
-      <h1 class="pb-4 text-5xl font-shortstack max-w-[35ch]">{title}</h1>
+      <h1 class="pb-4 px-4 text-5xl font-shortstack max-w-[25ch]">{title}</h1>
       {
         pubDate && (
           <time class="text-stone-600 dark:text-stone-400">
@@ -114,7 +114,7 @@ const dateFormatConfig = {
     }
 
     a {
-      @apply underline underline-offset-2;
+      @apply underline underline-offset-2 font-shortstack;
     }
 
 

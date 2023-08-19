@@ -1,5 +1,7 @@
 import type { BskyAgent } from "@atproto/api";
 import type { Accessor, Component } from "solid-js";
+import { Button } from "./Button";
+import { Input } from "./Input";
 
 interface LoginFormProps {
   agent: Accessor<BskyAgent | undefined>;
@@ -18,7 +20,7 @@ export const LoginForm: Component<LoginFormProps> = ({ agent, handle, postId, })
         to comment.
       </p>
       <form
-        class="flex flex-col items-center justify-center w-full"
+        class="flex flex-col items-center justify-center w-full gap-4"
         onSubmit={async (e) => {
           e.preventDefault();
           console.log("Logging in");
@@ -37,11 +39,7 @@ export const LoginForm: Component<LoginFormProps> = ({ agent, handle, postId, })
 
         <label class="flex flex-col">
           Handle
-          <input
-            class={`
-            
-            w-64 p-2 mt-1 mb-4 bg-stone-800
-            rounded-md border border-stone-700`}
+          <Input
             name="handle"
             type="text"
           />
@@ -49,29 +47,17 @@ export const LoginForm: Component<LoginFormProps> = ({ agent, handle, postId, })
 
         <label class="flex flex-col">
           App password
-          <input
-            class={`
-            w-64 p-2 mt-1  mb-4 bg-stone-800
-            rounded-md border border-stone-700`}
+          <Input
             name="password"
             type="password"
           />
         </label>
 
-        <button
-          class={`
-              inline-flex
-              text-stone-900 dark:text-stone-50
-              no-underline
-              p-4 mt-4
-              border border-stone-500 dark:border-stone-500
-              focus:outline-none focus:border-stone-900 dark:focus:border-stone-50
-              rounded
-            `}
+        <Button
           type="submit"
         >
           Login
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -48,8 +48,6 @@ export const Comments: Component<CommentsProps> = ({ postId, handle }) => {
       localStorage.removeItem("atpSession");
     }
   });
-
-  console.log("Rendering Comments.tsx")
   
 
   return (
