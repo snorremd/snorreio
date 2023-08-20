@@ -1,44 +1,37 @@
-import { BskyAgent, RichText, AppBskyFeedGetPostThread } from "@atproto/api";
-import type {
-  BlockedPost,
-  FeedViewPost,
-  NotFoundPost,
-  ThreadViewPost,
-} from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import type { BskyAgent } from "@atproto/api";
+import type { ThreadViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import {
   createSignal,
   type Accessor,
   type Component,
-  createEffect,
   Setter,
   createResource,
   For,
-  onMount,
 } from "solid-js";
-import { formatRelative, formatDistance, sub } from "date-fns";
+import { formatDistance } from "date-fns";
 import { VsComment, VsHeart, VsHeartFilled, VsLink } from "solid-icons/vs";
 import { ThreadViewPostUI, enrichThreadWithUIData, flatten } from "./utils";
 import { Reply } from "./Reply";
 
 interface ThreadProps {
   agent: Accessor<BskyAgent | undefined>;
-  postId: string;
+  atprotoURI: string;
   handle: string;
 }
 
-export const Thread: Component<ThreadProps> = ({ postId, handle, agent }) => {
-  const [post, setPost] = createSignal<string>();
+export const Thread: Component<ThreadProps> = ({ atprotoURI, handle, agent }) => {
+  const [, setPost] = createSignal<string>();
   const [showEditor, setShowEditor] = createSignal<ThreadViewPostUI | null>(null);
 
   
-  const [thread, { mutate, refetch }] = createResource<
+  const [thread, { refetch }] = createResource<
   ThreadViewPostUI[] | undefined,
     true
   >(async () => {
     if (agent()) {
-      console.time("get post thread");
       const threadResult = await agent()!.getPostThread({
-        uri: `at://did:plc:o34f4av7ed7szx24dqm4x3g6/app.bsky.feed.post/3jzrrunu4c22b`,
+        
+        uri: atprotoURI,
       });
 
       const enrichedAndFlattened = [
@@ -47,8 +40,6 @@ export const Thread: Component<ThreadProps> = ({ postId, handle, agent }) => {
         ),
       ];
 
-      console.log("Enriched and flattened: ", enrichedAndFlattened);
-      console.timeEnd("get post thread");
       return enrichedAndFlattened;
     }
     return undefined;
@@ -63,7 +54,6 @@ export const Thread: Component<ThreadProps> = ({ postId, handle, agent }) => {
           <For each={thread()}>
             {(post) => (
               <Post
-                setPost={setPost}
                 agent={agent}
                 post={post}
                 refetch={() => refetch()}
@@ -85,17 +75,16 @@ function getPostId(uri: string) {
 const Post = ({
   agent,
   post,
-  setPost,
   refetch,
   setShowEditor,
 }: {
   agent: Accessor<BskyAgent | undefined>;
   post: ThreadViewPostUI;
-  setPost: Setter<ThreadViewPostUI | null>;
   refetch: () => void;
   setShowEditor: Setter<ThreadViewPostUI | null>;
 }) => {
 
+  const { text, createdAt } = post.post.record as { text: string; createdAt: string };
 
   return (
     <li class={`flex flex-col`}>
@@ -111,9 +100,9 @@ const Post = ({
           <span class="text-xs text-stone-600 dark:text-stone-300">@{post.post.author.handle}</span>
           <time
             class="text-xs text-stone-600 dark:text-stone-300"
-            dateTime={post.post.record.createdAt}
+            dateTime={createdAt}
           >
-            {formatDistance(new Date(post.post.record.createdAt), new Date())}
+            {formatDistance(new Date(createdAt), new Date())}
           </time>
         </div>
 
@@ -124,7 +113,7 @@ const Post = ({
           ${post.showChildReplyLine ? "border-l-2" : ""}
           border-stone-400 dark:border-stone-600 ml-6 pl-6`}
         >
-          <p class="mt-0">{(post.post.record as { text: string }).text}</p>
+          <p class="mt-0">{text}</p>
           <div class="flex flex-row gap-4 text-stone-600 dark:text-stone-400">
             <button
               class="flex flex-row items-center"

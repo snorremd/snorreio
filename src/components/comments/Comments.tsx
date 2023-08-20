@@ -17,11 +17,11 @@ import { LoginForm } from "./LoginForm";
 import { Thread } from "./Thread";
 
 interface CommentsProps {
-  postId: string;
+  atprotoURI: string;
   handle: string;
 }
 
-export const Comments: Component<CommentsProps> = ({ postId, handle }) => {
+export const Comments: Component<CommentsProps> = ({ atprotoURI, handle }) => {
   const [session, setSession] = createSignal<AtpSessionData>();
   const [agent, setAgent] = createSignal<BskyAgent>();
 
@@ -61,10 +61,10 @@ export const Comments: Component<CommentsProps> = ({ postId, handle }) => {
       <main>
         {!session() ? (
           // User is not logged in, show login form
-          <LoginForm agent={agent} handle={handle} postId={postId} />
+          <LoginForm agent={agent} handle={handle} atprotoURI={atprotoURI} />
         ) : null}
         {session() ? (
-          <Thread agent={agent} postId={postId} handle={handle} />
+          <Thread agent={agent} atprotoURI={atprotoURI} handle={handle} />
         ) : null}
       </main>
     </div>

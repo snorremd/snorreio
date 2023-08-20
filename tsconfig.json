@@ -5,7 +5,7 @@
   ],
   "compilerOptions": {
     "types": [
-      "@astrojs/image/client"
+      "@astrojs/image/client",
     ],
     // Solid specific settings
     "jsx": "preserve",

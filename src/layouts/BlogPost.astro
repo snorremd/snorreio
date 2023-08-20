@@ -9,12 +9,12 @@ export interface Props {
     pubDate: string;
     modDate?: string;
     heroImage?: string;
-    atprotoDID: string;
+    atprotoURI: string;
   };
 }
 
 const {
-  content: { title, description, pubDate, modDate, heroImage, atprotoDID },
+  content: { title, description, pubDate, modDate, heroImage, atprotoURI },
 } = Astro.props;
 
 const dateFormatConfig = {
@@ -60,14 +60,14 @@ const dateFormatConfig = {
       <slot>
       </slot> 
     </article>
-    {atprotoDID && <div 
+    {atprotoURI && <div 
       slot="content"
       class="grid auto-cols-fr justify-start w-full max-w-3xl mt-8">
       <Comments
         client:load
         client:only
         handle="snorre.io"
-        postId="foo" />
+        atprotoURI={atprotoURI} />
       </div>}
 </BaseLayout>
 

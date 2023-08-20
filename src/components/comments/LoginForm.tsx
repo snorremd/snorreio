@@ -6,10 +6,13 @@ import { Input } from "./Input";
 interface LoginFormProps {
   agent: Accessor<BskyAgent | undefined>;
   handle: string;
-  postId: string;
+  atprotoURI: string;
 }
 
-export const LoginForm: Component<LoginFormProps> = ({ agent, handle, postId, }) => {
+export const LoginForm: Component<LoginFormProps> = ({ agent, handle, atprotoURI, }) => {
+  
+  const postId = atprotoURI.split("/").pop();
+  
   return (
     <div class="flex flex-col items-center justify-center">
       <p class="pb-4">
