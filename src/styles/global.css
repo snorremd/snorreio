@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'nanum-pen-script';
+  font-family: 'shortstack';
   src:
-    url('/fonts/nanum-pen-script-regular.woff2') format('woff2');
+    url('/fonts/shortstack-regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -16,4 +16,14 @@
   box-sizing: border-box;
 }
 
+@layer utilities {
+  .rounded-drawn {
+    border-radius: 95% 4% 92% 5%/4% 95% 6% 95%;
+  }
+
+  .rounded-drawn-sm {
+    border-radius: 64% 4% 32% 5%/4% 15% 6% 15%;
+  }
+
+}
 

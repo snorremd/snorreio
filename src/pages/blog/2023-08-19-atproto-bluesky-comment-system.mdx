@@ -1,0 +1,315 @@
+---
+pubDate: "2023-08-19"
+layout: "../../layouts/BlogPost.astro"
+title: "A comment system on top of ATProto and Bluesky"
+---
+
+In this post you will learn about how I built a comment interface on top the [ATProto](https://atproto.com/) protocol and [Bluesky](https://blueskyweb.xyz) social network.
+The post is relatively technical, but I also try to tell a story of how I got to this point.
+Read on if you are interested in social networks, decentralized protocols, open standards, and Bluesky.
+
+
+## Some history first
+
+This is not the first time I've tried to run a comment system on my blog.
+I was determined to create a nice blog, and any nice blog needs a comment system right?
+[Discus](https://disqus.com/) was out of the question for reasons of privacy and tracking.
+
+Research suggested that [Isso](https://isso-comments.de/) was a good option.
+Isso [solved a lot of the problems](/blog/2016-05-03-isso-a-lightweight-privacy-minded-comment-system) I had with Discus.
+It was self hosted, stored everything in a SQLite database, and was open source.
+Additionally it did not require users to sign up for an account in order to comment.
+Isso is probably still a good option for many people, but alas I eventually wanted something with more features.
+
+Along came [Coral Talk](https://coralproject.net/).
+It was open source, backed by Mozilla (at the time), and had a lot of features.
+The implementation supported plugins and was written in Node.js, meaning I could read the source code.
+I even built a more privacy friendly [Gravatar plugin](/blog/2018-04-25-a-privacy-respecting-talk-gravatar-plugin/).
+Unlike Isso though it was rather heavy, complex to setup, and required a database.
+It slowly dawned on me that I was not a news site and probably not in need of all the features Coral Talk provided.
+
+## The Fediverse and the micro community trap
+
+Meanwhile a lot of interesting things where happening in the social network space.
+People were exploring and building decentralized or federated social network protocols.
+One of the more successful attempts at the time were [ActivityPub](https://www.w3.org/TR/activitypub/).
+[Mastodon](https://joinmastodon.org/) is perhaps the most recognizable project using ActivityPub.
+As the experience of Twitter became ever more toxic Mastodon seemed like a promising alternative.
+One of the things that these new social networks promised was data ownership and portability.
+
+An idea started to form in my head, what if I use Mastodon as a comment system?
+Then people could comment on my posts on Mastodon and I could fetch the comments and display them on my blog.
+I joined one of the "official" Mastodon instances in the hope that a lot of people would be there.
+But with time it became clear that the fediverse was pretty small and fragmented.
+It would be difficult to get the reach I wanted for my blog as the right people would have to share my posts for it to reach multiple instances.
+The protocol is also quite complex and implementing a client capable of adding comments to the fediverse seemed a bit daunting.
+
+## Cryptobros and web3 enthusiasts
+
+Later Elon Musk bought Twitter and again I wanted to find a new home for my social media presence.
+Someone posted about [Nostr](https://nostr.com/) and after reading about the protocol I decided to give it a try.
+Nostr is a true decentralized social network protocol, and as such does not present the same issues as Mastodon in terms of fragmentation.
+Running a server seemed simpler, and content would be more discoverable across servers.
+But to my big dismay the network seemed full of cryptobros, web3 enthusiasts, and other people I did not desire to engage with.
+Back when I was in university, Web 3.0, the future of the web, was all about the semantic web and linked data.
+Not at all about crypto currencies, smart contracts and pyramid schemes.
+But I digress.
+
+
+## ATProto and Bluesky
+
+I was about to give up on the idea of having a comment system when I came across the [AT Protocol](https://atproto.com/) and [Bluesky](https://blueskyweb.xyz).
+ATProto saw its infancy inside Twitter, but was later spun out as an independent project and company.
+Like Mastodon the protocol is federated, but not focused on keeping instances separate.
+Instead ATProto is based on global discovery services and freedom to choose your algorithms.
+No matter what instance you are on you can see content from other instances, perfect!
+
+So after receiving an invite to the Bluesky server I started looking at the protocol and client libraries.
+I won't go into too much details about the protocol here, but I will try to summarise the important bits.
+
+Every user has a *repository* of data records, each record being some unspecified type of data.
+Each ATProto data server also has a lexicon of *record types* that enumerate the types .
+For Bluesky data types could be things like post, like, follow, profile, etc.
+Additionnaly the lexicon describes *methods*, i.e. things you can do on the server.
+For Bluesky these include fetching a post thread or creating a new post.
+
+For my comment system I essentially only needed three methods from the Bluesky server:
+
+- `app.bsky.feed.getPostThread` to fetch all the replies to a post I use as a comment thread
+- `app.bsky.feed.post` to add a new comment to a blog post or reply to an existing comment
+- `app.bsky.feed.like` to allow users to like a comment
+
+## Implementation
+
+I had a few goals for the implementation of my Bluesky-based comment system:
+
+- Keep it reasonsbly light weight
+- Fit seamlessly into my blog design
+- Simple enough implementation
+- Don't gather any data unless necessary
+
+My choice fell on a client-side only solution using the [Astro islands pattern](https://docs.astro.build/en/concepts/islands/).
+The islands pattern allows you to integrate client-side components at specific points in your static site.
+Astro also supports [Solid](https://www.solidjs.com/), a relatively young client-side library for building user interfaces.
+Conceptually it is similar to React, but escews the virtual DOM and instead compiles to native DOM operations.
+It also has a very small run time footprint, but still manages to be fast and provide the features I need.
+
+I would also need to talk to the Bluesky server somehow.
+While I could have implemented the lexicon methods from scratch we are fortunate enough that there is an [ATProto client](https://github.com/bluesky-social/atproto/tree/main/packages/api).
+The ATProto client libraries are written in TypeScript and are quite easy to use in a typical Type/JavaScript project.
+It provides a simple API for talking to the server and also handles authentication.
+
+You can find the source code for the comment system [here](https://github.com/snorremd/snorreio/blob/main/src/components/comments).
+
+### Authentication
+
+Users authenticate using their Bluesky handle and app password.
+To keep the authentication live I cache the authentication token in local storage so that it can be reused on page reloads.
+The token is also used to fetch the user's profile information, which is used to display the user's avatar and name.
+
+### Fetching and displaying comments
+
+The first thing I do when the comment component is mounted and a user is logged in is to fetch the comments for the current post.
+I do this by calling the `app.bsky.feed.getPostThread`.
+The reponse is a tree shaped structure of posts, with an optional `parent` and a list of one or more `replies`.
+The `parent` is the post that the current post is a reply to, and the `replies` are the posts that are replies to the current post.
+
+I initially thought that the simplest way to display the comments would be to use a recursive component.
+This would make the rendering code a bit more complex, but it would allow me to render without having to do data transformations.
+With this approach I would display the thread using the old school nested comments view where each reply is indented.
+But how would this handle very long reply chains?
+And would users familiar with the modern flat comments view be confused by the nested view?
+
+I decided to go with a flat view mimicing the Bluesky app, but I was stumped on how they flattened the tree!
+Fortunately Bluesky is open source, so I could just go and look at the source code.
+It turns out that two functions are essential in determining the view.
+The [`PostThreadItemModel.assignTreeModels`](https://github.com/bluesky-social/social-app/blob/257c15ec1f1b327e21f6e1f5707e6c0724d3afc6/src/state/models/content/post-thread-item.ts#L74)
+method determines for each post if reply lines should be shown.
+The [`flattenThread`](https://github.com/bluesky-social/social-app/blob/257c15ec1f1b327e21f6e1f5707e6c0724d3afc6/src/view/com/post-thread/PostThread.tsx#L329C11-L329C24)
+function then flattens the tree into a list of posts, first walking up any parent posts and then walking down the replies.
+There is also a sorting step, but I decided to skip that as I don't expect to have a lot of comments.
+
+#### Should we show reply lines?
+
+I simplified the `assignTreeModels` method, but the basic idea is the same.
+When you fetch a post thread you can specify a `highlightedPost` which is the post that the user is currently viewing.
+This puts the outermost post in the response in the middle of the tree!
+After checking the first parent we recursively check the parent's parent until we reach the original post.
+
+Next we start enumerating all the replies and for each reply check if we should add reply lines.
+Reply lines are added if the reply has replies of its own.
+
+```ts
+function addThreadUIData(
+  threadViewPost: ThreadViewPostUI,
+  walkChildren = true,
+  walkParent = true,
+): ThreadViewPostUI {
+  let parent = threadViewPost.parent;
+  if (walkParent && AppBskyFeedDefs.isFeedViewPost(threadViewPost.parent)) {
+    // Recursively add UI data to parent
+    const newParent = {
+      ...threadViewPost.parent,
+      showParentReplyLine: false,
+      showChildReplyLine: false,
+      isHighlightedPost: false,
+    } satisfies ThreadViewPostUI;
+    threadViewPost.parent = newParent;
+    addThreadUIData(newParent, (walkChildren = false), (walkParent = true));
+  }
+
+  let replies: ThreadViewPostUI[] = []
+  if (walkChildren && threadViewPost.replies?.length) {
+    replies = threadViewPost.replies
+      .map((reply) => {
+        if (AppBskyFeedDefs.isThreadViewPost(reply)) {
+          // Recursively add UI data to children
+          return addThreadUIData({
+            ...reply,
+            showParentReplyLine: threadViewPost?.isHighlightedPost ? false : true,
+            showChildReplyLine: (reply?.replies?.length ?? 0) > 0 ? true : false,
+            isHighlightedPost: false,
+          } satisfies ThreadViewPostUI);
+        }
+        return undefined;
+      })
+      .filter((x): x is ThreadViewPostUI => x !== undefined);
+  }
+
+  return { ...threadViewPost, parent, replies };
+}
+```
+
+#### Flattening the tree
+
+Here the Bluesky app code used a fairly smart trick.
+JavaScript has a concept called [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
+Generators allow you to write functions that can be paused and resumed.
+The Bluesky app ingeniously uses this to flatten the tree.
+The `flattenThread` function is a generator that yields posts as it walks up the tree and then down the replies.
+By using a recursive generator function we can produce a flat list without producing a lot of intermediate data structures.
+
+My `flatten` function is more or less the same as theirs.
+It first recursively walks up the tree, yielding the result of calling `flatten` on the parent.
+Once we reach the top of the tree we yield the post being flattened.
+This ensures the root parent is yielded first, then the second parent, and so forth.
+Note that the tree does not contain the siblings of the parents as this data is not interesting in context of the highlighted post.
+
+The `flatten` function then yields the highlighted post as it has now yielded all parents.
+
+Finally we walk down the replies yielding the result of recursively calling `flatten` on each reply.
+This causes the recursive calls to be evaluated in a [pre order traversal](https://en.wikipedia.org/wiki/Tree_traversal) of the tree.
+It begins with the left most child, then the left most child of the left most child, and so forth.
+
+```ts
+export function* flatten(
+  thread: ThreadViewPostUI,
+): Generator<ThreadViewPostUI, void> {
+  if (thread.parent) {
+    if (isKnownType(thread.parent)) {
+      if (AppBskyFeedDefs.isThreadViewPost(thread.parent)) {
+        yield* flatten(thread.parent as ThreadViewPostUI);
+      }
+    }
+  }
+
+  yield thread;
+
+  if (thread.replies && thread.replies.length > 0) {
+    for (const reply of thread.replies) {
+      if (isKnownType(reply)) {
+        if (AppBskyFeedDefs.isThreadViewPost(reply)) {
+          yield* flatten(reply as ThreadViewPostUI);
+        }
+      }
+    }
+  }
+}
+```
+
+If you think about the order in which the posts are yielded you will recognise the Bluesky app view.
+It shows a chain of posts down to the highlihted post without any of the sibling replies.
+From the highligted post it shows the replies in a flat list, showing nested replies as a chain.
+This is exactly what we want!
+
+
+
+
+### Styling and layout
+
+I wanted the comment system to fit seamlessly into my blog design.
+So I just used the same styling setup as the rest of my blog.
+It uses [Tailwind CSS](https://tailwindcss.com/) and [PostCSS](https://postcss.org/) to style content.
+Tailwidn has seen its fair share of criticism, but I find it to be a very pleasent and flexible way to style content.
+
+Essentially Tailwind is a set of CSS utility classes that represent common CSS properties.
+What makes Tailwind so special is that the utility classes are built on top of a design system.
+Unlike using regular CSS, where you have to decide on the values for each property, Tailwind provides a set of values that work well together.
+
+Tailwind defines a list of colors, whitespace sizes, font sizes, border radii, etc.
+You can then use these values to get consistent styling across your site.
+For example, instead of deciding on a specific font size for a heading you can use the `text-2xl` class.
+If you always use the `text-2xl` class for h1 headings you can easily change the font size for all headings by changing the value of `text-2xl`.
+
+You could of course define a design system using CSS Custom Properties (aka CSS variables).
+But then you'd have to write css classes for each type of layout and component in your markup.
+Tailwind frees you from having to artifically separate style from markup and grouping css attributes into classes.
+Instead you can just use the utility classes directly in your markup.
+
+With Tailwind you'd write something like this:
+
+```html
+<div class="bg-gray-100 rounded-lg p-4">
+  <h1 class="text-2xl">Hello world</h1>
+  <p class="text-lg">This is a paragraph</p>
+</div>
+```
+
+Instead of this:
+
+```html
+<div class="my-component">
+  <h1 class="my-component__heading">Hello world</h1>
+  <p class="my-component__paragraph">This is a paragraph</p>
+</div>
+```
+
+```css
+.my-component {
+  background-color: var(--color-gray-100);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-4);
+}
+
+.my-component__heading {
+  font-size: var(--font-size-2xl);
+}
+
+.my-component__paragraph {
+  font-size: var(--font-size-lg);
+}
+```
+
+### Privacy and data collection
+
+I wanted to avoid collecting any data about my users.
+The comment system is entirely handled client-side, so I don't have to worry about storing any data.
+When users comment on my blog all communication goes directly to the Bluesky server.
+Users can easily check that no data is sent to my server by inspecting the network requests.
+I never touch any data and never see my readers' passwords.
+All in all I consider this a big win.
+Of course my readers now need to trust a third party, but if you are on Bluesky you already trust them.
+
+## Conclusion
+
+I am very happy with the result.
+The comment system is light weight, easy to use, and fits seamlessly into my blog design.
+This is a one time integration, so I don't have to worry about maintaining a server or database.
+I also don't have to worry about privacy as I don't collect any data.
+The only downside is that users need to have a Bluesky account, but as it becomes more available I hope this will be less of an issue.
+
+The comment system is currently in a minimal viable product state.
+It works and looks pretty good, but there are missing features and imperfections.
+Among other things I would like to support clicking a reply to highlight it, just like the Bluesky app.
+It would also be nice to extract it into a separate component that can be reused on other sites.
+But for now I am happy with the result and I hope you will enjoy using it.

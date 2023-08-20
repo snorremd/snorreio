@@ -9,6 +9,13 @@ const { title, description, dir = 'ltr' } = Astro.props;
 <html lang="en" class='min-h-full'>
   <head>
     <BaseHead title={title} description={description} />
+    <link
+      rel="preload"
+      href="/fonts/shortstack-regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <slot name="head" />
   </head>
   <body class={`
