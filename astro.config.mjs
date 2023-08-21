@@ -41,4 +41,7 @@ export default defineConfig({
   markdown: {
     rehypePlugins: [rehypeInferDescriptionMeta, descriptionRemarkPlugin],
   },
+  experimental: {
+    viewTransitions: true
+  }
 });

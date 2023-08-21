@@ -45,7 +45,8 @@ const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
               <h2 class={`
                 text-2xl font-shortstack
                 text-stone-900 dark:text-stone-50
-                underline-stone-900 dark:underline-stone-50`}>
+                underline-stone-900 dark:underline-stone-50`}
+              >
                 {post.frontmatter.title}
               </h2>
               <time
