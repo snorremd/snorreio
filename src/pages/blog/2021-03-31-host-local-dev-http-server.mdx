@@ -101,6 +101,7 @@ Once both my VPS and laptop was enrolled in the Tailscale network and magic DNS 
 Tailscale, being built on top of the Wireguard protocol, performs really well and more than good enough for a dev environment.
 With this approach you can expose your services to the internet in a safe manner on a domain you own.
 Shutting down the public access to your service can be done in many ways including:
+
 - disconnecting your laptop from Tailscale, thus shuttign down the tunnel
 - removing the proxy in your proxy server config, the tunnel is still there
 - using Tailscale ACL config to deny your VPS access to the service, tunnel is there but connections stopped by ACL

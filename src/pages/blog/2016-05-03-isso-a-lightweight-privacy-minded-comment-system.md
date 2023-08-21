@@ -7,11 +7,9 @@ modDate: 2018-04-02T10:50:49.000Z
 
 I've been using [Ghost blog](https://ghost.org/developers/) for quite some time now and have been very happy with the functionality, performance, and the simplicity of the solution. I use the default theme Casper which I find to be a minimalistic and rather pleasing blog theme. I've also avoided analytics software (and ads, not that ads would amount to any money on my little blog) like the plague for two important reasons:
 
-- 
-Privacy: Adds and analytics software tend to cobble together visitors' browsing history to form a web of browsing history. I'm privacy conscious myself and would prefer to not expose my visitors to tracking networks if I can avoid it.
+- Privacy: Adds and analytics software tend to cobble together visitors' browsing history to form a web of browsing history. I'm privacy conscious myself and would prefer to not expose my visitors to tracking networks if I can avoid it.
 
-- 
-Performance: Adding bloat and unnecessary Javascript to my page would only make the reading experience worse.
+- Performance: Adding bloat and unnecessary Javascript to my page would only make the reading experience worse.
 
 That is why if you visit this page [adblock plus](https://adblockplus.org/) reports zero blocked elements and [Ghostery](https://www.ghostery.com/) reports only [Gravatar](https://en.gravatar.com/) which is used by Ghost to find the avatar of each author. All in all not too shabby if you ask me.
 

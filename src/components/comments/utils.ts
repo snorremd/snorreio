@@ -71,7 +71,7 @@ function addThreadUIData(
     addThreadUIData(newParent, (walkChildren = false), (walkParent = true));
   }
 
-  let replies: ThreadViewPostUI[] = []
+  let replies: ThreadViewPostUI[] = [];
   if (walkChildren && threadViewPost.replies?.length) {
     replies = threadViewPost.replies
       .map((reply) => {
@@ -79,8 +79,11 @@ function addThreadUIData(
           // Recursively add UI data to children
           return addThreadUIData({
             ...reply,
-            showParentReplyLine: threadViewPost?.isHighlightedPost ? false : true,
-            showChildReplyLine: (reply?.replies?.length ?? 0) > 0 ? true : false,
+            showParentReplyLine: threadViewPost?.isHighlightedPost
+              ? false
+              : true,
+            showChildReplyLine:
+              (reply?.replies?.length ?? 0) > 0 ? true : false,
             isHighlightedPost: false,
           } satisfies ThreadViewPostUI);
         }
@@ -92,13 +95,17 @@ function addThreadUIData(
   return { ...threadViewPost, parent, replies };
 }
 
-export function enrichThreadWithUIData(threadViewPost: ThreadViewPost): ThreadViewPostUI {
-  return addThreadUIData({
-    ...threadViewPost,
-    showParentReplyLine: false,
-    showChildReplyLine: false,
-    isHighlightedPost: true,
-  } satisfies ThreadViewPostUI,
-  true,
-  true);
+export function enrichThreadWithUIData(
+  threadViewPost: ThreadViewPost,
+): ThreadViewPostUI {
+  return addThreadUIData(
+    {
+      ...threadViewPost,
+      showParentReplyLine: false,
+      showChildReplyLine: false,
+      isHighlightedPost: true,
+    } satisfies ThreadViewPostUI,
+    true,
+    true,
+  );
 }

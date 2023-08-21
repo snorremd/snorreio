@@ -8,7 +8,9 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@astrojs/image": "^0.17.3",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "astro-robots-txt": "^0.5.0",
     "prettier": "^3.0.2",
+    "prettier-plugin-astro": "^0.11.1",
     "prettier-plugin-tailwindcss": "^0.5.3",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-visualizer": "^5.9.2",

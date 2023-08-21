@@ -3,16 +3,17 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'shortstack';
-  src:
-    url('/fonts/shortstack-regular.woff2') format('woff2');
+  font-family: "shortstack";
+  src: url("/fonts/shortstack-regular.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 /* Box sizing border box all containers */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -24,6 +25,4 @@
   .rounded-drawn-sm {
     border-radius: 64% 4% 32% 5%/4% 15% 6% 15%;
   }
-
 }
-

@@ -9,17 +9,20 @@ interface LoginFormProps {
   atprotoURI: string;
 }
 
-export const LoginForm: Component<LoginFormProps> = ({ agent, handle, atprotoURI, }) => {
-  
+export const LoginForm: Component<LoginFormProps> = ({
+  agent,
+  handle,
+  atprotoURI,
+}) => {
   const postId = atprotoURI.split("/").pop();
-  
+
   return (
     <div class="flex flex-col items-center justify-center">
       <p class="pb-4">
-        Login or go to{' '}
+        Login or go to{" "}
         <a href={`https://bsky.app/profile/${handle}/post/${postId}`}>
           Bsky.app
-        </a>{' '}
+        </a>{" "}
         to comment.
       </p>
       <form
@@ -42,25 +45,15 @@ export const LoginForm: Component<LoginFormProps> = ({ agent, handle, atprotoURI
 
         <label class="flex flex-col">
           Handle
-          <Input
-            name="handle"
-            type="text"
-          />
+          <Input name="handle" type="text" />
         </label>
 
         <label class="flex flex-col">
           App password
-          <Input
-            name="password"
-            type="password"
-          />
+          <Input name="password" type="password" />
         </label>
 
-        <Button
-          type="submit"
-        >
-          Login
-        </Button>
+        <Button type="submit">Login</Button>
       </form>
     </div>
   );

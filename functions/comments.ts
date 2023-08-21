@@ -1,18 +1,18 @@
-import { BskyAgent } from "@atproto/api"
-import { decodeJwt } from "jose"
+import { BskyAgent } from "@atproto/api";
+import { decodeJwt } from "jose";
 
 interface Env {
-	KV: KVNamespace;
+  KV: KVNamespace;
   ATPROTO_HANDLE: string;
   ATPROTO_PASSWORD: string;
 }
 
 interface AuthState {
-  refreshToken: string | null
-  refreshTokenExpiresAt: number | null
-  accessToken: string | null
-  accessTokenExpiresAt: number | null
-  isRefreshing: boolean
+  refreshToken: string | null;
+  refreshTokenExpiresAt: number | null;
+  accessToken: string | null;
+  accessTokenExpiresAt: number | null;
+  isRefreshing: boolean;
 }
 
 const authState: AuthState = {
@@ -21,11 +21,10 @@ const authState: AuthState = {
   accessToken: null,
   accessTokenExpiresAt: null,
   isRefreshing: false,
-}
+};
 
-const agent = new BskyAgent({ service: 'https://bsky.social' })
+const agent = new BskyAgent({ service: "https://bsky.social" });
 
-export const onRequest: PagesFunction<Env>  = async (context) => {
-  return new Response("Hello, world!!!!!!")
-}
-
+export const onRequest: PagesFunction<Env> = async (context) => {
+  return new Response("Hello, world!!!!!!");
+};

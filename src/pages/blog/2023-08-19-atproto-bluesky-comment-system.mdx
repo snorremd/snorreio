@@ -9,7 +9,6 @@ In this post you will learn about how I built a comment interface on top the [AT
 The post is relatively technical, but I also try to tell a story of how I got to this point.
 Read on if you are interested in social networks, decentralized protocols, open standards, and Bluesky.
 
-
 ## Some history first
 
 This is not the first time I've tried to run a comment system on my blog.
@@ -56,7 +55,6 @@ Back when I was in university, Web 3.0, the future of the web, was all about the
 Not at all about crypto currencies, smart contracts and pyramid schemes.
 But I digress.
 
-
 ## ATProto and Bluesky
 
 I was about to give up on the idea of having a comment system when I came across the [AT Protocol](https://atproto.com/) and [Bluesky](https://blueskyweb.xyz).
@@ -68,10 +66,10 @@ No matter what instance you are on you can see content from other instances, per
 So after receiving an invite to the Bluesky server I started looking at the protocol and client libraries.
 I won't go into too much details about the protocol here, but I will try to summarise the important bits.
 
-Every user has a *repository* of data records, each record being some unspecified type of data.
-Each ATProto data server also has a lexicon of *record types* that enumerate the types .
+Every user has a _repository_ of data records, each record being some unspecified type of data.
+Each ATProto data server also has a lexicon of _record types_ that enumerate the types .
 For Bluesky data types could be things like post, like, follow, profile, etc.
-Additionnaly the lexicon describes *methods*, i.e. things you can do on the server.
+Additionnaly the lexicon describes _methods_, i.e. things you can do on the server.
 For Bluesky these include fetching a post thread or creating a new post.
 
 For my comment system I essentially only needed three methods from the Bluesky server:
@@ -159,7 +157,7 @@ function addThreadUIData(
     addThreadUIData(newParent, (walkChildren = false), (walkParent = true));
   }
 
-  let replies: ThreadViewPostUI[] = []
+  let replies: ThreadViewPostUI[] = [];
   if (walkChildren && threadViewPost.replies?.length) {
     replies = threadViewPost.replies
       .map((reply) => {
@@ -167,8 +165,11 @@ function addThreadUIData(
           // Recursively add UI data to children
           return addThreadUIData({
             ...reply,
-            showParentReplyLine: threadViewPost?.isHighlightedPost ? false : true,
-            showChildReplyLine: (reply?.replies?.length ?? 0) > 0 ? true : false,
+            showParentReplyLine: threadViewPost?.isHighlightedPost
+              ? false
+              : true,
+            showChildReplyLine:
+              (reply?.replies?.length ?? 0) > 0 ? true : false,
             isHighlightedPost: false,
           } satisfies ThreadViewPostUI);
         }
@@ -232,9 +233,6 @@ If you think about the order in which the posts are yielded you will recognise t
 It shows a chain of posts down to the highlihted post without any of the sibling replies.
 From the highligted post it shows the replies in a flat list, showing nested replies as a chain.
 This is exactly what we want!
-
-
-
 
 ### Styling and layout
 

@@ -48,7 +48,7 @@ services:
       driver: "json-file"
       options:
         max-size: "512k"
-        max-file: "10"  
+        max-file: "10"
 
   mongo:
     image: mongo:latest
@@ -75,7 +75,6 @@ services:
       options:
         max-size: "512k"
         max-file: "10"
-
 
 volumes:
   mongo:

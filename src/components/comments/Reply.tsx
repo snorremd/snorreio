@@ -28,9 +28,8 @@ export const Reply = ({
   const [editorText, setEditorText] = createSignal(new RichText({ text: "" }));
   const [dialog, setDialog] = createSignal<HTMLDialogElement | null>(null);
 
-
   createEffect(() => {
-    if(showEditor()) {
+    if (showEditor()) {
       dialog()!.showModal();
       document.documentElement.style.overflow = "hidden";
     } else {
@@ -110,17 +109,10 @@ export const Reply = ({
             onCut={(e) => setEditorText(new RichText({ text: "" }))}
           />
           <div class="flex flex-row gap-2 w-full justify-between">
-            <Button
-              type="button"
-              onClick={() => setShowEditor(null)}
-            >
+            <Button type="button" onClick={() => setShowEditor(null)}>
               Nevermind
             </Button>
-            <Button
-              type="submit"
-            >
-              Share thoughts
-            </Button>
+            <Button type="submit">Share thoughts</Button>
           </div>
         </form>
       </dialog>

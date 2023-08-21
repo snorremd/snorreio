@@ -14,7 +14,6 @@ pub struct AppState {
     pub cache: Mutex<TimedCache<String, CodeItem>>,
 }
 ```
-    
 
 As you can see the Appstate struct's cache property uses a Mutex type to hold the cache which would make it possible to do thread safe mutations on the cache via locking. Then I created the actix app:
 
@@ -62,7 +61,7 @@ let item = match cache.cache_get(&params.code) {
         )))
     }
 };
-``` 
+```
 
 In my `/auth` handler I would verify some authentication request, generate a code, cache the code, and finally return the response. In my `/token` handler I would try to read the value associated with the code from the cache, as the code above shows. My less than profound knowledge of Rust and the Actix framework left me surprised when it turned out that the cache was properly set in the /auth handler, but then suddenly empty in the /token endpoint. As it turns out the [Actix documentation](https://actix.rs/docs/application/) offered an answer and a clue to fix this.
 
@@ -75,11 +74,10 @@ pub struct AppState {
     pub cache: Arc<Mutex<TimedCache<String, CodeItem>>>,
 }
 ```
-    
 
 Now the cache property would hold an Arc style pointer to a cache value, and the value would only be deallocated once all the references to it was gone. Finally it was necessary to move the initialization of the cache to someplace outside the application factory. So for the time being I placed it right before the code constructing the server:
 
-```rust    
+```rust
 // In the app module
 pub fn new_app(cache: Arc<Mutex<TimedCache<String, CodeItem>>>) -> App<AppState> {
 // App initialization code
