@@ -2,7 +2,6 @@
 pubDate: "2020-05-03"
 layout: "../../layouts/BlogPost.astro"
 title: "New homepage with Gatsby.js hosted with Cloudflare Workers"
-
 ---
 
 The past couple of years or so I've been running a homepage at [snorre.io](https://snorre.io).
@@ -51,9 +50,8 @@ And while I could certainly have done that I wanted a new learning experience an
 Paying for Cloudflare's Worker service assures me that I'm a customer and that hosting my page is indeed a priority for them.
 
 At my old website I tried out two different comment systems, but never really got many comments.
-To be compliant with GDPR (just in case) I had to set up a privacy policy to explain users how the data submitted to my comment system would be handled. 
+To be compliant with GDPR (just in case) I had to set up a privacy policy to explain users how the data submitted to my comment system would be handled.
 So for my new pages I probably will not use a comment system.
 Instead you can reach me at [contact@snorre.io](mailto:contact@snorre.io).
 Don't hesitate to contact me if you have any questions about the setup.
 I will leave you with this boilerplate Gatsby image from their example site setup:
-

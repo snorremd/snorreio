@@ -1,20 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
-  plugins: [
-    require("@kobalte/tailwindcss"),
-  ],
+  plugins: [require("@kobalte/tailwindcss")],
   theme: {
     fontFamily: {
-      "shortstack": ["shortstack"],
+      shortstack: ["shortstack"],
     },
     extend: {
       animation: {
         "gradient-bg": "spin linear 5s infinite",
       },
       backgroundImage: {
-        'layered-waves-light': "url('/graphics/layered-waves-light.svg')",
-        'layered-waves-dark': "url('/graphics/layered-waves-dark.svg')",
+        "layered-waves-light": "url('/graphics/layered-waves-light.svg')",
+        "layered-waves-dark": "url('/graphics/layered-waves-dark.svg')",
       },
       colors: {
         "neon-gray": {

@@ -14,7 +14,6 @@ The first piece of the puzzle is [ElasticSearch](https://www.elastic.co/products
 Create an `elk` and `elasticsearch` folder somewhere appropriate. When using docker `/srv` is commonly used.
 
     mkdir -p /srv/elk/elasticsearch
-    
 
 Now create a new `docker-compose.yml` file either in the `/srv/elk` folder, or better yet on your own computer. It all depends on whether you have tcp access to the docker-engine on the host where you are setting up the BELK stack. Add the following contents to it:
 
@@ -27,7 +26,6 @@ Now create a new `docker-compose.yml` file either in the `/srv/elk` folder, or b
       ports:
         - "127.0.0.1:9200:9200"
         - "127.0.0.1:9300:9300"
-    
 
 We call the service `elasticsearch`, use the latest elasticsearch image, and map in ports and volumes from the host into the container. The elasticsearch api should now be available from the host server's port `9200` on `localhost` only.
 
@@ -48,17 +46,14 @@ For Kibana we'll use the official [Kibana image](https://hub.docker.com/_/kibana
         - "127.0.0.1:5601:5601"
       links:
         - elasticsearch
-    
 
 and create a `kibana` folder under our elk folder:
 
     mkdir -p /srv/elk/kibana/config
-    
 
 Kibana relies on a config file `kibana.yml` to function so you will need to add this under the kibana config folder.
 
     touch /srv/elk/kibana/config/kibana.yml
-    
 
 See [Setting Kibana server properties](https://www.elastic.co/guide/en/kibana/current/kibana-server-properties.html) in the Kibana docs for which properties you may configure. For this setup you probably don't need to change anything and can rely on the default values.
 
@@ -71,7 +66,6 @@ While it is entirely possible to make TopBeat, PacketBeat, and FileBeat send the
 An official [Logstash Docker image](https://hub.docker.com/_/logstash/) is available so again we use Docker to run the service. Create a folder for logstash configs:
 
     mkdir -p /srv/elk/logstash/config
-    
 
 and add the following Logstash service configuration to the existing `docker-compose.yml` file:
 
@@ -85,14 +79,12 @@ and add the following Logstash service configuration to the existing `docker-com
         - "127.0.0.1:5000:5000"
       links:
         - elasticsearch
-    
 
 As you can see we link in the elasticsearch service (so logstash can gain access to it from `elasticsearch:9200`, and map in a configuration directory from our host to the logstash container. We've also exposed the Logstash container's port `5000` on the server's `localhost:5000`.
 
 You need to provide logstash with a configuration file in order to make it listen to port 5000 and send documents to elasticsearch:
 
     vim /srv/elk/logstash/config/logstash.conf
-    
 
 which should contain an input section for the Beats and an ouput section for the ElasticSearch server:
 
@@ -101,7 +93,7 @@ which should contain an input section for the Beats and an ouput section for the
         port => 5000
       }
     }
-    
+
     output {
       elasticsearch {
         hosts => "elasticsearch:9200"
@@ -110,7 +102,6 @@ which should contain an input section for the Beats and an ouput section for the
         document_type => "%{[@metadata][type]}"
       }
     }
-    
 
 The Beats will now be able to send their data to Logstash at `localhost:5000` from the host. We are now done with the Docker based services so you may start them with: `docker-compose up -d` from the directory where you keep your `docker-compose.yml` file. We need Logstash and Elasticsearch to be running for the upcoming steps.
 
@@ -121,7 +112,6 @@ Finally we need a way to collect our log data. While Logstash can read log files
 First add the Beat repository as [described here](https://www.elastic.co/guide/en/beats/libbeat/1.2/setup-repositories.html) (for the distro of your choice). Then install the beats. On Ubuntu you can use apt:
 
     apt install filebeat packetbeat topbeat
-    
 
 Now we need to configure each Beat to use our Logstash instance, and provide our Elasticsearch server with the relevant Beat templates.
 
@@ -129,7 +119,6 @@ First edit the filebeat config with `vim /etc/filebeat/filebeat.yml` and make su
 
     # elasticsearch:
         # hosts: ["localhost:9200"]
-    
 
 Then comment in the logstash ouput config:
 
@@ -137,14 +126,12 @@ Then comment in the logstash ouput config:
       logstash:
         # The Logstash hosts
         hosts: ["localhost:5000"]
-    
 
 Remember that we configured our Logstash server to listen to port 5000, and mapped port 5000 out to `localhost:5000` on our host. This enables Filebeat to log its event to that port.
 
 Then we need to insert the Filebeat template into our Elasticsearch index. The documentation tells us that we can use Curl for this:
 
     curl -XPUT 'http://localhost:9200/_template/filebeat' -d@/etc/filebeat/filebeat.template.json
-    
 
 Finally we can start Filebeat. On Ubuntu you may use `service filebeat start`.
 
@@ -154,11 +141,11 @@ You can now repeat these steps for PacketBeat and TopBeat. Note that you may wan
 
 If everything worked out okay you should now be able to go to Kibana and add your indices. Go to [localhost:5601](http://localhost:5601) and click the `Settings` tab. You should be presented with a screen where you can configure an index pattern. Thanks to our Logstash configuration an new index will be created each day for each of our Beat loggers. Our pattern should thus match the configuration `"%{[@metadata][beat]}-%{+YYYY.MM.dd}"` (from the Logstash config). So to get each of the three index types into Kibana we simply add them as `filebeat-*`, etc. If your index pattern is matched Kibana should show a green `Create` button as in the screenshot below.
 
-*Removed*
+_Removed_
 
 After adding the index pattern you should be able to go to the `Discover` tab and view and search your logs.
 
-*Removed*
+_Removed_
 
 You can now create your own visualizations over the indexed logs or you can download some of the visualizations and dashboards already created by the Kibana team. You can read more about that [here](https://www.elastic.co/guide/en/kibana/current/dashboard.html) and [here](https://www.elastic.co/guide/en/beats/libbeat/current/load-kibana-dashboards.html).
 

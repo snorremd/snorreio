@@ -11,7 +11,7 @@ My five year long education and short few months of work have so far been spent 
 
 To that end I bought [Clojure Programming](http://shop.oreilly.com/product/0636920013754.do) and set to it. This blog post will not discuss the book, but it might be the topic of a future post.
 
-*Removed image*
+_Removed image_
 
 In what might become a blog series I will attempt to document my journey with Clojure. Without further ado let's get on with it.
 
@@ -20,14 +20,12 @@ In what might become a blog series I will attempt to document my journey with Cl
 Installing Clojure was relatively simple as Clojure is really just a JAR library that runs on the JVM. I ended up installing the newest version of the JVM (8), and installed [Leiningen](http://leiningen.org/), a build manager for Clojure with the [HomeBrew](http://brew.sh/) package manager for OS X. I immidiately stumbled into an error after running `lein repl`, the lein command for running an interactive Clojure repl. The JVM stack trace informed me of the following error:
 
     Error loading namespace; falling back to userNoSuchMethodError
-    
 
 Some googling turned up an [issue](https://github.com/technomancy/leiningen/issues/1625) submitted in the GitHub repo for the HomeBrew distribution of Leiningen. Of course the issue is already fixed in the Leiningen master branch, but the newest version is probably not pushed into the Homebrew package repositories yet. A workaround for the moment appeared to be running the command from inside a Leiningen Clojure-project. So that is was I tried:
 
     lein app helloclojure
     cd helloclojure
     lein repl
-    
 
 Running lein repl from inside a project changes the context in which the repl is run and alleviates the error, but I can't say what differences there might be.
 
@@ -39,6 +37,6 @@ While writing and testing Clojure in the OS X terminal in a REPL environment wor
 
 I found that it kickstarted me on my way to Clojure comprehension quite soon as its documentation suggested I try its feature instarepl. Instarepl appears to be a pseudo-repl environment that does not conform to the repl loop of read, evaluate, print, loop. Instead the editor provides a window in which you can enter and edit code at will; The code is interpreted on the fly. Next to each line of code Light Table shows you the data value or values being used. This amazing feature quickly tells you what the input to, and output of a given expression is.
 
-*Removed image*
+_Removed image_
 
 I will end the blog post before it becomes a Clojure book. Fare well, and keep on coding.

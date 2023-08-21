@@ -5,10 +5,13 @@ pubDate: 2018-08-23T05:50:15.000Z
 modDate: 2018-08-23T07:11:34.000Z
 ---
 
-Today I changed how I embed the Coral Talk comment system in my blog posts. Previously I had downloaded the Casper theme and edited the *post.hbs* file and inserted the Coral embed script. Then I re-uploaded the customized theme and enabled it in the admin panel. This works of course, but also mean you don't get to enjoy any of the new Casper updates for free. Instead you need to regularly re-customize new versions of Casper. So today I decided to be a bit smarter about it and created this little embed script to add to the Ghost footer (via the admin dashboard):
+Today I changed how I embed the Coral Talk comment system in my blog posts. Previously I had downloaded the Casper theme and edited the _post.hbs_ file and inserted the Coral embed script. Then I re-uploaded the customized theme and enabled it in the admin panel. This works of course, but also mean you don't get to enjoy any of the new Casper updates for free. Instead you need to regularly re-customize new versions of Casper. So today I decided to be a bit smarter about it and created this little embed script to add to the Ghost footer (via the admin dashboard):
 
-```html    
-<script src="https://talk.snorre.io/static/embed.js" async onload="
+```html
+<script
+  src="https://talk.snorre.io/static/embed.js"
+  async
+  onload="
   var articles = document.getElementsByClassName('post-full post');
   if (articles.length === 1) {
     var coral = document.createElement('div');
@@ -20,10 +23,11 @@ Today I changed how I embed the Coral Talk comment system in my blog posts. Prev
     });
   }
   
-"></script>
+"
+></script>
 ```
 
-*Removed image*
+_Removed image_
 
 Code Injection Footer settings screen capture
 So essentially I now first get all elements in the dom with the class name "post-full post". Only if such an element is found do I create a div to mount Coral in and render Coral. As long as the Casper theme developers don't change the class names for the article element on the post page this script will continue to do its job.

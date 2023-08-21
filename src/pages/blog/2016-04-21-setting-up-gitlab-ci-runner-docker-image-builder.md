@@ -19,19 +19,18 @@ Gitlab CI uses `gitlab-ci.yml` files defining one or more build jobs to run cont
       - build
       - test
       - deploy
-    
+
     build_app:
       type: build
       script: ./make build
-    
+
     test_app:
       type: test
       script: ./make test
-    
+
     deploy_app:
       type: deploy
       script: scp ./app deployuser@someserver:/app
-    
 
 In the example we define three build stage types: `build`, `test`, and `deploy`. The order is significant. We also define three jobs, `build_app`, `test_app`, and `deploy_app`, which are executed in the order given by the types to which they belong. If one build stage fail, the others will not be executed. All of this is probably familiar to you if you've used other CI services before.
 
@@ -62,7 +61,7 @@ So say we want to build a Node.js-application, we can supply a `.gitlab-ci.yml` 
 
     types:
       - allthethings
-    
+
     build_app:
       type: allthethings
       image: node:5
@@ -70,7 +69,6 @@ So say we want to build a Node.js-application, we can supply a `.gitlab-ci.yml` 
         - npm run test
         - npm run build
         - npm run deploy
-    
 
 Great! We've managed to get our app tested, built, and deployed from within the Node.js docker container. Though this is not actually the problem we set out to solve. Indeed what we want is for the Gitab Runner to build us a Docker image with our app inside and then deploy that docker image to a registry of our choice.
 
@@ -86,7 +84,6 @@ Running `docker-machine ls` will reveal the IP your dockerbuilder machine is lis
 
     NAME            ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER    ERRORS
     dockerbuilder   -        virtualbox   Running   tcp://192.168.99.100:2376           v1.11.0
-    
 
 So how do we gain access to the docker-engine from our build script running inside a container? Docker Hub provides us with a [`Docker Docker image`](https://hub.docker.com/_/docker/). This image container the docker binary we need to communicate with our virtualbox hosted docker engine.
 
@@ -94,7 +91,7 @@ To build a docker image from within the `docker` docker container we can now sim
 
     types:
       - dockerbuild
-    
+
     build_docker_image:
       type: dockerbuild
       image: docker:latest
@@ -108,7 +105,6 @@ To build a docker image from within the `docker` docker container we can now sim
         - docker build -t username/imagename:latest .
         - docker login --username="${REGISTRY_USER}" --password="${REGISTRY_PASSWORD}" --email="${REGISTRY_EMAIL}" docker.example.com
         - docker push username/imagename:latest
-    
 
 `DOCKER_CERT_PEM` is the variable name from the Gitlab project settings and its value is the contents of the `cert.pem` file from before. The solution is a bit noisy, but could probably be moved into a shell script to reduce clutter. The important takeaway here is that we fetch the certificates that the `docker-machine create -d dockerbuilder` command generated for us and stored them in the Gitlab project settings variable page. Gitlab CI will send them to Gitlab Runner when orchestrating a build, and Gitlab Runner will make them available as environment variables in our build.
 

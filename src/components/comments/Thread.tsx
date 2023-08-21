@@ -19,18 +19,22 @@ interface ThreadProps {
   handle: string;
 }
 
-export const Thread: Component<ThreadProps> = ({ atprotoURI, handle, agent }) => {
+export const Thread: Component<ThreadProps> = ({
+  atprotoURI,
+  handle,
+  agent,
+}) => {
   const [, setPost] = createSignal<string>();
-  const [showEditor, setShowEditor] = createSignal<ThreadViewPostUI | null>(null);
+  const [showEditor, setShowEditor] = createSignal<ThreadViewPostUI | null>(
+    null,
+  );
 
-  
   const [thread, { refetch }] = createResource<
-  ThreadViewPostUI[] | undefined,
+    ThreadViewPostUI[] | undefined,
     true
   >(async () => {
     if (agent()) {
       const threadResult = await agent()!.getPostThread({
-        
         uri: atprotoURI,
       });
 
@@ -63,7 +67,12 @@ export const Thread: Component<ThreadProps> = ({ atprotoURI, handle, agent }) =>
           </For>
         </ul>
       )}
-      <Reply agent={agent} showEditor={showEditor} setShowEditor={setShowEditor} refetch={refetch} />
+      <Reply
+        agent={agent}
+        showEditor={showEditor}
+        setShowEditor={setShowEditor}
+        refetch={refetch}
+      />
     </>
   );
 };
@@ -83,8 +92,10 @@ const Post = ({
   refetch: () => void;
   setShowEditor: Setter<ThreadViewPostUI | null>;
 }) => {
-
-  const { text, createdAt } = post.post.record as { text: string; createdAt: string };
+  const { text, createdAt } = post.post.record as {
+    text: string;
+    createdAt: string;
+  };
 
   return (
     <li class={`flex flex-col`}>
@@ -97,7 +108,9 @@ const Post = ({
           <span class="font-shortstack text-lg">
             {post.post.author.displayName}
           </span>
-          <span class="text-xs text-stone-600 dark:text-stone-300">@{post.post.author.handle}</span>
+          <span class="text-xs text-stone-600 dark:text-stone-300">
+            @{post.post.author.handle}
+          </span>
           <time
             class="text-xs text-stone-600 dark:text-stone-300"
             dateTime={createdAt}
@@ -141,12 +154,15 @@ const Post = ({
             </button>
             <a
               class="flex flex-row items-center"
-              href={`https://bsky.app/profile/${post.post.author.handle}/post/${getPostId(post.post.uri)}`}
+              href={`https://bsky.app/profile/${
+                post.post.author.handle
+              }/post/${getPostId(post.post.uri)}`}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="View on Bsky"
             >
-              <VsLink /> <span class="ml-1 font-shortstack text-sm">View on Bsky</span>
+              <VsLink />{" "}
+              <span class="ml-1 font-shortstack text-sm">View on Bsky</span>
             </a>
           </div>
         </div>

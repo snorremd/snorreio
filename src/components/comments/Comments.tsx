@@ -1,16 +1,7 @@
-import {
-  Component,
-  createEffect,
-  createSignal,
-  onMount,
-} from "solid-js";
-import {
-  AtpSessionData,
-  BskyAgent
-} from "@atproto/api";
+import { Component, createEffect, createSignal, onMount } from "solid-js";
+import { AtpSessionData, BskyAgent } from "@atproto/api";
 
-import 'solid-devtools'
-
+import "solid-devtools";
 
 import { Header } from "./Header";
 import { LoginForm } from "./LoginForm";
@@ -48,16 +39,19 @@ export const Comments: Component<CommentsProps> = ({ atprotoURI, handle }) => {
       localStorage.removeItem("atpSession");
     }
   });
-  
 
   return (
     <div class="w-full text-stone-900 dark:text-stone-100 flex flex-col gap-8">
-      <Header agent={agent} session={session} signOut={() => {
-        if (agent()) {
-          setSession(undefined);
-          setAgent(undefined);
-        }
-      }}/>
+      <Header
+        agent={agent}
+        session={session}
+        signOut={() => {
+          if (agent()) {
+            setSession(undefined);
+            setAgent(undefined);
+          }
+        }}
+      />
       <main>
         {!session() ? (
           // User is not logged in, show login form
@@ -70,4 +64,3 @@ export const Comments: Component<CommentsProps> = ({ atprotoURI, handle }) => {
     </div>
   );
 };
-

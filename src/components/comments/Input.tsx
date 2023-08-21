@@ -19,7 +19,7 @@ export const Input: Component<InputProps> = (props) => {
         text-stone-800 dark:text-stone-100 
       `}
     >
-      {props.children}    
+      {props.children}
     </input>
   );
 };
