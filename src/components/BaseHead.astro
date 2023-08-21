@@ -3,6 +3,8 @@
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
 
+// Enable Astro's built-in support for view transitions
+import { ViewTransitions } from 'astro:transitions';
 
 export interface Props {
 	title: string;
@@ -12,6 +14,9 @@ export interface Props {
 
 const { title, description, image = '/placeholder-social.jpg' } = Astro.props;
 ---
+
+
+<ViewTransitions />
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />

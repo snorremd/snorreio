@@ -3,7 +3,7 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 
-const { title, description, dir = 'ltr' } = Astro.props;
+const { title, description, dir = 'ltr', page } = Astro.props;
 ---
 
 <html lang="en" class='min-h-full'>
@@ -20,11 +20,12 @@ const { title, description, dir = 'ltr' } = Astro.props;
   </head>
   <body class={`
     min-h-screen
-  bg-stone-200 dark:bg-stone-800
+  bg-stone-50 dark:bg-stone-900
     grid grid-cols-1
     grid-rows-[auto_1fr_auto]`}>
-    <Header />
-    <main class="bg-stone-50 dark:bg-stone-900 h-full flex flex-col">
+    <Header  />
+    <main class="bg-stone-50 dark:bg-stone-900 h-full flex flex-col pt-24"
+    >
       <div
         class={`
           flex flex-row justify-center
