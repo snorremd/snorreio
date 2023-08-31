@@ -4,7 +4,7 @@ layout: "../../layouts/BlogPost.astro"
 title: "Spotifyd and Spotify TUI for a leaner listening experience"
 ---
 
-import { Picture } from "@astrojs/image/components";
+import { Image } from "astro:assets";
 import SpotifyProcessesImg from "../../assets/images/spotify-processes.png";
 import SpotifyTuiImg from "../../assets/images/spotify-tui.png";
 
@@ -18,7 +18,7 @@ For all those hours my Spotify app is barely open, mostly to skip songs I don't 
 For this measly work Spotify fires up five processes consuming more than 300MB of memory.
 All of this just to mostly stay in the background and playing music. Below you see a screenshot of the processes and their memory consumption as reported by MacOS monitor:
 
-<Picture
+<Image
   src={SpotifyProcessesImg}
   alt="Screenshot of Mac Monitor app showing Spotify processes"
   widths={[400, 800, 1200, 1920]}
@@ -49,7 +49,7 @@ One big advantage of TUIs today are the fact that they run in your terminal and 
 This allows them to be quite lean as they only need to work with text output.
 Gone are the embedded browser engines with giant DOM hierarchies, layout engines, etc.
 
-<Picture
+<Image
   src={SpotifyTuiImg}
   alt="Screenshot of Spotify TUI"
   widths={[400, 800, 1200, 1920]}

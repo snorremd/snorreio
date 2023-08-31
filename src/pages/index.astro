@@ -1,5 +1,5 @@
 ---
-import { Image, Picture } from "@astrojs/image/components";
+import { Image, Image } from "astro:assets";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 import profileImg from "../assets/images/profile.png";
 
@@ -16,10 +16,10 @@ import FrontPageFeatured from "../components/FrontPageFeatured.astro";
   >
     <div class="flex flex-col items-center pb-8">
       <h1 class="hidden">Snorre.io</h1>
-      <Picture
+      <Image
         src={profileImg}
         loading="eager"
-        alt="Profile picture of me, Snorre"
+        alt="Profile Image of me, Snorre"
         widths={[400, 600, 800]}
         aspectRatio={1}
         sizes="(max-width: 800px) 100vw, 800px"

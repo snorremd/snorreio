@@ -6,12 +6,12 @@ updatedDate: "August 08 2022"
 heroImage: "/placeholder-about.jpg"
 ---
 
-import { Picture } from "@astrojs/image/components";
+import { Image } from "astro:assets";
 import profileImg from "../assets/images/profile.png";
 
-<Picture
+<Image
   src={profileImg}
-  alt="Profile picture of me, Snorre"
+  alt="Profile Image of me, Snorre"
   loading="eager"
   widths={[400, 600, 800]}
   aspectRatio={1}
