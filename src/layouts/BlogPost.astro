@@ -62,9 +62,9 @@ const dateFormatConfig = {
     </section>
     <article slot="content" id="blog-post" class="grid auto-cols-fr justify-start w-full max-w-3xl">
       <slot>
-      </slot> 
+      </slot>
     </article>
-    {atprotoURI && <div 
+    {atprotoURI && <div
       slot="content"
       class="grid auto-cols-fr justify-start w-full max-w-3xl mt-8">
       <Comments
@@ -78,7 +78,7 @@ const dateFormatConfig = {
 <style is:global>
   #blog-post {
     @apply text-stone-900 dark:text-stone-50 w-full;
-    
+
     h1, h2, h3, h4, h5, h6 {
       @apply font-shortstack;
       margin: 1em 0 0.5em;
@@ -106,14 +106,14 @@ const dateFormatConfig = {
 
     pre {
       @apply rounded-lg mx-0 my-4 px-4 py-8 drop-shadow max-w-full self-center;
-      
+
     }
 
     img  {
       @apply rounded-lg drop-shadow self-center inline-flex;
     }
 
-    picture {
+    Image {
       @apply w-fit justify-self-center;
     }
 
@@ -124,7 +124,7 @@ const dateFormatConfig = {
 
     ul {
       max-width: 70ch;
-      
+
     }
 
     li {

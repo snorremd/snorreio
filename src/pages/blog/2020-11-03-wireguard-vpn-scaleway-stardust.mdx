@@ -4,10 +4,10 @@ layout: "../../layouts/BlogPost.astro"
 title: "Running Wireguard on Scaleway Stardust"
 ---
 
-import { Picture } from "@astrojs/image/components";
+import { Image } from "astro:assets";
 import StarDust from "../../assets/images/star-dust.jpg";
 
-<Picture
+<Image
   src={StarDust}
   alt="Image of star dust in space used as illustration"
   widths={[400, 800, 1200]}
