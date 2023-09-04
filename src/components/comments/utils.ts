@@ -58,22 +58,20 @@ function addThreadUIData(
   walkChildren = true,
   walkParent = true,
 ): ThreadViewPostUI {
-  let parent = threadViewPost.parent;
-  if (walkParent && AppBskyFeedDefs.isFeedViewPost(threadViewPost.parent)) {
+  let parent
+  if (walkParent && AppBskyFeedDefs.isThreadViewPost(threadViewPost.parent)) {
     // Recursively add UI data to parent
-    const newParent = {
+    parent = addThreadUIData({
       ...threadViewPost.parent,
-      showParentReplyLine: false,
-      showChildReplyLine: false,
+      showParentReplyLine: threadViewPost.parent?.parent? true : false,
+      showChildReplyLine: true,
       isHighlightedPost: false,
-    } satisfies ThreadViewPostUI;
-    threadViewPost.parent = newParent;
-    addThreadUIData(newParent, (walkChildren = false), (walkParent = true));
+    }, false, true);
   }
 
   let replies: ThreadViewPostUI[] = [];
-  if (walkChildren && threadViewPost.replies?.length) {
-    replies = threadViewPost.replies
+  if (walkChildren && (threadViewPost.replies?.length?? 0) > 0) {
+    replies = threadViewPost.replies!
       .map((reply) => {
         if (AppBskyFeedDefs.isThreadViewPost(reply)) {
           // Recursively add UI data to children
@@ -85,12 +83,14 @@ function addThreadUIData(
             showChildReplyLine:
               (reply?.replies?.length ?? 0) > 0 ? true : false,
             isHighlightedPost: false,
-          } satisfies ThreadViewPostUI);
+          } satisfies ThreadViewPostUI,
+            true,
+            false);
         }
-        return undefined;
       })
       .filter((x): x is ThreadViewPostUI => x !== undefined);
   }
+
 
   return { ...threadViewPost, parent, replies };
 }

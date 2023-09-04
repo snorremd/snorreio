@@ -1,20 +1,18 @@
 import { BskyAgent, RichText } from "@atproto/api";
 import {
-  Accessor,
-  Setter,
+  type Accessor,
+  type Setter,
   Show,
   createEffect,
   createSignal,
-  on,
-  onMount,
 } from "solid-js";
 
 import type { ThreadViewPostUI } from "./utils";
 import { Button } from "./Button";
 
 interface DialogProps {
-  showEditor: Accessor<ThreadViewPostUI | null>;
-  setShowEditor: Setter<ThreadViewPostUI | null>;
+  showEditor: Accessor<ThreadViewPostUI | undefined>;
+  setShowEditor: Setter<ThreadViewPostUI | undefined>;
   agent: Accessor<BskyAgent | undefined>;
   refetch: () => void;
 }
@@ -43,13 +41,13 @@ export const Reply = ({
         // When user clicks outside of dialog, close it
         onClick={(e) => {
           if (e.target === dialog()) {
-            setShowEditor(null);
+            setShowEditor(undefined);
           }
         }}
         // When user presses escape, close it
         onKeyDown={(e) => {
           if (e.key === "Escape") {
-            setShowEditor(null);
+            setShowEditor(undefined);
           }
         }}
         ref={(el) => setDialog(el)}
@@ -85,7 +83,7 @@ export const Reply = ({
                 },
               });
               await refetch();
-              setShowEditor(null);
+              setShowEditor(undefined);
             }
           }}
         >
@@ -109,7 +107,7 @@ export const Reply = ({
             onCut={(e) => setEditorText(new RichText({ text: "" }))}
           />
           <div class="flex flex-row gap-2 w-full justify-between">
-            <Button type="button" onClick={() => setShowEditor(null)}>
+            <Button type="button" onClick={() => setShowEditor(undefined)}>
               Nevermind
             </Button>
             <Button type="submit">Share thoughts</Button>
