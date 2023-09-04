@@ -5,6 +5,7 @@ module.exports = {
   theme: {
     fontFamily: {
       shortstack: ["shortstack"],
+      ubuntu: ["ubuntu"], // For use in Satori og image generator
     },
     extend: {
       animation: {
