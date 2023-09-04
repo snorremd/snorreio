@@ -4,13 +4,18 @@ import {
   createSignal,
   type Accessor,
   type Component,
-  Setter,
+  type Setter,
   createResource,
   For,
+  onMount,
 } from "solid-js";
 import { formatDistance } from "date-fns";
 import { VsComment, VsHeart, VsHeartFilled, VsLink } from "solid-icons/vs";
-import { ThreadViewPostUI, enrichThreadWithUIData, flatten } from "./utils";
+import {
+  type ThreadViewPostUI,
+  enrichThreadWithUIData,
+  flatten,
+} from "./utils";
 import { Reply } from "./Reply";
 
 interface ThreadProps {
@@ -24,30 +29,34 @@ export const Thread: Component<ThreadProps> = ({
   handle,
   agent,
 }) => {
-  const [, setPost] = createSignal<string>();
-  const [showEditor, setShowEditor] = createSignal<ThreadViewPostUI | null>(
-    null,
-  );
+  const [showEditor, setShowEditor] = createSignal<ThreadViewPostUI>();
+  const [highlightedPost, setHighlightedPost] =
+    createSignal<string>(atprotoURI);
 
   const [thread, { refetch }] = createResource<
     ThreadViewPostUI[] | undefined,
+    string,
     true
-  >(async () => {
-    if (agent()) {
-      const threadResult = await agent()!.getPostThread({
-        uri: atprotoURI,
-      });
+  >(
+    () => highlightedPost(),
+    async (uri) => {
+      if (agent()) {
+        const threadResult = await agent()!.getPostThread({
+          uri,
+          parentHeight: 20,
+        });
 
-      const enrichedAndFlattened = [
-        ...flatten(
-          enrichThreadWithUIData(threadResult.data.thread as ThreadViewPost),
-        ),
-      ];
+        const enriched = enrichThreadWithUIData(
+          threadResult.data.thread as ThreadViewPost,
+        );
 
-      return enrichedAndFlattened;
-    }
-    return undefined;
-  });
+        const enrichedAndFlattened = [...flatten(enriched)];
+
+        return enrichedAndFlattened;
+      }
+      return undefined;
+    },
+  );
 
   return (
     <>
@@ -62,6 +71,7 @@ export const Thread: Component<ThreadProps> = ({
                 post={post}
                 refetch={() => refetch()}
                 setShowEditor={setShowEditor}
+                setHighlightedPost={setHighlightedPost}
               />
             )}
           </For>
@@ -86,24 +96,39 @@ const Post = ({
   post,
   refetch,
   setShowEditor,
+  setHighlightedPost,
 }: {
   agent: Accessor<BskyAgent | undefined>;
   post: ThreadViewPostUI;
   refetch: () => void;
-  setShowEditor: Setter<ThreadViewPostUI | null>;
+  setShowEditor: Setter<ThreadViewPostUI | undefined>;
+  setHighlightedPost: Setter<string>;
 }) => {
   const { text, createdAt } = post.post.record as {
     text: string;
     createdAt: string;
   };
 
+  const showContinueThread =
+    (post.post?.replyCount ?? 0) > 0 &&
+    (post.replies?.length ?? 0) === 0 &&
+    post.showChildReplyLine === false;
+
   return (
-    <li class={`flex flex-col`}>
+    <li
+      class={`flex flex-col`}
+      classList={{
+        "border-t border-b pt-4 my-8 border-stone-400 dark:border-stone-600 mt-8": post.isHighlightedPost,
+      }}
+    >
       {post.showParentReplyLine ? (
         <div class="flex pt-8 ml-6 border-l-2 border-stone-400 dark:border-stone-600"></div>
       ) : null}
       <div class="flex flex-col items-start">
-        <div class="flex flex-row items-center justify-center gap-2">
+        <button
+          class="flex flex-row items-center justify-center gap-2"
+          onClick={() => setHighlightedPost(post.post.uri)}
+        >
           <img class="rounded-full w-12" src={post.post.author.avatar} />
           <span class="font-shortstack text-lg">
             {post.post.author.displayName}
@@ -117,11 +142,11 @@ const Post = ({
           >
             {formatDistance(new Date(createdAt), new Date())}
           </time>
-        </div>
+        </button>
 
         <div
           class={`
-          flex flex-col gap-2 pb-4 w-full
+          flex flex-col gap-4 pb-4 w-full
           ${post.showParentReplyLine ? "" : ""}
           ${post.showChildReplyLine ? "border-l-2" : ""}
           border-stone-400 dark:border-stone-600 ml-6 pl-6`}
@@ -134,7 +159,7 @@ const Post = ({
               aria-label={`Reply to ${post.post.author.displayName}`}
             >
               <VsComment />
-              <span class="ml-1 text-sm">{post.replies?.length ?? 0}</span>
+              <span class="ml-1 text-sm">{post.post.replyCount ?? 0}</span>
             </button>
             <button
               class="flex flex-row items-center"
@@ -165,6 +190,17 @@ const Post = ({
               <span class="ml-1 font-shortstack text-sm">View on Bsky</span>
             </a>
           </div>
+          {showContinueThread ? (
+            <div>
+              <button
+                class="flex flex-row items-center justify-center gap-2 text-stone-600 dark:text-stone-400"
+                onClick={() => setHighlightedPost(post.post.uri)}
+                aria-label={`Reply to ${post.post.author.displayName}`}
+              >
+                Continue thread...
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </li>
