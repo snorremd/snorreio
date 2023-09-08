@@ -10,8 +10,8 @@ import prefetch from "@astrojs/prefetch";
 import analyze from "rollup-plugin-analyzer";
 import { visualizer } from "rollup-plugin-visualizer";
 import devtools from "solid-devtools/vite";
-import { satoriPlugin } from "./src/plugins/satori-plugin"
-
+import { satoriPlugin } from "./src/plugins/satori-plugin";
+  
 
 // https://astro.build/config
 export default defineConfig({
@@ -20,7 +20,10 @@ export default defineConfig({
     plugins: [analyze(), visualizer(), devtools({
       /* features options - all disabled by default */
       autoname: true // e.g. enable autoname
-    })]
+    })],
+    optimizeDeps: {
+      exclude: ["@resvg/resvg-js"]
+    }
   },
   integrations: [satoriPlugin(), sitemap({}), robotsTxt({}), tailwind(), solid(), mdx({
     rehypePlugins: [rehypeInferDescriptionMeta, descriptionRemarkPlugin]
