@@ -10,6 +10,17 @@
   font-display: swap;
 }
 
+
+// Only used for the Satori og image generator
+// For regular web pages we use the system fonts instead
+@font-face {
+  font-family: "ubuntu";
+  src: url("/fonts/ubuntu-regular.ttf") format("ttf");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Box sizing border box all containers */
 *,
 *::before,
