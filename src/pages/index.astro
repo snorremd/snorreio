@@ -1,7 +1,7 @@
 ---
-import { Image, Image } from "astro:assets";
+import { Image } from "astro:assets";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
-import profileImg from "../assets/images/profile.png";
+import profileImg from "../assets/images/profile.jpeg";
 
 import BaseLayout from "../layouts/BaseLayout.astro";
 import FrontPageFeatured from "../components/FrontPageFeatured.astro";
@@ -26,7 +26,7 @@ import FrontPageFeatured from "../components/FrontPageFeatured.astro";
         class={`
         grayscale
         opacity-80
-        rounded-full
+        rounded-md
         w-64
         h-64
         object-cover
