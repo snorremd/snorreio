@@ -27,10 +27,10 @@ function OgImageTemplate({ site, title, profilePic, wavesSvg }: OgImageTemplateP
         </h1>
       </div>
       <img src="data:image/svg+xml;base64,${wavesSvg}" class="w-full h-32 -mt-24" />
-      <div class="flex flex-col bg-stone-800 pb-16 px-32 grow justify-center" style="font-family: ubuntu;">
+      <div class="flex flex-col bg-stone-800 pb-16 px-32 grow justify-center" style="font-family: shortstack;">
         <div class="flex flex-row max-w-full items-center"> 
           <img src="data:image/jpeg;base64,${profilePic}" class="w-32 h-32 rounded-lg mr-8" />
-          <p class="text-4xl font-ubuntu m-0">
+          <p class="text-4xl m-0">
             ${title}
           </p>
         </div>
@@ -74,12 +74,6 @@ async function generateOgImage({ site, route, profilePic, wavesSvg }: GenerateOg
           data: await readFile("./public/fonts/shortstack-regular.woff"),
           style: "normal",
         },
-        {
-          // Ubuntu font for bread text in satori
-          name: "ubuntu",
-          data: await readFile("./public/fonts/ubuntu-regular.ttf"),
-          style: "normal",
-        }
       ],
     });
 
