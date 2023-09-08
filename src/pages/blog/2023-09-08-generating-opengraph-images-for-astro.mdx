@@ -1,0 +1,185 @@
+---
+pubDate: "2023-09-08"
+layout: "../../layouts/BlogPost.astro"
+title: "Generating opengraph images for your Astro page"
+---
+
+Facebook introduced the [Open Graph protocol](https://ogp.me/) in 2010.
+It allows you to specify metadata about your page, such as the title, description, and image.
+This metadata is then in turn used by social media platforms to display a preview of your page when it is shared.
+The open graph image is especially important as it is the first thing people see when they see a link to your page.
+The image should either be an eye-catching image or an image resembling your site brand in some way.
+If you are anything like me and running an Astro site, you probably don't want to manually create an image for every page you create.
+Luckily, there is a way to automate this process.
+
+## Satori - A simple opengraph image generator
+
+If you've browsed the Internet a bit you might have come over web site image previews with a nice background and some text.
+I wanted to have something similar for my own site, and remembered something about a Vercel project that did just that.
+After a bit of searching I found [Satori](https://www.npmjs.com/package/satori), a simple opengraph image generator.
+In short Satori allows you to write HTML and CSS that it then renders to an SVG.
+It does this using a custom rendering engine that handles layouting, typograhpy, and other things.
+
+There are limitations however.
+It only supports a limited flexbox layout, has some font limitations, and only ltr languages.
+But for my use case it was perfect.
+
+## Using Satori with Astro
+
+I did what any old developer would do and started searching for a pre-existing solution.
+I found some options, but none of them were quite what I wanted.
+
+[One blog post](https://aidankinzett.com/blog/astro-open-graph-image/) suggested using [astro-og-canvar](https://www.npmjs.com/package/astro-og-canvas) and generating static routes for each image./
+This would work, but astro-og-canvas was too limited as it had a predefined layout.
+I wanted to be able to use my own layout and have more control over the image.
+
+[astro-opengraph-image](https://github.com/altano/npm-packages/tree/main/packages/astro-opengraph-image) seems like a promising effort.
+It is implemented as an Astro middleware using Satori to generate the image.
+Astro middleware run as part of the build process and can modify the output.
+Unfortunately it is not yet ready as it requires changes to Astro before it will work as intended.
+
+
+## Implementing my own solution
+
+I decided to try and implement my own solution as an Astro plugin instead.
+To build a plugin you simply need to create a JavaScript function that optionally takes some options and returns an object with a `name` and `hooks` property.
+The `name` property is the name of the plugin, and the `hooks` property is an object of the hooks the plugin wants Astro to call.
+For example the `astro:config:done` hook is called when Astro is done configuring itself.
+
+My plugin would run after Astro has built the site and generate an opengraph image for each page.
+To do this I would need to use the `astro:build:done` hook.
+The plugin function is called with an object containing the routes (a.k.a pages) Astro has generated.
+
+```ts
+/**
+ * Satori plugin for Astro, returns Astro plugin
+ */
+export function satoriPlugin(): AstroIntegration {
+  let astroConfig: AstroConfig;
+  return {
+    name: "satori-plugin",
+    hooks: {
+      "astro:config:done": ({ config }) => {
+        console.log("Store config for satori-plugin");
+        astroConfig = config;
+      },
+      "astro:build:done": async ({ routes }) => {
+        console.log("Build done, generate og:image for each route");
+
+        const profilePic = (await readFile("./public/images/profile.jpeg")).toString("base64");
+        const wavesSvg = (await readFile("./public/graphics/layered-waves-dark.svg")).toString("base64");
+        
+        const ogImages = routes
+          .filter((route) => route.distURL?.pathname?.endsWith("index.html")?? false)
+          .map((route) =>
+            generateOgImage({ route, site: astroConfig.site ?? "", profilePic, wavesSvg }),
+          );
+
+        await Promise.all(ogImages);
+      },
+    },
+  };
+}
+```
+
+The plugin function first run when Astro's config done hook is done.
+It reads the Astro config and stores it in a variable we can access later.
+
+Then when the Astro build is done the `astro:build:done` hook is called and we can start generating the opengraph images.
+We begin by reading the profile picture and the waves SVG file (my site uses an svg to add wavy gradients).
+This is to avoid having Satori load the files from remote URLs and every time we generate an image.
+
+To find the routes to generate images for I simply filter the routes to only include the ones that ended with `index.html`.
+Other routes are not pages, but assets such as images and JavaScript files.
+The `generateOgImage` function is where the magic happens.
+
+
+```ts
+/**
+ * Generate an og:image for a given route
+ */
+async function generateOgImage({ site, route, profilePic, wavesSvg }: GenerateOgImageProps) {
+  // First we get the html for the route and parse out the title and description
+  const html = await readFile(route.distURL!, { encoding: "utf-8" });
+  const root = parse(html.toString());
+  const title =
+    root.querySelector("meta[name='title']")?.attributes["content"] ?? "";
+  const author = "Snorre Magnus Davøen";
+
+  // Then we generate the URL for the og:image
+  const template = OgImageTemplate({ site, title, author, profilePic, wavesSvg });
+
+
+  try {
+    const svg = await satori(template, {
+      width: 1200,
+      height: 600,
+      fonts: [
+        {
+          // Same font as used on the site headers
+          name: "shortstack",
+          data: await readFile("./public/fonts/shortstack-regular.woff"),
+          style: "normal",
+        },
+      ],
+    });
+
+    // calculate write path by replacing index.html with index-og.svg
+    const writePath = route.distURL!.pathname.replace(
+      "index.html",
+      "index-og.png",
+    );
+
+    // Convert svg to png 
+    const resvg = new Resvg(svg, {})
+    const png = await resvg.render()
+    const pngBuffer = await png.asPng()
+    await writeFile(writePath, pngBuffer);
+  } catch (e) {
+    console.error("Could not generate og:image for route", route.route, e);
+  }
+}
+```
+
+Okay so there is a lot going on here, so let me explain each part in some more detail.
+
+1.  First we read the html for the route and parse it using [parse5](https://www.npmjs.com/package/parse5).
+    This allows us to find the title and description for the page using the `meta` tags.
+    We have to do this as the title and description are not available in the `astro:build:done` hook data.
+
+2.  Then we generate an SVG opengraph image using Satori.
+    We pass in the title we found in the previous step, as well as the site name and author.
+    The `OgImageTemplate` function is a simple function that returns a Satori template object structure.
+    This HTML string is then passed to Satori to generate the SVG.
+    We use the same font as the site headers to keep the style consistent.
+
+3.  After we have generated the SVG we convert it to a PNG.
+    Generally opengraph consumers will not support SVGs, so PNGs are a better choice.
+    We use [resvg](https://www.npmjs.com/package/resvg) to convert the SVG to a PNG.
+    It is a fast XML to PNG converter with a focus on correctness.
+
+4.  Finally we write the PNG to the file system in a location that matches the route.
+    This is done by replacing `index.html` with `index-og.png` in the route path.
+    For example the route `/blog/astro-opengraph-image/index.html` would be written to `/blog/astro-opengraph-image/index-og.png`.
+
+## Using the plugin
+
+To use the plugin I simply add it to my `astro.config.mjs` file.
+
+```js
+import { satoriPlugin } from "./src/plugins/satori-plugin"
+
+export default {
+  integrations: [
+    satoriPlugin(),
+  ],
+}
+```
+
+## The result
+
+In the end I got exactly what I wanted.
+A simple way to generate opengraph images for my Astro site.
+If you want to see the result you can check out the [open graph image for this page](/blog/generating-opengraph-images-for-your-astro-page/index-og.png).
+The full source code for my site is available on [GitHub](https://github.com/snorremd/snorreio/blob/main/src/plugins/satori-plugin.ts).
+Feel free to use it as a starting point for your own site.
