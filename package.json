@@ -36,9 +36,6 @@
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.4.1",
-    "@resvg/resvg-js-darwin-arm64": "^2.4.1",
-    "@resvg/resvg-js-darwin-x64": "^2.4.1",
-    "@resvg/resvg-js-linux-x64-gnu": "^2.4.1",
     "astro-robots-txt": "^1.0.0",
     "node-html-parser": "^6.1.10",
     "prettier": "^3.0.3",
