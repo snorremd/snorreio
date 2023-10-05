@@ -26,7 +26,7 @@ const projects = (await Astro.glob("../projects/*.mdx")).sort(
     slot="content"
     class="w-full bg-stone-200 dark:bg-stone-800 flex flex-col items-center"
   >
-    <ul class="grid gap-8 max-w-6xl auto-cols-auto">
+    <ul class="grid gap-12 max-w-6xl auto-cols-auto">
       {
         projects.map((post) => (
           <li class={`max-w-2xl text-stone-900 dark:text-stone-50`}>
@@ -65,6 +65,7 @@ const projects = (await Astro.glob("../projects/*.mdx")).sort(
               <a
                 href={post.frontmatter.link}
                 class={`
+                  mt-6
                   w-fit
                   flex flex-row items-center gap-2
                   font-shortstack text-sm
