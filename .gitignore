@@ -21,3 +21,8 @@ pnpm-debug.log*
 
 # Rollup analysis
 stats.html
+
+# Babashka/Clojure stuff
+.lsp
+.clj-kondo
+.calva
