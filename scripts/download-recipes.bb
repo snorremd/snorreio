@@ -95,12 +95,13 @@
 (defn main [& args]
     (op-available?)
     (as-> (op-secret!) $
-    (basic-auth client $)
-    (list-remote-recipes! $ nil)
-    (map :_id $)
-    (doseq [id $]
-      (-> (fetch-remote-recipe! (basic-auth client (op-secret!)) id)
-          (write-recipe!)))))
+      (basic-auth client $)
+      (list-remote-recipes! $ (last-recipe!))
+      (map :_id $)
+      (doseq [id $]
+        (println "Fetcing recipe" id)
+        (-> (fetch-remote-recipe! (basic-auth client (op-secret!)) id)
+            (write-recipe!)))))
   
   
   
@@ -114,8 +115,6 @@
 
 (comment
   (main)
-
-  
   (last-recipe!)
 
   (op-secret!)
