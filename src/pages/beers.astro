@@ -1,0 +1,145 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
+
+// Use Astro.glob() to fetch all posts, and then sort them by date.
+const recipes = (await getCollection("beers")).sort((a, b) => {
+  console.log(a.data._timestamp_ms);
+  return b.data._timestamp_ms - a.data._timestamp_ms;
+});
+
+function ebcToHex(ebc: number) {
+    // Convert EBC to RGB (approximation)
+    const r = ebc > 40 ? 255 : Math.round(237 - 6.1 * ebc);
+    const g = ebc > 40 ? Math.round(255 - 254 * ((ebc - 40) / 50)) : Math.round(209 - 4.13 * ebc);
+    const b = ebc > 40 ? 0 : Math.round(54 - 0.46 * ebc);
+
+    // Convert RGB to Hex
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+---
+
+<BaseLayout title={`Beers - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+  <section
+    slot="top"
+    class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+  >
+    <h1 class="pb-4 text-6xl font-shortstack">Beer recipes</h1>
+    <p class="max-w-2xl">
+      This is a collection of beer recipes I've made the past few years. While
+      my homebrewing career stretches back to around 2012, a lot of my recipes
+      were lost to the sands of time. Now that I use
+      <a href="https://www.brewfather.app">Brewfather</a> to manage my recipes,
+      I can easily share them with you.
+    </p>
+  </section>
+  <section
+    slot="content"
+    class="w-full bg-stone-200 dark:bg-stone-800 flex flex-col items-center"
+  >
+    <ul class="grid gap-16 max-w-6xl auto-cols-auto">
+      {
+        recipes.map(({data: recipe}) => (
+          <li class={`max-w-2xl text-stone-900 dark:text-stone-50`}>
+            <a
+              href={`./beers/${recipe.slug}`}
+              class="flex flex-col"
+            >
+            <h2
+              class={`
+                font-shortstack underline-stone-900
+                dark:underline-stone-50 text-2xl
+                mb-2
+                `}
+            >
+              {recipe.name}
+            </h2>
+            <div class="flex flex-row flex-wrap gap-4 text-stone-700 dark:text-stone-200">
+              <dl class="flex flex-row">
+                <dt class="font-bold mr-2">Style</dt>
+                <dd class="mr-4">{recipe?.style?.name ?? "N/A"}</dd>
+
+                <dt class="font-bold mr-2">ABV</dt>
+                <dd class="mr-4">{recipe.abv ?? "N/A"}</dd>
+
+                <dt class="font-bold mr-2">IBU</dt>
+                <dd class="mr-4">{recipe.ibu ?? "N/A"}</dd>
+
+                <dt class="font-bold mr-2">EBC</dt>
+                <dd class="mr-4">
+                  {recipe?.color ?? "N/A"}
+                  <span
+                    class="inline-block w-4 h-4 rounded-full ml-2"
+                    style={{ backgroundColor: ebcToHex(recipe?.color ?? 0) }}
+                  />
+                </dd>
+              </dl>
+            </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .project {
+    @apply w-full text-stone-900 dark:text-stone-50;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply font-shortstack;
+      margin: 1em 0 0.5em;
+    }
+
+    h2 {
+      @apply text-4xl;
+    }
+
+    h3 {
+      @apply text-3xl;
+    }
+
+    h4 {
+      @apply text-2xl;
+    }
+
+    h5 {
+      @apply text-xl;
+    }
+
+    p {
+      margin: 1em 0 0.5em;
+    }
+
+    pre {
+      @apply mx-0 my-4 max-w-full self-center rounded-lg px-4 py-8 drop-shadow;
+    }
+
+    img {
+      @apply inline-flex self-center rounded-lg drop-shadow;
+    }
+
+    Image {
+      @apply w-fit justify-self-center;
+    }
+
+    a {
+      @apply underline underline-offset-2;
+    }
+
+    ul {
+      max-width: 70ch;
+    }
+
+    li {
+      @apply ml-4 list-disc;
+    }
+  }
+</style>
