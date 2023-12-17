@@ -1,0 +1,239 @@
+---
+import { getCollection } from 'astro:content';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../config';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const beers = await getCollection('beers')
+
+  return beers.map(beer => {
+    return {
+      params: {
+        slug: beer.data.slug
+      },
+      props: {
+        beer: beer.data
+      }
+    }
+  })
+}
+
+
+const { slug } = Astro.params;
+const { beer } = Astro.props;
+---
+
+<BaseLayout title={`${beer.name} - beers - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+  <section
+    slot="top"
+    class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+  >
+    <h1 class="pb-4 text-6xl font-shortstack">{beer.name}</h1>
+    <div class="flex flex-row flex-wrap gap-4 text-stone-700 dark:text-stone-200">
+      <dl class="flex flex-row">
+        <dt class="font-bold mr-2">Style</dt>
+        <dd class="mr-4">{beer?.style?.name ?? "N/A"}</dd>
+
+        <dt class="font-bold mr-2">ABV</dt>
+        <dd class="mr-4">{beer?.abv ?? "N/A"}%</dd>
+
+        <dt class="font-bold mr-2">IBU</dt>
+        <dd class="mr-4">{beer?.ibu ?? "N/A"}</dd>
+
+        <dt class="font-bold mr-2">EBC</dt>
+        <dd class="mr-4">
+          {beer?.color ?? "N/A"}
+         
+        </dd>
+
+      </dl>
+    </div>
+  </section>
+  <section
+    slot="content"
+    class="w-full bg-stone-200 dark:bg-stone-800 grid recipe"
+  >
+  <div class="fermentables">
+    <h2>Fermentables</h2>
+
+    <ul>
+      {beer.fermentables.map(({name, amount}) => (
+        <li>
+          {name} - {amount < 1 ? amount * 1000 : amount}
+          {amount < 1 ? "g" : "kg"}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="hops">
+    <h2>Hops</h2>
+
+    <ul>
+      {beer.hops.map(({name, amount, time}) => (
+        <li>
+          {name} - {amount}g @ {time}m
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="yeast">
+    <h2>Yeast</h2>
+
+    <ul>
+      {beer.yeasts.map(({name, amount, unit, type}) => (
+        <li>
+          {name} ({type}) - {amount} {unit}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="measures">
+    <h2>Measures</h2>
+
+    <ul>
+      <li>OG: {beer.og.toFixed(3)}</li>
+      <li>FG: {beer.fg.toFixed(3)}</li>
+      <li>ABV: {beer.abv}%</li>
+      <li>IBU: {beer.ibu}</li>
+      <li>EBC: {beer.color}</li>
+    </ul>
+  </div>
+
+
+  <div class="equiptment">
+    <h2>Equipment</h2>
+
+    
+    <dl>
+      <div class="flex gap-2">
+        <dt>Name:</dt>
+        <dd>{beer.equipment.name}</dd>
+      </div>
+      
+      <div class="flex gap-4">
+        <dt>Batch Size:</dt>
+        <dd>{beer.equipment.batchSize} liters</dd>
+      </div>
+      
+      <div class="flex gap-4">
+        <dt>Efficiency:</dt>
+        <dd>{beer.equipment.efficiency}%</dd>
+      </div>
+
+    </dl>
+  </section>
+
+</BaseLayout>
+
+<style is:global>
+  .recipe {
+    @apply w-full text-stone-900 dark:text-stone-50;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply font-shortstack;
+      margin: 1em 0 0.5em;
+    }
+
+    h2 {
+      @apply text-4xl;
+    }
+
+    h3 {
+      @apply text-3xl;
+    }
+
+    h4 {
+      @apply text-2xl;
+    }
+
+    h5 {
+      @apply text-xl;
+    }
+
+    p {
+      margin: 1em 0 0.5em;
+    }
+
+    pre {
+      @apply mx-0 my-4 max-w-full self-center rounded-lg px-4 py-8 drop-shadow;
+    }
+
+    img {
+      @apply inline-flex self-center rounded-lg drop-shadow;
+    }
+
+    Image {
+      @apply w-fit justify-self-center;
+    }
+
+    a {
+      @apply underline underline-offset-2;
+    }
+
+    ul {
+      max-width: 70ch;
+    }
+
+    li {
+      @apply ml-4 list-disc;
+    }
+  }
+
+  dl {
+    /* Make grid use as little space as possible */
+    @apply grid;
+  }
+
+  dt {
+    @apply font-bold;
+  }
+
+  dd {
+  }
+</style>
+<style>
+  .recipe {
+    grid-template-areas:
+        'measures'
+        'equipment'
+        'fermentables'
+        'hops'
+        'yeast';
+    
+    @media screen(md) {
+    grid-template-areas:
+        'fermentables measures'
+        'hops equiptment'
+        'yeast .';
+    }
+    
+  }
+
+  .fermentables {
+    grid-area: fermentables;
+  }
+
+  .hops {
+    grid-area: hops;
+  }
+
+  .yeast {
+    grid-area: yeast;
+  }
+
+  .measures {
+    grid-area: measures;
+  }
+
+  .equipment {
+    grid-area: equipment;
+  }
+</style>
