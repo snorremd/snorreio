@@ -20,7 +20,8 @@ import { Icon } from 'astro-icon'
     flex lg:flex-row flex-col
     justify-between items-center 
   `}>
-    <a href="/" class="no-underline focus:underline"><h2 class="center text-xl">
+    <a href="/" class="no-underline focus:underline mb-4 lg:mb-0">
+      <h2 class="center text-xl">
       {SITE_TITLE}
     </h2>
     </a>
@@ -28,6 +29,7 @@ import { Icon } from 'astro-icon'
       <HeaderLink href="/">Home</HeaderLink>
       <HeaderLink href="/blog">Blog</HeaderLink>
       <HeaderLink href="/projects">Projects</HeaderLink>
+      <HeaderLink href="/beers">Beers</HeaderLink>
       <HeaderLink href="/about">About</HeaderLink>
       <HeaderLink href="/privacy">Privacy</HeaderLink>
       <HeaderLink href="https://twitter.com/snorremd" title="Twitter" target="_blank"><Icon class="-mx-2 w-[1em]" name="mdi:twitter" /></HeaderLink>
