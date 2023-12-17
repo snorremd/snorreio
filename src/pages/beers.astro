@@ -8,16 +8,6 @@ const recipes = (await getCollection("beers")).sort((a, b) => {
   console.log(a.data._timestamp_ms);
   return b.data._timestamp_ms - a.data._timestamp_ms;
 });
-
-function ebcToHex(ebc: number) {
-    // Convert EBC to RGB (approximation)
-    const r = ebc > 40 ? 255 : Math.round(237 - 6.1 * ebc);
-    const g = ebc > 40 ? Math.round(255 - 254 * ((ebc - 40) / 50)) : Math.round(209 - 4.13 * ebc);
-    const b = ebc > 40 ? 0 : Math.round(54 - 0.46 * ebc);
-
-    // Convert RGB to Hex
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-}
 ---
 
 <BaseLayout title={`Beers - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
@@ -69,10 +59,6 @@ function ebcToHex(ebc: number) {
                 <dt class="font-bold mr-2">EBC</dt>
                 <dd class="mr-4">
                   {recipe?.color ?? "N/A"}
-                  <span
-                    class="inline-block w-4 h-4 rounded-full ml-2"
-                    style={{ backgroundColor: ebcToHex(recipe?.color ?? 0) }}
-                  />
                 </dd>
               </dl>
             </div>

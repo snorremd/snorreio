@@ -23,7 +23,7 @@ const { slug } = Astro.params;
 const { beer } = Astro.props;
 ---
 
-<BaseLayout title={`${beer.name} - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+<BaseLayout title={`${beer.name} - beers - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
   <section
     slot="top"
     class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
