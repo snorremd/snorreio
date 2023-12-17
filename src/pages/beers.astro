@@ -33,7 +33,7 @@ const recipes = (await getCollection("beers")).sort((a, b) => {
         recipes.map(({data: recipe}) => (
           <li class={`max-w-2xl text-stone-900 dark:text-stone-50`}>
             <a
-              href={`./beers/${recipe.slug}`}
+              href={`/beers/${recipe.slug}`}
               class="flex flex-col"
             >
             <h2
