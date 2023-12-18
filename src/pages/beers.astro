@@ -1,11 +1,11 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import BeerGlass from "../components/BeerGlass.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
 const recipes = (await getCollection("beers")).sort((a, b) => {
-  console.log(a.data._timestamp_ms);
   return b.data._timestamp_ms - a.data._timestamp_ms;
 });
 ---
@@ -13,7 +13,7 @@ const recipes = (await getCollection("beers")).sort((a, b) => {
 <BaseLayout title={`Beers - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
   <section
     slot="top"
-    class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+    class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50 p-8 md:p-0"
   >
     <h1 class="pb-4 text-6xl font-shortstack">Beer recipes</h1>
     <p class="max-w-2xl">
@@ -30,38 +30,47 @@ const recipes = (await getCollection("beers")).sort((a, b) => {
   >
     <ul class="grid gap-16 max-w-6xl auto-cols-auto">
       {
-        recipes.map(({data: recipe}) => (
+        recipes.map(({ data: recipe }) => (
           <li class={`max-w-2xl text-stone-900 dark:text-stone-50`}>
             <a
               href={`/beers/${recipe.slug}`}
-              class="flex flex-col"
+              class="flex flex-row items-center"
             >
-            <h2
-              class={`
+              <BeerGlass
+                classOverrides={`
+                min-w-16 min-h-16 w-16 h-16
+                md:min-w-20 md:min-h-20 md:w-20 md:h-20
+              `}
+                srm={recipe?.color ?? "N/A"}
+              />
+              <div class="flex flex-col">
+                <h2
+                  class={`
                 font-shortstack underline-stone-900
                 dark:underline-stone-50 text-2xl
                 mb-2
+                underline
                 `}
-            >
-              {recipe.name}
-            </h2>
-            <div class="flex flex-row flex-wrap gap-4 text-stone-700 dark:text-stone-200">
-              <dl class="flex flex-row">
-                <dt class="font-bold mr-2">Style</dt>
-                <dd class="mr-4">{recipe?.style?.name ?? "N/A"}</dd>
+                >
+                  {recipe.name}
+                </h2>
+                <dl class="flex flex-row flex-wrap">
+                  <div class="w-full md:w-auto flex flex-row">
+                    <dt class="font-bold mr-2">Style</dt>
+                    <dd class="mr-4 whitespace-nowrap">
+                      {recipe?.style?.name ?? "N/A"}
+                    </dd>
+                  </div>
+                  <dt class="font-bold mr-2">ABV</dt>
+                  <dd class="mr-4">{recipe.abv ?? "N/A"}</dd>
 
-                <dt class="font-bold mr-2">ABV</dt>
-                <dd class="mr-4">{recipe.abv ?? "N/A"}</dd>
+                  <dt class="font-bold mr-2">IBU</dt>
+                  <dd class="mr-4">{recipe.ibu ?? "N/A"}</dd>
 
-                <dt class="font-bold mr-2">IBU</dt>
-                <dd class="mr-4">{recipe.ibu ?? "N/A"}</dd>
-
-                <dt class="font-bold mr-2">EBC</dt>
-                <dd class="mr-4">
-                  {recipe?.color ?? "N/A"}
-                </dd>
-              </dl>
-            </div>
+                  <dt class="font-bold mr-2">EBC</dt>
+                  <dd class="mr-4">{recipe?.color ?? "N/A"}</dd>
+                </dl>
+              </div>
             </a>
           </li>
         ))

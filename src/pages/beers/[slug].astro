@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../../config';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import BeerGlass from '../../components/BeerGlass.astro';
 
 export async function getStaticPaths() {
   const beers = await getCollection('beers')
@@ -28,24 +29,30 @@ const { beer } = Astro.props;
     slot="top"
     class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
   >
-    <h1 class="pb-4 text-6xl font-shortstack">{beer.name}</h1>
+  <BeerGlass
+    classOverrides={`
+      min-w-40 min-h-40 w-40 h-40
+      md:min-w-64 md:min-h-64 md:w-64 md:h-64
+    `}
+    srm={beer?.color ?? "N/A"}
+  />
+    <h1 class="pb-4 text-4xl font-shortstack max-w-full p-8">{beer.name}</h1>
     <div class="flex flex-row flex-wrap gap-4 text-stone-700 dark:text-stone-200">
-      <dl class="flex flex-row">
-        <dt class="font-bold mr-2">Style</dt>
-        <dd class="mr-4">{beer?.style?.name ?? "N/A"}</dd>
-
+      <dl class="flex flex-row flex-wrap justify-center">
+        <div class="flex flex-row justify-center flex-nowrap w-full md:w-auto">
+          <dt class="font-bold mr-2">Style</dt>
+          <dd class="mr-4 whitespace-nowrap">
+            {beer?.style?.name ?? "N/A"}
+          </dd>
+        </div>
         <dt class="font-bold mr-2">ABV</dt>
-        <dd class="mr-4">{beer?.abv ?? "N/A"}%</dd>
+        <dd class="mr-4">{beer.abv ?? "N/A"}</dd>
 
         <dt class="font-bold mr-2">IBU</dt>
-        <dd class="mr-4">{beer?.ibu ?? "N/A"}</dd>
+        <dd class="mr-4">{beer.ibu ?? "N/A"}</dd>
 
         <dt class="font-bold mr-2">EBC</dt>
-        <dd class="mr-4">
-          {beer?.color ?? "N/A"}
-         
-        </dd>
-
+        <dd class="mr-4">{beer?.color ?? "N/A"}</dd>
       </dl>
     </div>
   </section>
