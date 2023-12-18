@@ -1,0 +1,218 @@
+---
+pubDate: "2023-12-18"
+layout: "../../layouts/BlogPost.astro"
+title: "Building beer recipe pages with Astro and Brewfather"
+---
+
+
+import BeerGlass from "../../components/BeerGlass.astro"
+
+Christmas is coming up and I took an early vacation to spend some time on my side projects.
+One of my precious hobbies is home brewing which I get to do every so often.
+Me and my friend like to experiment with different recipes that we make ourselves.
+For recipes I use a tool called [Brewfather](https://brewfather.app/).
+
+Brewfather is a great tool for creating and managing your recipes and brew sessions.
+As a home brewer I have often found help in reading and learning from other people's recipes.
+So I wanted a way to share my recipes with the home brewing world.
+There is a function in Brewfather to share individual recipes via links, but I wanted to have a place where I could share all my recipes in one place.
+As I already have this site I thought it would be a good idea to add a section for my recipes here.
+
+## Brewfather API
+
+Fortunately for me Brewfather has an API that I can use to fetch my recipes.
+The API is provided as a REST-like API with endpoints for fetching recipes, batches, and inventory.
+So I set out to build a helper script that would download each recipe and save it as a JSON file.
+Because I'm in love with [Clojure](https://clojure.org/) from my old job, I decided to use [babashka](https://https://babashka.org/) to build it.
+
+The script is pretty simple, it essentially boils down to a few steps:
+
+1. Define some global variables
+2. Fetch the API secret using the 1Password CLI
+3. Fetch the list of recipes not already downloaded
+4. Fetch each recipe and save it as a JSON file
+
+The main function then looks like this:
+
+```clojure
+(defn main [& args]
+  (op-available?)
+  (as-> (op-secret!) $
+    (basic-auth client $)
+    (list-remote-recipes! $ (last-recipe!))
+    (map :_id $)
+    (doseq [id $]
+      (println "Fetcing recipe" id)
+      (-> (fetch-remote-recipe! (basic-auth client (op-secret!)) id)
+          (write-recipe!)))))
+```
+
+I keep the secret stored in 1Password and fetch it directly from 1Password using their CLI to avoid leaking it.
+Leaking the secret can happen if you pass it as an environment variable or as a command line argument.
+Brewfather uses basic authentication so I create a basic auth header using the hard-coded client id and the secret.
+Then I fetch the list of recipes that I haven't already downloaded.
+Because I order the recipes by date I can use the last recipe I downloaded as a starting point.
+I then map the list of recipes to their ids and fetch each recipe and save it as a JSON file.
+
+## Astro
+
+Now that I have all my recipes downloaded I need to build a page to display them.
+Astro has great support for [data collections](https://docs.astro.build/en/guides/content-collections).
+This allows me to define a collection type for my beer recipes and strongly type them via [zod schemas](https://zod.dev/).
+So I created a `config.ts` file in `src/content/config.ts` and defined my collection type:
+
+```typescript
+// Sub schemas elided for brevity
+
+const beerRecipesCollection = defineCollection({
+  type: "data",
+  schema: z.object({
+    name: z.string(),
+    slug: z.string(),
+    _timestamp_ms: z.number(),
+    abv: z.number(),
+    ibu: z.number(),
+    color: z.number(),
+    fg: z.number(),
+    og: z.number(),
+    batchSize: z.number(), // liters
+    style: style.optional().nullable(),
+    mash: mashAndFerment,
+    fermentables: z.array(fermentable),
+    yeasts: z.array(yeast),
+    hops: z.array(hop),
+    equipment
+  }),
+});
+
+export const collections = {
+  beers: beerRecipesCollection,
+}
+```
+
+So now I have a collection of beer recipes that I can use in my pages.
+I then defined two pages, one for the list of recipes and one for the individual recipes.
+
+### List page
+
+The list page, `/src/pages/beers.astro`, is pretty simple.
+It just lists all the recipes in the collection.
+
+```astro
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BeerGlass from "../components/BeerGlass.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
+
+// Use Astro.glob() to fetch all posts, and then sort them by date.
+const recipes = (await getCollection("beers")).sort((a, b) => {
+  return b.data._timestamp_ms - a.data._timestamp_ms;
+});
+---
+
+
+{/* Simplified layout example */}
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <h1>Beer recipes</h1>
+  <ul>
+    {recipes.map((recipe) => (
+      <li>
+        <a href={`/recipes/${recipe.data.slug}`}>{recipe.data.name}</a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
+```
+
+### Recipe page
+
+The recipe page, `/src/pages/beers/[slug].astro`, is a bit more involved.
+Astro requires you to define a `getStaticPaths` function that returns a list of paths to render.
+For each path you return you specify any parameters and properties that should be passed to the page.
+
+
+```astro
+---
+import { getCollection } from 'astro:content';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../config';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BeerGlass from '../../components/BeerGlass.astro';
+
+export async function getStaticPaths() {
+  const beers = await getCollection('beers')
+
+  return beers.map(beer => {
+    return {
+      params: {
+        slug: beer.data.slug
+      },
+      props: {
+        beer: beer.data
+      }
+    }
+  })
+}
+
+const { slug } = Astro.params;
+const { beer } = Astro.props;
+---
+
+{/* Simplified layout */}
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <h1>{beer.name}</h1>
+  <BeerGlass beer={beer} />
+</BaseLayout>
+```
+
+## Some design choices
+
+For the beer recipe design I wanted to keep it simple like the rest of the site.
+However, I wanted to add some color to the page to make it stand out a bit.
+Also it is common to show which color the beer will have based on the recipe.
+I ended up using ChatGPT to help generate a simple vector like image of a tulip style beer glass.
+This was then vectorized using [Vectorizer.ai](https://vectorizer.ai/) to convert the webp raster image to an SVG.
+The result from that was a promising SVG with only three different colors used for the beer liquid.
+I then edited away artifacts using [Krita](https://krita.org/en/) which has some simple SVG support.
+
+From the SVG I then created an Astro component which accepts a beer color (SRM).
+It then calculates the primary beer color in RGB and two darker shades of the same color.
+I do this by simply incrementing the SRM value by 2 and 4 respectively and using the same converter as with the base color.
+
+The end result turned out to be pretty good, but don't take my word for it, see for yourself:
+
+<div class="flex min-w-full justify-center">
+<BeerGlass classOverrides="w-64 h-64" srm={4} />
+</div>
+
+<ul class="flex flex-row flex-wrap justify-center min-w-full">
+  <BeerGlass classOverrides="w-16 h-16" srm={1} />
+  <BeerGlass classOverrides="w-16 h-16" srm={2} />
+  <BeerGlass classOverrides="w-16 h-16" srm={4} />
+  <BeerGlass classOverrides="w-16 h-16" srm={6} />
+  <BeerGlass classOverrides="w-16 h-16" srm={8} />
+  <BeerGlass classOverrides="w-16 h-16" srm={10} />
+  <BeerGlass classOverrides="w-16 h-16" srm={12} />
+  <BeerGlass classOverrides="w-16 h-16" srm={14} />
+  <BeerGlass classOverrides="w-16 h-16" srm={16} />
+  <BeerGlass classOverrides="w-16 h-16" srm={18} />
+  <BeerGlass classOverrides="w-16 h-16" srm={20} />
+  <BeerGlass classOverrides="w-16 h-16" srm={22} />
+  <BeerGlass classOverrides="w-16 h-16" srm={24} />
+  <BeerGlass classOverrides="w-16 h-16" srm={26} />
+  <BeerGlass classOverrides="w-16 h-16" srm={28} />
+  <BeerGlass classOverrides="w-16 h-16" srm={30} />
+  <BeerGlass classOverrides="w-16 h-16" srm={32} />
+  <BeerGlass classOverrides="w-16 h-16" srm={34} />
+  <BeerGlass classOverrides="w-16 h-16" srm={36} />
+  <BeerGlass classOverrides="w-16 h-16" srm={38} />
+  <BeerGlass classOverrides="w-16 h-16" srm={40} />
+</ul>
+
+## Conclusion
+
+I'm really happy with the results so far.
+There is still some work to be done for the recipe page.
+It lacks some details around mash temperatures, total boil time, and sparge water volume among other things.
+I do believe that this is a good start though and I'm looking forward to adding more recipes to my site.
+You can find all the recipes at [/beers](/beers).
