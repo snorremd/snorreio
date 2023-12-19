@@ -41,7 +41,7 @@ const { beer } = Astro.props;
       min-w-40 min-h-40 w-40 h-40
       md:min-w-64 md:min-h-64 md:w-64 md:h-64
     `}
-      srm={beer?.color ?? "N/A"}
+      srm={beer?.color}
     />
     <h1 class="pb-4 text-4xl font-shortstack max-w-full p-8">{beer.name}</h1>
     <div
@@ -166,7 +166,7 @@ const { beer } = Astro.props;
 
     <div class="recipe-steps h-fit">
 
-      <BeerGlass classOverrides="w-24 h-24 md:place-self-center pb-4" />
+      <BeerGlass classOverrides="w-24 h-24 md:place-self-center pb-4" srm={beer?.color} />
       <div class="flex flex-col">
         <h2>Style</h2>
         <p>
