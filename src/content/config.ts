@@ -6,7 +6,7 @@ const mashAndFerment = z.object({
     stepTemp: z.number(),
     type: z.string(),
     name: z.string(),
-    time: z.number().optional(),
+    stepTime: z.number().optional(),
   }))
 })
 
@@ -51,6 +51,11 @@ const equipment = z.object({
   batchSize: z.number(), // liters
 })
 
+const data = z.object({
+  mashWaterAmount: z.number(),
+  spargeWaterAmount: z.number(),
+})
+
 const beerRecipesCollection = defineCollection({
   type: "data",
   schema: z.object({
@@ -68,7 +73,10 @@ const beerRecipesCollection = defineCollection({
     fermentables: z.array(fermentable),
     yeasts: z.array(yeast),
     hops: z.array(hop),
-    equipment
+    equipment,
+    data,
+    boilTime: z.number(),
+    boilSize: z.number(),
   }),
 });
 

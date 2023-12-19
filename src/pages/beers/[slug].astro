@@ -1,43 +1,52 @@
 ---
-import { getCollection } from 'astro:content';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../config';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import BeerGlass from '../../components/BeerGlass.astro';
+import { getCollection } from "astro:content";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../config";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BeerGlass from "../../components/BeerGlass.astro";
+import hops from "../../assets/images/hops.svg";
+import grain from "../../assets/images/grain.svg";
+import waterDroplet from "../../assets/images/water-droplet.svg";
+import pot from "../../assets/images/pot.svg";
+import yeast from "../../assets/images/yeast.svg";
 
 export async function getStaticPaths() {
-  const beers = await getCollection('beers')
+  const beers = await getCollection("beers");
 
-  return beers.map(beer => {
+  return beers.map((beer) => {
     return {
       params: {
-        slug: beer.data.slug
+        slug: beer.data.slug,
       },
       props: {
-        beer: beer.data
-      }
-    }
-  })
+        beer: beer.data,
+      },
+    };
+  });
 }
-
 
 const { slug } = Astro.params;
 const { beer } = Astro.props;
 ---
 
-<BaseLayout title={`${beer.name} - beers - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+<BaseLayout
+  title={`${beer.name} - beers - ${SITE_TITLE}`}
+  description={SITE_DESCRIPTION}
+>
   <section
     slot="top"
     class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
   >
-  <BeerGlass
-    classOverrides={`
+    <BeerGlass
+      classOverrides={`
       min-w-40 min-h-40 w-40 h-40
       md:min-w-64 md:min-h-64 md:w-64 md:h-64
     `}
-    srm={beer?.color ?? "N/A"}
-  />
+      srm={beer?.color ?? "N/A"}
+    />
     <h1 class="pb-4 text-4xl font-shortstack max-w-full p-8">{beer.name}</h1>
-    <div class="flex flex-row flex-wrap gap-4 text-stone-700 dark:text-stone-200">
+    <div
+      class="flex flex-row flex-wrap gap-4 text-stone-700 dark:text-stone-200"
+    >
       <dl class="flex flex-row flex-wrap justify-center">
         <div class="flex flex-row justify-center flex-nowrap w-full md:w-auto">
           <dt class="font-bold mr-2">Style</dt>
@@ -58,86 +67,168 @@ const { beer } = Astro.props;
   </section>
   <section
     slot="content"
-    class="w-full bg-stone-200 dark:bg-stone-800 grid recipe"
+    class="bg-stone-200 dark:bg-stone-800 flex flex-col md:flex-row gap-16 p-4 recipe"
   >
-  <div class="fermentables">
-    <h2>Fermentables</h2>
+    <div class="recipe-steps">
+      <img src={grain.src} alt="Grain" class="w-16 h-32 md:place-self-center pb-4" />
+      <div class="flex flex-col w-full">
+        <h2>Fermentables</h2>
+        <ul class="content">
+          {
+            beer.fermentables.map(({ name, amount }) => (
+              <li>
+                {name} - {amount < 1 ? amount * 1000 : amount}
+                {amount < 1 ? "g" : "kg"}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-    <ul>
-      {beer.fermentables.map(({name, amount}) => (
-        <li>
-          {name} - {amount < 1 ? amount * 1000 : amount}
-          {amount < 1 ? "g" : "kg"}
-        </li>
-      ))}
-    </ul>
-  </div>
+      <img src={waterDroplet.src} alt="Water" class="w-16 h-16 md:place-self-center pb-4" />
+      <div class="flex flex-col w-full">
+        <h2>Water</h2>
 
-  <div class="hops">
-    <h2>Hops</h2>
+        <dl>
+          <div class="flex gap-4">
+            <dt>Batch Size:</dt>
+            <dd>{beer.batchSize} liters</dd>
+          </div>
 
-    <ul>
-      {beer.hops.map(({name, amount, time}) => (
-        <li>
-          {name} - {amount}g @ {time}m
-        </li>
-      ))}
-    </ul>
-  </div>
+          <div class="flex gap-2">
+            <dt>Pre-mash:</dt>
+            <dd>{beer.data.mashWaterAmount} liters</dd>
+          </div>
+  
+          <div class="flex gap-4">
+            <dt>Sparge:</dt>
+            <dd>{beer.data.spargeWaterAmount} liters</dd>
+          </div>
 
-  <div class="yeast">
-    <h2>Yeast</h2>
+          <div class="flex gap-4">
+            <dt>Pre-boil:</dt>
+            <dd>{beer.boilSize} liters</dd>
+          </div>
+        </dl>
 
-    <ul>
-      {beer.yeasts.map(({name, amount, unit, type}) => (
-        <li>
-          {name} ({type}) - {amount} {unit}
-        </li>
-      ))}
-    </ul>
-  </div>
+      </div>
 
-  <div class="measures">
-    <h2>Measures</h2>
+      <img src={pot.src} alt="Pot" class="w-16 h-16 md:place-self-center pb-4" />
+      <div class="flex flex-col w-full">
+        <h2>Mash steps</h2>
+        <ul>
+          {
+            beer.mash.steps.map(({ name, stepTemp, stepTime }) => (
+              <li>
+                {stepTemp}°C for {stepTime}m
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-    <ul>
-      <li>OG: {beer.og.toFixed(3)}</li>
-      <li>FG: {beer.fg.toFixed(3)}</li>
-      <li>ABV: {beer.abv}%</li>
-      <li>IBU: {beer.ibu}</li>
-      <li>EBC: {beer.color}</li>
-    </ul>
-  </div>
+      <img src={hops.src} alt="Hops" class="w-16 h-16 md:place-self-center pb-4" />
+      <div class="flex flex-col w-full">
+        <h2>Hops</h2>
+        <dl class="mb-4">
+          <div class="flex gap-2">
+            <dt>Boil time:</dt>
+            <dd>{beer.boilTime}m</dd>
+          </div>
+        </dl>
 
+        <h3>Additions</h3>
+        <ul>
+          {
+            beer.hops.map(({ name, amount, time }) => (
+              <li>
+                {name} - {amount}g @ {time}m
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-  <div class="equiptment">
-    <h2>Equipment</h2>
+      <img src={yeast.src} alt="Yeast" class="w-16 h-16 md:place-self-center pb-4" />
+      <div class="flex flex-col w-full">
+        <h2>Yeast</h2>
+        <ul>
+          {
+            beer.yeasts.map(({ name, amount, unit, type }) => (
+              <li>
+                {name} ({type}) - {amount} {unit}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
 
-    
-    <dl>
-      <div class="flex gap-2">
-        <dt>Name:</dt>
-        <dd>{beer.equipment.name}</dd>
+    <div class="recipe-steps h-fit">
+
+      <BeerGlass classOverrides="w-24 h-24 md:place-self-center pb-4" />
+      <div class="flex flex-col">
+        <h2>Style</h2>
+        <p>
+          {beer?.style?.name}
+          <span class="font-light">({beer?.style?.category})</span>
+        </p>
+
+        <dl>
+          <div class="flex gap-2">
+            <dt>OG:</dt>
+            <dd>{beer.og.toFixed(3)}</dd>
+          </div>
+  
+          <div class="flex gap-4">
+            <dt>FG:</dt>
+            <dd>{beer.fg.toFixed(3)}</dd>
+          </div>
+  
+          <div class="flex gap-4">
+            <dt>ABV:</dt>
+            <dd>{beer.abv}%</dd>
+          </div>
+
+          <div class="flex gap-4">
+            <dt>IBU:</dt>
+            <dd>{beer.ibu}</dd>
+          </div>
+
+          <div class="flex gap-4">
+            <dt>EBC:</dt>
+            <dd>{beer.color}</dd>
+          </div>
+        </dl>
       </div>
       
-      <div class="flex gap-4">
-        <dt>Batch Size:</dt>
-        <dd>{beer.equipment.batchSize} liters</dd>
-      </div>
-      
-      <div class="flex gap-4">
-        <dt>Efficiency:</dt>
-        <dd>{beer.equipment.efficiency}%</dd>
-      </div>
+      <img src={pot.src} alt="Pot" class="w-16 h-16 md:place-self-center pb-4" />
+      <div class="flex flex-col">
+        <h2>Equipment</h2>
+        <dl>
+          <div class="flex gap-2">
+            <dt>Name:</dt>
+            <dd>{beer.equipment.name}</dd>
+          </div>
 
-    </dl>
+          <div class="flex gap-4">
+            <dt>Batch Size:</dt>
+            <dd>{beer.equipment.batchSize} liters</dd>
+          </div>
+
+          <div class="flex gap-4">
+            <dt>Efficiency:</dt>
+            <dd>{beer.equipment.efficiency}%</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
   </section>
-
 </BaseLayout>
 
 <style is:global>
   .recipe {
-    @apply w-full text-stone-900 dark:text-stone-50;
+    @apply text-stone-900 dark:text-stone-50;
 
     h1,
     h2,
@@ -146,7 +237,7 @@ const { beer } = Astro.props;
     h5,
     h6 {
       @apply font-shortstack;
-      margin: 1em 0 0.5em;
+      margin: 0 0 0.5em;
     }
 
     h2 {
@@ -154,15 +245,15 @@ const { beer } = Astro.props;
     }
 
     h3 {
-      @apply text-3xl;
-    }
-
-    h4 {
       @apply text-2xl;
     }
 
-    h5 {
+    h4 {
       @apply text-xl;
+    }
+
+    h5 {
+      @apply text-lg;
     }
 
     p {
@@ -171,14 +262,6 @@ const { beer } = Astro.props;
 
     pre {
       @apply mx-0 my-4 max-w-full self-center rounded-lg px-4 py-8 drop-shadow;
-    }
-
-    img {
-      @apply inline-flex self-center rounded-lg drop-shadow;
-    }
-
-    Image {
-      @apply w-fit justify-self-center;
     }
 
     a {
@@ -205,42 +288,28 @@ const { beer } = Astro.props;
 
   dd {
   }
+
 </style>
+
 <style>
-  .recipe {
-    grid-template-areas:
-        'measures'
-        'equipment'
-        'fermentables'
-        'hops'
-        'yeast';
-    
+  .recipe-steps {
+    @apply grid;
+    grid-template-columns: 1fr;
+    /* Every second child margin bottom */
+
+    > *:nth-child(2n) {
+      @apply mb-12;
+    }
+
     @media screen(md) {
-    grid-template-areas:
-        'fermentables measures'
-        'hops equiptment'
-        'yeast .';
+      grid-template-columns: auto 1fr;
+      @apply gap-12;
+
+      > *:nth-child(2n) {
+      @apply mb-0;
+    }
     }
     
-  }
-
-  .fermentables {
-    grid-area: fermentables;
-  }
-
-  .hops {
-    grid-area: hops;
-  }
-
-  .yeast {
-    grid-area: yeast;
-  }
-
-  .measures {
-    grid-area: measures;
-  }
-
-  .equipment {
-    grid-area: equipment;
+    grid-template-rows: auto;
   }
 </style>
