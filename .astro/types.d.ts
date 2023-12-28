@@ -209,11 +209,6 @@ declare module 'astro:content' {
   collection: "beers";
   data: InferEntrySchema<"beers">
 };
-"2022-01-31-rykeloven---lov-om-vern-mot-tobakksskader--25": {
-	id: "2022-01-31-rykeloven---lov-om-vern-mot-tobakksskader--25";
-  collection: "beers";
-  data: InferEntrySchema<"beers">
-};
 "2022-06-11-lov-om-helligdager-og-helligdagsfred": {
 	id: "2022-06-11-lov-om-helligdager-og-helligdagsfred";
   collection: "beers";
@@ -234,8 +229,13 @@ declare module 'astro:content' {
   collection: "beers";
   data: InferEntrySchema<"beers">
 };
-"2023-08-01-christmas": {
-	id: "2023-08-01-christmas";
+"2023-12-17-christmas": {
+	id: "2023-12-17-christmas";
+  collection: "beers";
+  data: InferEntrySchema<"beers">
+};
+"2023-12-28-winter-warmer": {
+	id: "2023-12-28-winter-warmer";
   collection: "beers";
   data: InferEntrySchema<"beers">
 };
