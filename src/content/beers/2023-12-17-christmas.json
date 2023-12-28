@@ -1,5 +1,5 @@
 {
-  "styleColor" : null,
+  "styleColor" : true,
   "_created" : {
     "_seconds" : 1687970515,
     "_nanoseconds" : 213000000
@@ -8,10 +8,10 @@
   "preBoilGravity" : 1.06,
   "tags" : null,
   "_id" : "oWQZJbxQ6swUzCFrrM5p7k7lftr1S1",
-  "_timestamp_ms" : 1690922487460,
+  "_timestamp_ms" : 1702816817821,
   "rbRatio" : 1.15,
   "carbonation" : 2.4,
-  "slug" : "2023-08-01-christmas",
+  "slug" : "2023-12-17-christmas",
   "mash" : {
     "name" : "High fermentability",
     "_id" : "default",
@@ -23,7 +23,7 @@
     } ]
   },
   "sumAromaHopPerLiter" : 0,
-  "_rev" : "vYaGJxF334o6RsHYJ4pAWm4IkS1YYb",
+  "_rev" : "Zxuxvz27JVYAMCiLxpkORviHcQDetb",
   "color" : 35.1,
   "fermentation" : {
     "name" : "Ale",
@@ -34,16 +34,21 @@
       "stepTime" : 14
     } ]
   },
-  "styleAbv" : null,
+  "styleAbv" : true,
   "fgFormula" : "normal",
   "_timestamp" : {
-    "_seconds" : 1690922487,
-    "_nanoseconds" : 460000000
+    "_seconds" : 1702816817,
+    "_nanoseconds" : 821000000
   },
+  "styleCarb" : true,
   "fg" : 1.002,
-  "styleIbu" : null,
+  "styleIbu" : true,
   "name" : "Christmas",
-  "carbonationStyle" : null,
+  "carbonationStyle" : {
+    "carbMax" : 2.8,
+    "carbMin" : 2.2,
+    "name" : "Imperial Stout"
+  },
   "primaryTemp" : 20,
   "sumDryHopPerLiter" : 0,
   "_type" : "recipe",
@@ -131,7 +136,7 @@
   } ],
   "ibu" : 73.7,
   "type" : "All Grain",
-  "styleBuGu" : null,
+  "styleBuGu" : true,
   "og" : 1.077887973,
   "hops" : [ {
     "actualTime" : null,
@@ -209,6 +214,33 @@
   "_ev" : 1.1,
   "ibuFormula" : "tinseth",
   "abv" : 9.98,
+  "style" : {
+    "category" : "American Porter and Stout",
+    "abvMin" : 8,
+    "_id" : "default-64",
+    "carbMin" : 2.2,
+    "lovibondMin" : 30,
+    "name" : "Imperial Stout",
+    "styleLetter" : "C",
+    "colorMin" : 30,
+    "type" : "Stout",
+    "carbMax" : 2.8,
+    "ibuMax" : 90,
+    "categoryNumber" : "20",
+    "rbrMin" : 0.51,
+    "fgMin" : 1.018,
+    "styleGuide" : "BJCP 2021",
+    "colorMax" : 40,
+    "buGuMax" : 0.95,
+    "buGuMin" : 0.53,
+    "rbrMax" : 0.92,
+    "lovibondMax" : 40,
+    "ibuMin" : 50,
+    "abvMax" : 12,
+    "ogMax" : 1.115,
+    "ogMin" : 1.075,
+    "fgMax" : 1.03
+  },
   "mashEfficiency" : 77.5,
   "author" : "Snorremd",
   "hopsTotalAmount" : 90,
@@ -381,10 +413,11 @@
     "substitutes" : ""
   } ],
   "batchSize" : 21,
+  "styleRbr" : false,
   "extraGravity" : 0,
   "efficiency" : 74,
-  "styleOg" : null,
-  "_version" : "2.9.2",
+  "styleOg" : true,
+  "_version" : "2.10.3",
   "water" : {
     "diluted" : null,
     "mashTargetDiff" : null,
@@ -599,7 +632,7 @@
   "postBoilGravity" : 1.077887973,
   "_uid" : "tVjFFz7ZN2V5u4vBr31tqqBDxss1",
   "fermentablesTotalAmount" : 6.9,
-  "styleFg" : null,
+  "styleFg" : false,
   "nutrition" : {
     "carbs" : {
       "total" : 3.740542272635673
@@ -638,7 +671,7 @@
     "manufacturingDate" : null
   } ],
   "fermentableIbu" : 0,
-  "styleConformity" : null,
+  "styleConformity" : false,
   "boilSize" : 25.42,
   "data" : {
     "hltWaterAmount" : 6.28,
