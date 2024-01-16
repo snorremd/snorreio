@@ -1,0 +1,222 @@
+---
+pubDate: "2024-01-16"
+layout: "../../layouts/BlogPost.astro"
+title: "process-bonk a small utility to watch and kill a process"
+---
+
+It was a lovely day, I was at work doing my regular frontend development.
+I was testing out the [spotify_player](https://github.com/aome510/spotify-player) a beautiful TUI client for spotify on MacOS.
+As anyone testing out a new app I was curious to see how much resources it was using so I fired up the activity monitor.
+`spotify_player` was using a modest amount of resources and I was happy.
+But to my dismay I discovered that a completely different process was using a lot of resources.
+In fact it was using 100% of my CPU and had been doing so for quite a few hours!
+It was a process that ran as a service and it was one that was mandated by my company.
+
+So I killed the process, it restarted, and from then on seemed to behave normally.
+But I was curious, why did it start using so much resources?
+Apparently it was a known issue that this process could sometimes go haywire, leak memory, and start hogging the CPU.
+If there were shorter periods of high CPU usage it might be fine, but this process had been running for hours at 100% CPU usage.
+That seems excessive for most processes, and I was reasonably sure the process was in fact buggy and restarting it was the way to go.
+
+Now the fun thing is that the new MacBook Pros are insanely quiet, and so the normal fan noise was not enough to alert me to the fact that my CPU was being used at 100%.
+So how would I know if it started acting up again?
+I could check the activity monitor every few minutes, but that would be borderline insane.
+So I did what any sane person would do, I wrote a small utility to watch the process and allow me to kill it if it started acting up again.
+
+## process-bonk
+
+Enter [process-bonk](https://github.com/snorremd/process-bonk), a small utility to watch and kill a process.
+It's a small utility written in Rust that allows you to watch a process and kill it if it starts using too much CPU over time.
+process-bonk is about a 100 lines of code, and a silly project, but it was fun to write and it is useful to me.
+Basically the application works by reading the process name to monitor from a config file.
+It then starts a monitoring loop that first identifies the process corresponding to the name.
+Then it checks the CPU usage and if over a certain threshold starts a timer.
+Now if the CPU usage is still over the threshold when the timer expires the app notifies me via a dialog and gives me the option to kill the process.
+
+```rust
+use std::{env, fs};
+use std::time::{Duration, Instant};
+use std::thread::sleep;
+use sysinfo::{System, Signal};
+use toml::Value;
+use native_dialog::{MessageDialog, MessageType};
+
+fn main() {
+    let mut system = System::new_all();
+    let mut monitored_process: Option<&sysinfo::Process> = None;
+    let mut high_cpu_usage_start: Option<Instant> = None;
+
+    // Get the config file path from the command-line arguments
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        println!("Please provide a config file path");
+        std::process::exit(1);
+    }
+
+    let config_file_path = &args[1];
+
+    println!("Loading config file from {}", config_file_path);
+
+    // Read the config file
+    let config_file_content = fs::read_to_string(config_file_path)
+        .expect("Could not read config file");
+
+    // Parse the TOML content
+    let config: Value = config_file_content.parse()
+        .expect("Could not parse config file");
+
+    // Get the process name from the config
+    let process_name = config.get("process_name")
+        .and_then(Value::as_str)
+        .expect("Could not find 'process_name' in config file");
+
+    // Log that we are monitoring the process
+    println!("process-bonk is now monitoring the {} process", process_name);
+    system.refresh_all();
+
+    loop {
+        while monitored_process.is_none() {
+            // Find the process
+            let processes = system.processes();
+            for (pid, process) in processes.iter() {
+                if process.name() == process_name {
+                    println!("Found {} process with PID {}", process_name, pid);
+                    monitored_process = Some(process);
+                    break;
+                }
+            }
+
+            // If we didn't find the process, sleep for a while before trying again
+            if monitored_process.is_none() {
+                println!("{} process not found, sleeping for 60 seconds", process_name);
+                sleep(Duration::from_secs(60));
+            }
+        }
+
+        if let Some(process) = monitored_process {
+            let cpu_usage = process.cpu_usage();
+            if cpu_usage >= 98.0 {
+                match high_cpu_usage_start {
+                    Some(start_time) if start_time.elapsed() > Duration::from_secs(300) => {
+                        // If the process has been using 100% CPU for more than 5 minutes, kill it
+                        println!("{} has been using lots of CPU for more than 5 minutes, bonking it", process_name);
+                        let yes = MessageDialog::new()
+                            .set_type(MessageType::Info)
+                            .set_title("Process Bonk")
+                            .set_text(&format!("{} is misbehaving, kill it?", process_name))
+                            .show_confirm()
+                            .unwrap();
+                        if yes {
+                            println!("User chose to kill {}", process_name);
+                            process.kill_with(Signal::Kill);
+                        } else {
+                            println!("User chose not to kill {}", process_name);
+                        }
+                        // User has been notified, reset the tracking
+                        high_cpu_usage_start = None;
+                    }
+                    None => {
+                        // Start tracking when the process started using 100% CPU
+                        println!("{} started using lots of CPU at {}%, will bonk if not behaving", process_name, cpu_usage);
+                        high_cpu_usage_start = Some(Instant::now());
+                    }
+                    _ => {
+                        println!("{} is still using lots of CPU at {}% for {} minutes", process_name, cpu_usage, high_cpu_usage_start.unwrap().elapsed().as_secs() / 60);
+                    }
+                }
+            } else {
+                // If the process is not using 100% CPU anymore, reset tracking
+                println!("{} is currently using {}% CPU", process_name, cpu_usage);
+                high_cpu_usage_start = None;
+            }
+        }
+        // Sleep for a while before the next iteration
+        sleep(Duration::from_secs(60));
+    }
+}
+```
+
+But how to run this thing?
+I didn't want to have to manually start it every time I rebooted my computer.
+Well fortunately I remembered having previous experience with Brew formulas implemented as services.
+Homebrew allows formula creators to create application services that gets installed as MacOS launchd services.
+I also had some experience with creating Homebrew formulas, so I decided to create a formula for process-bonk.
+
+## process-bonk Homebrew formula
+
+The Homebrew formula is pretty simple, it compiles the Rust application using `cargo build --release` and then installs it as a launchd service.
+The formula is available in the [process-bonk Homebrew tap](https://github.com/snorremd/homebrew-tap) and can be installed using the following command:
+
+```bash
+brew install snorremd/tap/process-bonk
+```
+
+Again there is not that many lines of code to achieve my goal, but it was my first service!
+
+```ruby
+class ProcessBonk < Formula
+  desc "BONK process, don't eat all my Mac's CPU"
+  homepage "https://github.com/snorremd/process-bonk"
+  url "https://github.com/snorremd/process-bonk/archive/refs/tags/v0.1.0.tar.gz"
+  sha256 "6a6bedc6b2e0b17badd068cc99c720de7aaa5492a218ead7a750469345234f38"
+  license "MIT"
+
+  bottle do
+    root_url "https://ghcr.io/v2/snorremd/tap"
+    sha256 cellar: :any_skip_relocation, ventura:      "907b82f4dbae39a595fb75fe197a0792cce270329d9b97d0fb0c8280ebbe4f26"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "fd68dccc7bdc3aa415c5513784acd27f8dea524afe58ffafc0a57f70b45091f4"
+  end
+
+  depends_on "rust" => :build
+
+  def install
+    system "cargo", "install", *std_cargo_args
+  end
+
+  service do
+    run [opt_bin/"process-bonk", "#{etc}/process-bonk/process-bonk.toml"]
+    log_path var/"log/process-bonk.log"
+    error_log_path var/"log/process-bonk.log"
+  end
+
+  def post_install
+    # Create a configuration file if it doesn't exist
+    (etc/"process-bonk").mkpath
+    unless (etc/"process-bonk/process-bonk.toml").exist?
+      (etc/"process-bonk/process-bonk.toml").write <<~EOS
+        process_name = ""
+      EOS
+    end
+  end
+
+  def caveats
+    <<~EOS
+      The config file is located at:
+      #{pkgetc}/process-bonk.toml
+
+      Please edit this file to suit your needs.
+      E.g. to monitor a process with name "my-process"
+      specify the following in the config file:
+      process_name = "my-process"
+    EOS
+  end
+
+  test do
+    system "true"
+  end
+end
+```
+
+As you can see it uses the rust toolchain dependency in Homebrew as a dependency.
+It compiles the application using `cargo` and installs it as a service.
+A default config file is also created if it doesn't exist, and the Formula prints a message to the user to edit the config file.
+
+## Conclusion
+
+So far I've only tested the service on my own computer, and the process in question have ironically so far behaved itself.
+Maybe it is scared of being bonked?
+But I'm happy to have learned a bit more about Rust, Homebrew, and MacOS services.
+And I'm happy to have a small utility that can help me monitor and kill a process if it starts acting up.
+
+If you want to try out process-bonk feel free to read the code and install it using the Homebrew formula.
+If you have any feedback or suggestions feel free to open an issue or a pull request on the process-bonk repository.
