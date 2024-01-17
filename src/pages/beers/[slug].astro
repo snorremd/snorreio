@@ -8,7 +8,7 @@ import grain from "../../assets/images/grain.svg";
 import waterDroplet from "../../assets/images/water-droplet.svg";
 import pot from "../../assets/images/pot.svg";
 import yeast from "../../assets/images/yeast.svg";
-import Icon from "astro-icon";
+import { Icon } from 'astro-icon/components'
 
 export async function getStaticPaths() {
   const beers = await getCollection("beers");

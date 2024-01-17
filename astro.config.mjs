@@ -10,6 +10,7 @@ import prefetch from "@astrojs/prefetch";
 import analyze from "rollup-plugin-analyzer";
 import { visualizer } from "rollup-plugin-visualizer";
 import devtools from "solid-devtools/vite";
+import icon from "astro-icon";
 import { satoriPlugin } from "./src/plugins/satori-plugin";
   
 
@@ -25,7 +26,12 @@ export default defineConfig({
       exclude: ["@resvg/resvg-js"]
     }
   },
-  integrations: [satoriPlugin(), sitemap({}), robotsTxt({}), tailwind(), solid(), mdx({
+  integrations: [icon({
+    include: {
+      // Include only three `mdi` icons in the bundle
+      mdi: ["twitter", "github", "link-variant", "download"],
+    }
+  }), satoriPlugin(), sitemap({}), robotsTxt({}), tailwind(), solid(), mdx({
     rehypePlugins: [rehypeInferDescriptionMeta, descriptionRemarkPlugin]
   }), prefetch()],
   markdown: {
