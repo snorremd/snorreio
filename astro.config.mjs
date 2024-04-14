@@ -30,6 +30,8 @@ export default defineConfig({
     include: {
       // Include only three `mdi` icons in the bundle
       mdi: ["twitter", "github", "link-variant", "download"],
+      "material-symbols": ["download", "copyright-outline"],
+      "fa": ["soundcloud"]
     }
   }), satoriPlugin(), sitemap({}), robotsTxt({}), tailwind(), solid(), mdx({
     rehypePlugins: [rehypeInferDescriptionMeta, descriptionRemarkPlugin]

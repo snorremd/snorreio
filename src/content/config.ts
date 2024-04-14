@@ -1,4 +1,4 @@
-import { z, defineCollection } from "astro:content";
+import { defineCollection, z } from 'astro:content';
 
 
 const mashAndFerment = z.object({
@@ -80,6 +80,29 @@ const beerRecipesCollection = defineCollection({
   }),
 });
 
+const musicCollection = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    date: z.string(),
+    tracklist: z.array(z.object({
+      title: z.string(),
+      duration: z.object({
+        hours: z.number().optional(),
+        minutes: z.number(),
+        seconds: z.number(),
+      }),
+      soundcloud: z.string().optional().nullable(),
+      downloads: z.array(z.object({
+        url: z.string(),
+        format: z.string(),
+        sizeBytes: z.number(),
+      })),
+    })),
+  }),
+});
+
 export const collections = {
   beers: beerRecipesCollection,
+  music: musicCollection,
 }

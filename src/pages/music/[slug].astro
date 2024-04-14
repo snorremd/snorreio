@@ -1,0 +1,179 @@
+---
+import { getCollection } from "astro:content";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../config";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Icon } from "astro-icon/components";
+import { formatDate, formatDuration } from "date-fns";
+import { formatBytes } from "../../utils/conversions";
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection("music");
+  return blogEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const music = entry.data;
+---
+
+<BaseLayout
+  title={`${entry.data.title} - music - ${SITE_TITLE}`}
+  description={SITE_DESCRIPTION}
+>
+  <section
+    slot="top"
+    class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+  >
+    <h1 class="pb-4 text-4xl font-shortstack max-w-full p-8">{music.title}</h1>
+  </section>
+  <section
+    slot="content"
+    class="bg-stone-200 dark:bg-stone-800 flex flex-col p-4 content"
+  >
+    <Content />
+  </section>
+  <section slot="content" class="text-stone-900 dark:text-stone-50 w-full p-4">
+    {
+      music.tracklist.map((track) => {
+        return (
+          <div class="flex flex-col justify-between">
+            <div class="flex flex-col align-center gap-8">
+              <section class="flex flex-col gap-2">
+              <h3 class="text-2xl gap-2">
+                {track.title} -{" "}
+                <span class="text-stone-700 dark:text-stone-200">
+                  {formatDuration(track.duration, {
+                    format: ["minutes", "seconds"],
+                  })}
+                </span>
+              </h3>
+              <span class="flex flex-row gap-2 items-center text-sm opacity-70">
+                <Icon name="material-symbols:copyright-outline" /> Copyright{" "}
+                {formatDate(new Date(), "yyyy")} Snorre Magnus Davøen - All rights reserved
+              </span>
+            </section>
+              <audio controls class="w-full" preload="none">
+                {track.downloads.map((download) => {
+                  return (
+                    <source
+                      src={`https://music.snorre.io/${download.url}`}
+                      type={`audio/${download.format}`}
+                    />
+                  );
+                })}
+              </audio>
+              <div class="flex flex-col gap-4">
+                <h4 class="text-lg">Downloads</h4>
+                <ul class="flex flex-row flex-wrap gap-8">
+                  {track.downloads.map((download) => {
+                    return (
+                      <li class="text-sm">
+                        <a
+                          href={`https://music.snorre.io/${download.url}`}
+                          download=""
+                          target="_blank"
+                          class="flex flex-row gap-2"
+                        >
+                          <Icon
+                            name="material-symbols:download"
+                            class="w-6 h-6"
+                          />
+                          {download.format}
+                          <span class="font-light opacity-80">
+                            {formatBytes(download.sizeBytes)}
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+              <div class="flex flex-row gap-8">
+
+                {track.soundcloud ? (
+                  <a
+                    href={track.soundcloud}
+                    target="_blank"
+                    class="flex flex-row gap-4 underline underline-offset-2"
+                  >
+                    <Icon name="fa:soundcloud" class="w-6 h-6" />
+                    Listen on Soundcloud
+                  </a>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .content {
+    @apply text-stone-900 dark:text-stone-50;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply font-shortstack;
+      margin: 1em 0 0.5em;
+    }
+
+    h2 {
+      @apply text-4xl;
+    }
+
+    h3 {
+      @apply text-2xl;
+    }
+
+    h4 {
+      @apply text-xl;
+    }
+
+    h5 {
+      @apply text-lg;
+    }
+
+    p {
+      margin: 1em 0 0.5em;
+    }
+
+    pre {
+      @apply mx-0 my-4 max-w-full self-center rounded-lg px-4 py-8 drop-shadow;
+    }
+
+    a {
+      @apply underline underline-offset-2;
+    }
+
+    ul {
+      max-width: 70ch;
+    }
+
+    li {
+      @apply ml-4 list-disc;
+    }
+  }
+
+  dl {
+    /* Make grid use as little space as possible */
+    @apply grid;
+  }
+
+  dt {
+    @apply font-bold;
+  }
+
+  dd {
+  }
+</style>
+
+<style></style>
