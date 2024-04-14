@@ -50,18 +50,18 @@ const music = (await getCollection("music")).sort((a, b) => {
                   {formatDate(new Date(), "yyyy")} Snorre Magnus Davøen - All
                   rights reserved
                 </span>
-                <audio controls class="w-full pt-4" preload="none">
-                  {data.tracklist[0].downloads.map((download) => {
-                    return (
-                      <source
-                        src={`https://music.snorre.io/${download.url}`}
-                        type={`audio/${download.format}`}
-                      />
-                    );
-                  })}
-                </audio>
               </div>
             </a>
+            <audio controls class="w-full pt-4" preload="none">
+              {data.tracklist[0].downloads.map((download) => {
+                return (
+                  <source
+                    src={`https://music.snorre.io/${download.url}`}
+                    type={`audio/${download.format}`}
+                  />
+                );
+              })}
+            </audio>
           </li>
         ))
       }
