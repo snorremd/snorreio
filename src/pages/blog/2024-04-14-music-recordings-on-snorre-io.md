@@ -23,6 +23,26 @@ Currently I'm using the standard HTML5 audio player to allow playback of the mus
 There are also download links to the music files in various formats if you want to listen to them in a player of your choice.
 The web audio player will select the best format for your device if you choose to play the music directly from my website.
 
+I convert my recordings to the various formats using a simple ffmpeg script.
+I've added a function to my shell configuration to make this easier.
+  
+```zsh
+# Convert wav files to other audio formats
+function convert_audio() {
+    local input="$1"
+    local basename="${input:r}"
+    
+    ffmpeg -i "$input" \
+           -c:a flac "${basename}.flac" \
+           -c:a libmp3lame -qscale:a 2 "${basename}.mp3" \
+           -c:a libvorbis -qscale:a 4 "${basename}.ogg" \
+           -c:a aac -b:a 192k "${basename}.m4a"
+}
+
+# Create an alias to the function
+alias convert_audio='convert_audio'
+```
+
 Including an audio player on a web page is not so complicated.
 My code for achieving this with Astro boils down to the following:
 
@@ -43,7 +63,6 @@ Here I'm using the `track` object that I pass to the page to render the audio pl
 A track can contain multiple downloads, essentially different formats of the same recording.
 For each track I include a `source` element with the URL to the music file and the format of the file.
 The browser will then select the best format to play based on the capabilities of the device, neat!
-
 
 In the future I might build a Soundcloud like player for my website using [Wavesurfer][https://wavesurfer.xyz/].
 This is a bigger task and I'll have to see if I can find the time to do it.
