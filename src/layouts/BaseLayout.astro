@@ -1,14 +1,17 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
+
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 
 const { title, description, dir = 'ltr', page } = Astro.props;
 ---
-
+<!doctype html>
 <html lang="en" class='min-h-full'>
   <head>
     <BaseHead title={title} description={description} />
+    <ViewTransitions />
     <link
       rel="preload"
       href="/fonts/shortstack-regular.woff2"
