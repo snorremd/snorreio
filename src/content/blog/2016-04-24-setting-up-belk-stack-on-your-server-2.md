@@ -1,8 +1,8 @@
 ---
 title: Setting up (B)ELK stack on your server
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2016-04-24T17:14:57.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2016-04-24"
+modDate: "2018-04-02"
 ---
 
 I'm a developer by day, but as evening falls I sometimes like to dabble as an amateur sysops. I've recently helped out setting up a server as part of a hobby project that I participate in. While I'm no sysops expert I like testing out technologies helpful in server administration. As a side effect it makes me appreciate just how much detail and work sysops people put into managing servers. One of these sysops technologies is the much known ELK stack (ElasticSearch, Logstash, and Kibana) recently joined by the different Beat log ingestion system services. ELK are usually used as a general tool to gather, filter, index, and analyze logs from different sources. In this post I will describe how a BELK stack can be set up, partially in docker and partially on the host, to provide an insight into your systems network traffic, system activity (from system logs), and process and performance activity.

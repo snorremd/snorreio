@@ -1,8 +1,8 @@
 ---
 title: Jalopy (game) - A trip through Eastern Europe in a Lada
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2016-07-26T10:22:00.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2016-07-26"
+modDate: "2018-04-02"
 ---
 
 I recently learned about an early access game called [Jalopy](http://store.steampowered.com/app/446020/). For those who does not know _jalopy_ is a term used to describe an old and damaged car in barely functioning state.

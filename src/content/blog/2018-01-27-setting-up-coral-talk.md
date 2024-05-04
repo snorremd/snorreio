@@ -1,8 +1,8 @@
 ---
 title: Coral Talk - An open source comment system from Mozilla
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2018-01-27T22:41:21.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2018-01-27"
+modDate: "2018-04-02"
 ---
 
 [Coral Talk](https://coralproject.net/products/talk.html) is a comment and moderation system from Mozilla. It is part of the Coral project which proclaims that it wants to improve journalism. I'm no journalist, but I found their comment system interesting for four particular reasons:

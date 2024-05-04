@@ -1,8 +1,8 @@
 ---
 title: Shared mutable app state in Actix Web
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2018-08-23T14:32:06.000Z
-modDate: 2018-08-23T19:34:17.000Z
+pubDate: "2018-08-23"
+modDate: "2018-08-23"
 ---
 
 Not too long ago, and in this very galaxy, I decided to learn [the Rust programming language](https://www.rust-lang.org/en-US/). I went through each chapter in [the Rust Book](https://doc.rust-lang.org/book/) and discovered a lot of things I like about Rust. When the chapters ran out I set out to build something with Rust, a little pet project that would put my newly acquired Rust knowledge to the test. I decided to implement an authorization server using the [actix web framework](https://actix.rs/).

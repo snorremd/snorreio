@@ -1,8 +1,8 @@
 ---
 title: Setting up a  Docker image builder with Gitlab CI Runner
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2016-04-21T19:05:40.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2016-04-21"
+modDate: "2018-04-02"
 ---
 
 In this post I'll give you an idea on how to implement a Docker image builder with the Gitlab Runner. Before I do that I'll briefly introduce Gitlab and Gitlab CI.

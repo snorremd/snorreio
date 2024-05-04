@@ -1,6 +1,5 @@
 ---
 pubDate: "2024-04-14"
-layout: "../../layouts/BlogPost.astro"
 title: "Musical recordings on Snorre.io"
 ---
 

@@ -1,13 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
+import { getCollection } from "astro:content";
 
-// Use Astro.glob() to fetch all posts, and then sort them by date.
-const posts = (await Astro.glob("./blog/**/*.{md,mdx}")).sort(
-  (a, b) =>
-    new Date(b.frontmatter.pubDate).valueOf() -
-    new Date(a.frontmatter.pubDate).valueOf()
-);
+
+const posts = (await getCollection("blog")).sort((a, b) => {
+  return (b.data.pubDate?.getTime()?? 0) - (a.data.pubDate?.getTime()?? 0);
+});
 ---
 
 <BaseLayout title={`Blog - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
@@ -27,12 +26,12 @@ const posts = (await Astro.glob("./blog/**/*.{md,mdx}")).sort(
   >
     <ul class="grid gap-2 max-w-6xl">
       {
-        posts.map((post) => (
+        posts.map(({data: post, slug}) => (
           <li
             class={``}
           >
             <a
-              href={post.url}
+              href={`/blog/${slug}`}
               class={`
                 flex
                 min-w-full
@@ -47,13 +46,13 @@ const posts = (await Astro.glob("./blog/**/*.{md,mdx}")).sort(
                 text-stone-900 dark:text-stone-50
                 underline-stone-900 dark:underline-stone-50`}
               >
-                {post.frontmatter.title}
+                {post.title}
               </h2>
               <time
-                datetime={post.frontmatter.pubDate}
+                datetime={post.pubDate?.toISOString()}
                 class="text-stone-700 dark:text-stone-300"
               >
-                {new Date(post.frontmatter.pubDate).toLocaleDateString(
+                {post.pubDate?.toLocaleDateString(
                   "en-us",
                   {
                     year: "numeric",
@@ -63,7 +62,7 @@ const posts = (await Astro.glob("./blog/**/*.{md,mdx}")).sort(
                 )}
               </time>
               <p class="text-stone-800 dark:text-stone-100 max-w-[70ch]">
-                {post.frontmatter.description}
+                {post.description}
               </p>
             </a>
           </li>

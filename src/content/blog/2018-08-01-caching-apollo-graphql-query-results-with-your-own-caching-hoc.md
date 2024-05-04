@@ -1,8 +1,8 @@
 ---
 title: Caching apollo graphql query results with your own caching hoc
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2018-08-01T06:53:16.000Z
-modDate: 2018-08-01T06:59:29.000Z
+pubDate: "2018-08-01"
+modDate: "2018-08-01"
 ---
 
 I am currently building a search portal at work and have been using a [React](https://reactjs.org/), [Apollo Client](https://www.apollographql.com/docs/react/), and GraphQL stack.
