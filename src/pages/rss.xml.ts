@@ -5,7 +5,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 
 
 export async function GET(context: APIContext) {
-  console.log('context', context);
   const blog = await getCollection('blog');
   return rss({
     // `<title>` field in output xml
