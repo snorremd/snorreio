@@ -1,8 +1,8 @@
 ---
 title: isso - a lightweight privacy minded comment system
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2016-05-03T19:35:57.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2016-05-03"
+modDate: "2018-04-02"
 ---
 
 I've been using [Ghost blog](https://ghost.org/developers/) for quite some time now and have been very happy with the functionality, performance, and the simplicity of the solution. I use the default theme Casper which I find to be a minimalistic and rather pleasing blog theme. I've also avoided analytics software (and ads, not that ads would amount to any money on my little blog) like the plague for two important reasons:

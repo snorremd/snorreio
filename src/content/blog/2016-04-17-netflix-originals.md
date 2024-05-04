@@ -1,8 +1,8 @@
 ---
 title: Netflix launches second round of kimmification
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2016-04-17T16:22:06.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2016-04-17"
+modDate: "2018-04-02"
 ---
 
 Netflix recently released the second season of [Unbreakable Kimmy Schmidt](https://en.wikipedia.org/wiki/Unbreakable_Kimmy_Schmidt), one of their original series focused around situational comedy. The first season introduced the titular character Kimmy Schmidt and bootstrapped the series with a rather bizarre premise:

@@ -27,8 +27,9 @@ export default defineConfig({
     include: {
       // Include only three `mdi` icons in the bundle
       mdi: ["twitter", "github", "link-variant", "download"],
-      "material-symbols": ["download", "copyright-outline"],
-      "fa": ["soundcloud"]
+      "material-symbols": ["download", "copyright-outline", "rss-feed"],
+      "fa6-brands": ["soundcloud", "github", "bluesky"],
+      "fa6-solid": ["square-rss"],
     }
   }), satoriPlugin(), sitemap({}), robotsTxt({}), tailwind(), solid(), ],
 

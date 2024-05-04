@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-
+import { rssSchema } from '@astrojs/rss';
 
 const mashAndFerment = z.object({
   steps: z.array(z.object({
@@ -102,7 +102,17 @@ const musicCollection = defineCollection({
   }),
 });
 
+
+const blogCollection = defineCollection({
+  type: "content",
+  schema: rssSchema.extend({
+    modDate: z.string().optional().nullable(),
+    atprotoURI: z.string().optional().nullable(),
+  }),
+});
+
 export const collections = {
+  blog: blogCollection,
   beers: beerRecipesCollection,
   music: musicCollection,
 }

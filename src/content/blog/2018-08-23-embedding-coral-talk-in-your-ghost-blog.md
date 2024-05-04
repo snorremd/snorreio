@@ -1,8 +1,8 @@
 ---
 title: Embedding Coral Talk in your Ghost Blog
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2018-08-23T05:50:15.000Z
-modDate: 2018-08-23T07:11:34.000Z
+pubDate: "2018-08-23"
+modDate: "2018-08-23"
 ---
 
 Today I changed how I embed the Coral Talk comment system in my blog posts. Previously I had downloaded the Casper theme and edited the _post.hbs_ file and inserted the Coral embed script. Then I re-uploaded the customized theme and enabled it in the admin panel. This works of course, but also mean you don't get to enjoy any of the new Casper updates for free. Instead you need to regularly re-customize new versions of Casper. So today I decided to be a bit smarter about it and created this little embed script to add to the Ghost footer (via the admin dashboard):

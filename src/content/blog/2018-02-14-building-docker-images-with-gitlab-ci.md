@@ -1,8 +1,8 @@
 ---
 title: Building Docker images with Gitlab CI
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2018-02-14T09:30:12.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2018-02-14"
+modDate: "2018-04-02"
 ---
 
 Different approaches to building Docker images with Gitlab CI, drawbacks, and solutions.

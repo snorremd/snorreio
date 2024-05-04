@@ -1,8 +1,8 @@
 ---
 title: Mosh (mobile shell)
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2014-05-11T21:03:18.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2014-05-11"
+modDate: "2018-04-02"
 ---
 
 It was quite a good while ago that an acquaintance of mine made me aware of a great alternative to SSH called [Mosh](http://mosh.mit.edu/) (short for mobile shell). Mosh was born out of MIT as a result of a few important factors.

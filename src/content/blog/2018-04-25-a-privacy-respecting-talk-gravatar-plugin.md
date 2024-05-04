@@ -1,8 +1,8 @@
 ---
 title: A privacy respecting talk gravatar plugin
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2018-04-25T15:01:44.000Z
-modDate: 2018-04-25T19:32:05.000Z
+pubDate: "2018-04-25"
+modDate: "2018-04-25"
 ---
 
 [Some time ago](https://snorre.io/setting-up-coral-talk/) I started using the [Coral Talk](https://coralproject.net/products/talk.html) comment system for my blog. The system is probably way overkill for a blog my size, and I have so far only received one comment! While Coral Talk is pretty nice it lacks built in avatar support and I could only find a [plugin recipe](https://github.com/coralproject/talk-recipes/tree/master/plugins/avatar) requiring avatars to be hosted by third parties and the links to be updated by some external service.

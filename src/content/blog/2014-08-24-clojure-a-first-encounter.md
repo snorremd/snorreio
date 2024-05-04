@@ -1,8 +1,8 @@
 ---
 title: Clojure - A first encounter
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2014-08-24T16:32:17.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2014-08-24"
+modDate: "2018-04-02"
 ---
 
 I have been thinking for some time about picking up Clojure, a functional programming language and Lisp dialect that runs on top of the Java Virtual Machine. I have always wanted to learn a proper functional language, and Clojure with its Python and Ruby influences, compatibility with Java and the JVM, and web version (ClojureScript) seemed like a good bet.

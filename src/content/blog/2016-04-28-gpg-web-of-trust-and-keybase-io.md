@@ -1,8 +1,8 @@
 ---
 title: GPG, Web of Trust, and Keybase.io
 layout: "../../layouts/BlogPost.astro"
-pubDate: 2016-04-28T15:51:47.000Z
-modDate: 2018-04-02T10:50:49.000Z
+pubDate: "2016-04-28"
+modDate: "2018-04-02"
 ---
 
 If you are a developer I'm sure you are familiar with GPG also abbreviated GnuPG which stands for [Gnu Privacy Guard](https://www.gnupg.org/). It is an open-source implementation of the [PGP (Pretty Good Privacy)](https://en.wikipedia.org/wiki/Pretty_Good_Privacy) algorithm.
