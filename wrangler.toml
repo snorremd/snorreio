@@ -1,8 +1,8 @@
 name = "snorre-io"
 compatibility_date = "2022-11-07"
 node_compat = true
+pages_build_output_dir = "dist"
 
-main = "src/index.js"
 
 [[d1_databases]]
 binding = "DB" # i.e. available in your Worker on env.DB
