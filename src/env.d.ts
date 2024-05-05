@@ -1,3 +1,12 @@
 /// <reference path="../.astro/types.d.ts" />
-// Replace `astro/client` with `@astrojs/image/client`
-/// <reference types="@astrojs/image/client" />
+/// <reference types="astro/client" />
+
+type Runtime = import('@astrojs/cloudflare').Runtime<Env>;
+
+declare namespace App {
+  interface Locals extends Runtime {
+    otherLocals: {
+      test: string;
+    };
+  }
+}

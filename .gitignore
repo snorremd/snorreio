@@ -29,3 +29,9 @@ stats.html
 
 # Astro
 .astro
+
+# Cloudflare
+.wrangler
+
+# Drizzle DB stuff
+.drizzle

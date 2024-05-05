@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Comments } from "../../components/comments/Comments";
+import { Likes } from "../../components/islands/Likes";
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection("blog");
@@ -26,7 +27,7 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
     <h1
       class="pb-4 px-4 text-5xl font-shortstack max-w-[25ch]"
     >{title}</h1>
-    {
+    <div class="flex flex-row gap-6">{
       pubDate && (
         <time class="text-stone-600 dark:text-stone-400">
           {new Date(pubDate).toLocaleDateString("en-us", {
@@ -37,6 +38,8 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
         </time>
       )
     }
+    <Likes client:only slug={entry.slug} />
+  </div>
     {
       modDate && (
         <div>
