@@ -8,6 +8,7 @@
     "start": "astro dev",
     "build": "astro build",
     "build:watch": "watch 'npm run build' src",
+    "check": "astro check",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write .",
@@ -25,6 +26,7 @@
     "db:studio:prod": "drizzle-kit studio"
   },
   "dependencies": {
+    "@astrojs/check": "^0.5.10",
     "@astrojs/cloudflare": "^10.2.5",
     "@astrojs/mdx": "^2.3.1",
     "@astrojs/prefetch": "^0.4.1",
@@ -51,7 +53,8 @@
     "sharp": "^0.33.3",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.8.17",
-    "tailwindcss": "^3.4.3"
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",

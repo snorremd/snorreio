@@ -38,7 +38,11 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
         </time>
       )
     }
-    <Likes client:only slug={entry.slug} />
+    <Likes
+      client:load
+      client:only="solid-js"
+      slug={entry.slug} 
+    />
   </div>
     {
       modDate && (
@@ -63,7 +67,7 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
     class="grid auto-cols-fr justify-start w-full max-w-3xl mt-8">
     <Comments
       client:load
-      client:only
+      client:only="solid-js"
       handle="snorre.io"
       atprotoURI={atprotoURI} />
     </div>}

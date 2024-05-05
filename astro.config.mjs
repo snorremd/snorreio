@@ -4,8 +4,6 @@ import solid from "@astrojs/solid-js";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import robotsTxt from "astro-robots-txt";
-import analyze from "rollup-plugin-analyzer";
-import { visualizer } from "rollup-plugin-visualizer";
 import devtools from "solid-devtools/vite";
 import icon from "astro-icon";
 import { satoriPlugin } from "./src/plugins/satori-plugin";
@@ -16,7 +14,7 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
   site: "https://snorre.io",
   vite: {
-    plugins: [analyze(), visualizer(), devtools({
+    plugins: [devtools({
       /* features options - all disabled by default */
       autoname: true // e.g. enable autoname
     })],
