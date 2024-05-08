@@ -37,7 +37,9 @@ This way, reads should always be reasonably fast, while writes must be routed to
 D1 has a low-level client library for JavaScript, but I wanted something to help me with migrations and query building.
 I'm normally very skeptical of ORMs, but I recalled having read good things about [Drizzle](https://orm.drizzle.team/) in the past.
 Their tag-line really resonated with me:
+
 > Drizzle is a good friend who’s there for you when necessary and doesn’t bother when you need some space.
+
 This is exactly what I want from an ORM.
 It should not force me to do things in a specific way, but it should provide me helpers when I need them.
 
