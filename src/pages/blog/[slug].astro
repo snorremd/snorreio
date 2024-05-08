@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Comments } from "../../components/comments/Comments";
+import { Likes } from "../../components/islands/Likes";
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection("blog");
@@ -13,6 +14,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+const { pathname } = Astro.url;
 
 const { title, pubDate, description, modDate, atprotoURI } = entry.data
 ---
@@ -26,7 +28,7 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
     <h1
       class="pb-4 px-4 text-5xl font-shortstack max-w-[25ch]"
     >{title}</h1>
-    {
+    <div class="flex flex-row gap-6">{
       pubDate && (
         <time class="text-stone-600 dark:text-stone-400">
           {new Date(pubDate).toLocaleDateString("en-us", {
@@ -37,6 +39,13 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
         </time>
       )
     }
+    <Likes
+      client:load
+      client:only="solid-js"
+      collection="blog"
+      slug={entry.slug}
+    />
+  </div>
     {
       modDate && (
         <div>
@@ -60,7 +69,7 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
     class="grid auto-cols-fr justify-start w-full max-w-3xl mt-8">
     <Comments
       client:load
-      client:only
+      client:only="solid-js"
       handle="snorre.io"
       atprotoURI={atprotoURI} />
     </div>}

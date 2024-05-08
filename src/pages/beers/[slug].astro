@@ -9,6 +9,7 @@ import waterDroplet from "../../assets/images/water-droplet.svg";
 import pot from "../../assets/images/pot.svg";
 import yeast from "../../assets/images/yeast.svg";
 import { Icon } from 'astro-icon/components'
+import { Likes } from "../../components/islands/Likes";
 
 export async function getStaticPaths() {
   const beers = await getCollection("beers");
@@ -62,21 +63,29 @@ const { beer } = Astro.props;
         <dt class="font-bold mr-2">EBC</dt>
         <dd class="mr-4">{beer?.color ?? "N/A"}</dd>
       </dl>
-      <!-- Allow users to download the JSON -->
-      <a
-        href={`./${slug}.json`}
-        download
-        class={`
-          w-fit
-          flex flex-row items-center gap-1
-          font-shortstack text-sm
-          border-b border-stone-500 dark:border-stone-500 p-1/2
-          focus-visible:outline-stone-800 dark:focus-visible:outline-stone-100
-          text-stone-800 dark:text-stone-100 
-        `}
-      >
-        Brewfather JSON <Icon class="ml-2 w-[1em]" name="mdi:download" />
-      </a>
+      <div class="flex flex-row gap-6">
+        <!-- Allow users to download the JSON -->
+        <a
+          href={`./${slug}.json`}
+          download
+          class={`
+            w-fit
+            flex flex-row items-center gap-1
+            font-shortstack text-sm
+            border-b border-stone-500 dark:border-stone-500 p-1/2
+            focus-visible:outline-stone-800 dark:focus-visible:outline-stone-100
+            text-stone-800 dark:text-stone-100 
+          `}
+        >
+          Brewfather JSON <Icon class="ml-2 w-[1em]" name="mdi:download" />
+        </a>
+        <Likes
+          client:load
+          client:only="solid-js"
+          collection="beers"
+          slug={slug}
+        />
+      </div>
     </div>
   </section>
   <section
