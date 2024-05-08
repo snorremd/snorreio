@@ -13,11 +13,10 @@ const fetchLikes = async ({slug, collection}: LikesProps) => {
 }
 
 export const Likes: Component<LikesProps> = ({ slug, collection }) => {
-  const [likes, { refetch }] = createResource(() => ({ slug, collection }), fetchLikes);
+  const [likes, { refetch, mutate }] = createResource(() => ({ slug, collection }), fetchLikes);
 
   return (
     <div class="flex flex-row gap-2 text-stone-800 dark:text-stone-400">
-      <span>{likes()?.likes}</span>
       <button
         class=""
         onClick={async () => {
@@ -25,11 +24,16 @@ export const Likes: Component<LikesProps> = ({ slug, collection }) => {
             method: "POST",
             body: JSON.stringify({ slug, collection }),
           });
+          mutate(prev => {
+            const previous = prev ?? { likes: 0, liked: false };
+            return { likes: previous.likes + (previous.liked ? -1 : 1), liked: !previous.liked };
+          })
           refetch()
         }}
       >
         {likes()?.liked ? <VsHeartFilled /> : <VsHeart />}
       </button>
+      <span>{likes()?.likes?? 0}</span>
     </div>
   );
 }
