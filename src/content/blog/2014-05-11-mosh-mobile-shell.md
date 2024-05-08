@@ -1,6 +1,5 @@
 ---
 title: Mosh (mobile shell)
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2014-05-11"
 modDate: "2018-04-02"
 ---

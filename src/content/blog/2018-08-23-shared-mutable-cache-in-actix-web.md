@@ -1,6 +1,5 @@
 ---
 title: Shared mutable app state in Actix Web
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2018-08-23"
 modDate: "2018-08-23"
 ---

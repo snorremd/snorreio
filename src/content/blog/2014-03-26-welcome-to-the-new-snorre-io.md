@@ -1,6 +1,5 @@
 ---
 title: Welcome to the new Snorre.io
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2014-03-26"
 modDate: "2018-04-02"
 ---

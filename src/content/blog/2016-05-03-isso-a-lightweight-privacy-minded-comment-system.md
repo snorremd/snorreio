@@ -1,6 +1,5 @@
 ---
 title: isso - a lightweight privacy minded comment system
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2016-05-03"
 modDate: "2018-04-02"
 ---

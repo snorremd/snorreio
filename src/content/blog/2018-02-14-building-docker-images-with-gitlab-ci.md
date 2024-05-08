@@ -1,6 +1,5 @@
 ---
 title: Building Docker images with Gitlab CI
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2018-02-14"
 modDate: "2018-04-02"
 ---

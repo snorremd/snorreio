@@ -1,6 +1,5 @@
 ---
 title: Jalopy (game) - A trip through Eastern Europe in a Lada
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2016-07-26"
 modDate: "2018-04-02"
 ---

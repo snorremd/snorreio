@@ -1,6 +1,5 @@
 ---
 title: Caching apollo graphql query results with your own caching hoc
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2018-08-01"
 modDate: "2018-08-01"
 ---

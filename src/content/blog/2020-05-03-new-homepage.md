@@ -1,6 +1,5 @@
 ---
 pubDate: "2020-05-03"
-layout: "../../layouts/BlogPost.astro"
 title: "New homepage with Gatsby.js hosted with Cloudflare Workers"
 ---
 

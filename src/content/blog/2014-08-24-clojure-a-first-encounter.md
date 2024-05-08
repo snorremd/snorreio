@@ -1,6 +1,5 @@
 ---
 title: Clojure - A first encounter
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2014-08-24"
 modDate: "2018-04-02"
 ---

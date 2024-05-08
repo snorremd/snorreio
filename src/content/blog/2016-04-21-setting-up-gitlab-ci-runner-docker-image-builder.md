@@ -1,6 +1,5 @@
 ---
 title: Setting up a  Docker image builder with Gitlab CI Runner
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2016-04-21"
 modDate: "2018-04-02"
 ---

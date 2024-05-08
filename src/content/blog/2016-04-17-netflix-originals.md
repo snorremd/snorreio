@@ -1,6 +1,5 @@
 ---
 title: Netflix launches second round of kimmification
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2016-04-17"
 modDate: "2018-04-02"
 ---

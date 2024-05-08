@@ -1,6 +1,5 @@
 ---
 title: A privacy respecting talk gravatar plugin
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2018-04-25"
 modDate: "2018-04-25"
 ---

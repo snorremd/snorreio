@@ -1,6 +1,5 @@
 ---
 title: Coral Talk - An open source comment system from Mozilla
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2018-01-27"
 modDate: "2018-04-02"
 ---

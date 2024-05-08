@@ -1,6 +1,5 @@
 ---
 title: GPG, Web of Trust, and Keybase.io
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2016-04-28"
 modDate: "2018-04-02"
 ---

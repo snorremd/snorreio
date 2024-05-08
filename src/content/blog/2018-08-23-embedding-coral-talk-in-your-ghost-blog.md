@@ -1,6 +1,5 @@
 ---
 title: Embedding Coral Talk in your Ghost Blog
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2018-08-23"
 modDate: "2018-08-23"
 ---

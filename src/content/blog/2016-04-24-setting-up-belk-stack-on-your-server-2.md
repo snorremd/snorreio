@@ -1,6 +1,5 @@
 ---
 title: Setting up (B)ELK stack on your server
-layout: "../../layouts/BlogPost.astro"
 pubDate: "2016-04-24"
 modDate: "2018-04-02"
 ---
