@@ -5,6 +5,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Icon } from "astro-icon/components";
 import { formatDate, formatDuration } from "date-fns";
 import { formatBytes } from "../../utils/conversions";
+import { Likes } from "../../components/islands/Likes";
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection("music");
@@ -28,6 +29,12 @@ const music = entry.data;
     class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
   >
     <h1 class="pb-4 text-4xl font-shortstack max-w-full p-8">{music.title}</h1>
+    <Likes
+      client:load
+      client:only="solid-js"
+      collection="music"
+      slug={entry.slug}
+    />
   </section>
   <section
     slot="content"

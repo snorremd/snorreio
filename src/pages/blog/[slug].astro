@@ -14,6 +14,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+const { pathname } = Astro.url;
 
 const { title, pubDate, description, modDate, atprotoURI } = entry.data
 ---
@@ -41,7 +42,8 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data
     <Likes
       client:load
       client:only="solid-js"
-      slug={entry.slug} 
+      collection="blog"
+      slug={entry.slug}
     />
   </div>
     {

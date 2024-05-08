@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "15bc6791-cfbe-444b-b754-fe5e786e2454",
+  "id": "3be41637-79a8-4f8b-871d-44a116d6a012",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "likes": {
@@ -9,6 +9,13 @@
       "columns": {
         "session_id": {
           "name": "session_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "collection": {
+          "name": "collection",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -22,18 +29,18 @@
           "autoincrement": false
         }
       },
-      "indexes": {
-        "likes_session_id_slug_unique": {
-          "name": "likes_session_id_slug_unique",
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "likes_session_id_collection_slug_pk": {
           "columns": [
+            "collection",
             "session_id",
             "slug"
           ],
-          "isUnique": true
+          "name": "likes_session_id_collection_slug_pk"
         }
       },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }
   },

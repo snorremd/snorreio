@@ -1,10 +1,11 @@
-import { sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import { primaryKey, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
 
 export const likes = sqliteTable('likes', {
   sessionId: text('session_id'),
+  collection: text('collection'),
   slug: text('slug'),
 }, likes => {
   return {
-    unique: unique().on(likes.sessionId, likes.slug)
+    pk: primaryKey({ columns: [likes.sessionId, likes.collection, likes.slug] }),
   }
 });
