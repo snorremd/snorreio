@@ -1,5 +1,4 @@
-import { Icon } from "astro-icon/components";
-import { type Component, createEffect, createSignal, onMount, createResource } from "solid-js";
+import { type Component, createResource } from "solid-js";
 import { VsHeart, VsHeartFilled } from "solid-icons/vs";
 
 interface LikesProps {
@@ -14,7 +13,6 @@ const fetchLikes = async ({slug, collection}: LikesProps) => {
 }
 
 export const Likes: Component<LikesProps> = ({ slug, collection }) => {
-
   const [likes, { refetch }] = createResource(() => ({ slug, collection }), fetchLikes);
 
   return (

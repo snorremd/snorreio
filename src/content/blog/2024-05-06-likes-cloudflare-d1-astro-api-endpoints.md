@@ -180,6 +180,53 @@ export async function GET(context: APIContext) {
 }
 ```
 
+### Client side Like counter and button
+
+To allow dynamic rendering of likes count and allowing users to like content I added a simple `Likes` component to my Astro setup.
+Astro supports client side rendering using something called [Astro Islands](https://docs.astro.build/en/concepts/islands/).
+I decided to use [Solid.js](https://www.solidjs.com/) for the client side rendering as I was already using it for my comments system.
+The whole implementation ended up being 35 lines of code:
+
+```typescript
+import { type Component, createResource } from "solid-js";
+import { VsHeart, VsHeartFilled } from "solid-icons/vs";
+
+interface LikesProps {
+  slug: string;
+  collection: string;
+}
+
+const fetchLikes = async ({slug, collection}: LikesProps) => {
+  const res = await fetch(`/api/likes?slug=${slug}&collection=${collection}`);
+  const data = await res.json() as { likes: number, liked: boolean };
+  return data;
+}
+
+export const Likes: Component<LikesProps> = ({ slug, collection }) => {
+  const [likes, { refetch }] = createResource(() => ({ slug, collection }), fetchLikes);
+
+  return (
+    <div class="flex flex-row gap-2 text-stone-800 dark:text-stone-400">
+      <span>{likes()?.likes}</span>
+      <button
+        class=""
+        onClick={async () => {
+          await fetch(`/api/likes`, {
+            method: "POST",
+            body: JSON.stringify({ slug, collection }),
+          });
+          refetch()
+        }}
+      >
+        {likes()?.liked ? <VsHeartFilled /> : <VsHeart />}
+      </button>
+    </div>
+  );
+}
+```
+
+The whole thing ends up compiling to less than 20 kilobytes of JavaScript (compressed) having a negligible impact on the performance of the site.
+
 ### Tooling, local environment and Cloudflare
 
 To develop and test this locally was a bit more complex than I had hoped.
@@ -205,4 +252,7 @@ Feel free to check out my [source code](https://github.com/snorremd/snorreio) fo
 
 I now have a simple like system that allows me to gauge the interest in my content.
 It is privacy-friendly, easy to use, and does not require user registration.
-If you liked this blog post, please give it a like!
+The like system is a bit vulnerable to abuse as you can like content multiple times by clearing your cookies.
+But this is a risk I'm willing to take to keep the site privacy-friendly.
+
+If you enjoyed this blog post, please give it a like!
