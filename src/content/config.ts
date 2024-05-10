@@ -1,14 +1,16 @@
-import { defineCollection, z } from 'astro:content';
-import { rssSchema } from '@astrojs/rss';
+import { defineCollection, z } from "astro:content";
+import { rssSchema } from "@astrojs/rss";
 
 const mashAndFerment = z.object({
-  steps: z.array(z.object({
-    stepTemp: z.number(),
-    type: z.string(),
-    name: z.string(),
-    stepTime: z.number().optional(),
-  }))
-})
+  steps: z.array(
+    z.object({
+      stepTemp: z.number(),
+      type: z.string(),
+      name: z.string(),
+      stepTime: z.number().optional(),
+    }),
+  ),
+});
 
 const fermentable = z.object({
   name: z.string(),
@@ -18,7 +20,7 @@ const fermentable = z.object({
   color: z.number(),
   grainCategory: z.string().optional().nullable(),
   amount: z.number(), // kg
-})
+});
 
 const yeast = z.object({
   name: z.string(),
@@ -29,7 +31,7 @@ const yeast = z.object({
   maxTemp: z.number(),
   amount: z.number(),
   unit: z.string(),
-})
+});
 
 const hop = z.object({
   name: z.string(),
@@ -38,23 +40,23 @@ const hop = z.object({
   amount: z.number(), // grams
   usage: z.string(),
   alpha: z.number(), // % alpha acid
-})
+});
 
 const style = z.object({
   category: z.string(),
   name: z.string(),
-})
+});
 
 const equipment = z.object({
   name: z.string(),
   efficiency: z.number(), // Percentage
   batchSize: z.number(), // liters
-})
+});
 
 const data = z.object({
   mashWaterAmount: z.number(),
   spargeWaterAmount: z.number(),
-})
+});
 
 const beerRecipesCollection = defineCollection({
   type: "data",
@@ -85,23 +87,26 @@ const musicCollection = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.string(),
-    tracklist: z.array(z.object({
-      title: z.string(),
-      duration: z.object({
-        hours: z.number().optional(),
-        minutes: z.number(),
-        seconds: z.number(),
+    tracklist: z.array(
+      z.object({
+        title: z.string(),
+        duration: z.object({
+          hours: z.number().optional(),
+          minutes: z.number(),
+          seconds: z.number(),
+        }),
+        soundcloud: z.string().optional().nullable(),
+        downloads: z.array(
+          z.object({
+            url: z.string(),
+            format: z.string(),
+            sizeBytes: z.number(),
+          }),
+        ),
       }),
-      soundcloud: z.string().optional().nullable(),
-      downloads: z.array(z.object({
-        url: z.string(),
-        format: z.string(),
-        sizeBytes: z.number(),
-      })),
-    })),
+    ),
   }),
 });
-
 
 const blogCollection = defineCollection({
   type: "content",
@@ -111,8 +116,41 @@ const blogCollection = defineCollection({
   }),
 });
 
+const projectCollection = defineCollection({
+  type: "content",
+  schema: rssSchema
+    .extend({
+      projectLink: z.string().optional().nullable(),
+      from: z
+        .union([z.string(), z.number(), z.date()])
+        .transform((value) => (value === undefined ? value : new Date(value)))
+        .refine((value) =>
+          value === undefined ? value : !isNaN(value.getTime()),
+        ),
+      to: z
+        .union([z.string(), z.number(), z.date()])
+        .transform((value) => (value === undefined ? value : new Date(value)))
+        .refine((value) =>
+          value === undefined ? value : !isNaN(value.getTime()),
+        )
+        .optional(),
+      pubDate: z
+        .union([z.string(), z.number(), z.date()])
+        .transform((value) => (value === undefined ? value : new Date(value)))
+        .refine((value) =>
+          value === undefined ? value : !isNaN(value.getTime()),
+        )
+        .optional(),
+    })
+    .transform((entry) => ({
+      ...entry,
+      pubDate: entry.pubDate ? entry.pubDate : entry.from,
+    })),
+});
+
 export const collections = {
   blog: blogCollection,
   beers: beerRecipesCollection,
   music: musicCollection,
-}
+  projects: projectCollection,
+};

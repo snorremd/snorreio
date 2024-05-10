@@ -2,13 +2,19 @@
 import { Icon } from 'astro-icon/components'
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
+import { getCollection } from 'astro:content';
 
-// Use Astro.glob() to fetch all posts, and then sort them by date.
-const projects = (await Astro.glob("../projects/*.mdx")).sort(
-  (a, b) =>
-    new Date(b.frontmatter.from).valueOf() -
-    new Date(a.frontmatter.from).valueOf()
-);
+const projects = (await getCollection("projects")).sort((a, b) => {
+  return b.data.from.getTime() - a.data.from.getTime();
+});
+
+const projectsRendered = await Promise.all(projects.map(async (project) => {
+  const { Content } = await project.render();
+  return {
+    ...project,
+    Content
+  };
+}));
 ---
 
 <BaseLayout title={`Projects - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
@@ -28,42 +34,42 @@ const projects = (await Astro.glob("../projects/*.mdx")).sort(
   >
     <ul class="grid gap-12 max-w-6xl auto-cols-auto">
       {
-        projects.map((post) => (
-          <li class={`max-w-2xl text-stone-900 dark:text-stone-50`}>
+        projectsRendered.map(({ slug, data, Content }) => {
+          return <li class={`max-w-2xl text-stone-900 dark:text-stone-50`}>
             <h2
               class={`
                 font-shortstack underline-stone-900
                 dark:underline-stone-50 text-4xl
                 `}
             >
-              {post.frontmatter.title}
+              {data.title}
             </h2>
             <div class="text-stone-700 dark:text-stone-300">
-              <time datetime={post.frontmatter.from}>
-                {new Date(post.frontmatter.from).toLocaleDateString("en-us", {
+              <time datetime={data.from.toDateString()}>
+                {new Date(data.from).toLocaleDateString("en-us", {
                   year: "numeric",
                   month: "short",
                 })}
               </time>
-              {post.frontmatter.to && (
+              {data.to && (
                 <>
                   {" to "}
-                  <time datetime={post.frontmatter.to}>
-                    {new Date(post.frontmatter.to).toLocaleDateString("en-us", {
+                  <time datetime={data.to.toDateString()}>
+                    {new Date(data.to).toLocaleDateString("en-us", {
                       year: "numeric",
                       month: "short",
                     })}
                   </time>
                 </>
               )}
-              {!post.frontmatter.to && <>{" to present"}</>}
+              {!data.to && <>{" to present"}</>}
             </div>
             <div class="project">
-              <post.Content />
+              <Content />
             </div>
-            {post.frontmatter.link && (
+            {data.projectLink && (
               <a
-                href={post.frontmatter.link}
+                href={data.projectLink}
                 class={`
                   mt-6
                   w-fit
@@ -80,7 +86,7 @@ const projects = (await Astro.glob("../projects/*.mdx")).sort(
               </a>
             )}
           </li>
-        ))
+        })
       }
     </ul>
   </section>
