@@ -5,18 +5,18 @@ import { Comments } from "../../components/comments/Comments";
 import { Likes } from "../../components/islands/Likes";
 
 export async function getStaticPaths() {
-  const blogEntries = await getCollection("blog");
-  return blogEntries.map((entry) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+	const blogEntries = await getCollection("blog");
+	return blogEntries.map((entry) => ({
+		params: { slug: entry.slug },
+		props: { entry },
+	}));
 }
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 const { pathname } = Astro.url;
 
-const { title, pubDate, description, modDate, atprotoURI } = entry.data
+const { title, pubDate, description, modDate, atprotoURI } = entry.data;
 ---
 
 

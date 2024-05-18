@@ -3,9 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 import { getCollection } from "astro:content";
 
-
 const posts = (await getCollection("blog")).sort((a, b) => {
-  return (b.data.pubDate?.getTime()?? 0) - (a.data.pubDate?.getTime()?? 0);
+	return (b.data.pubDate?.getTime() ?? 0) - (a.data.pubDate?.getTime() ?? 0);
 });
 ---
 

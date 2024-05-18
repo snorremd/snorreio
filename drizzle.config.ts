@@ -1,4 +1,4 @@
-import type { Config } from 'drizzle-kit';
+import type { Config } from "drizzle-kit";
 
 const {
 	LOCAL_DB_PATH,
@@ -6,17 +6,16 @@ const {
 	DB_NAME = "snorre-io-prod",
 } = process.env;
 
-
 export default LOCAL_DB_PATH
 	? ({
-			schema: './src/db-schema/*.ts',
+			schema: "./src/db-schema/*.ts",
 			driver: "better-sqlite",
 			dbCredentials: {
 				url: LOCAL_DB_PATH,
 			},
 		} satisfies Config)
 	: ({
-			schema: './src/db-schema/*.ts',
+			schema: "./src/db-schema/*.ts",
 			out: "./migrations",
 			driver: "d1",
 			dbCredentials: {

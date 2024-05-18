@@ -3,4 +3,4 @@
 
 export const SITE_TITLE = "Snorre.io";
 export const SITE_DESCRIPTION =
-  "Snorre.io is a blog about web development, programming, and other things.";
+	"Snorre.io is a blog about web development, programming, and other things.";

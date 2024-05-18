@@ -3,26 +3,26 @@ import { Comments } from "../components/comments/Comments";
 import BaseLayout from "./BaseLayout.astro";
 
 export interface Props {
-  content: {
-    title: string;
-    description: string;
-    pubDate: string;
-    modDate?: string;
-    heroImage?: string;
-    atprotoURI: string;
-  };
-  url: string
+	content: {
+		title: string;
+		description: string;
+		pubDate: string;
+		modDate?: string;
+		heroImage?: string;
+		atprotoURI: string;
+	};
+	url: string;
 }
 
 const {
-  content: { title, description, pubDate, modDate, heroImage, atprotoURI },
-  url
+	content: { title, description, pubDate, modDate, heroImage, atprotoURI },
+	url,
 } = Astro.props;
 
 const dateFormatConfig = {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
+	year: "numeric",
+	month: "short",
+	day: "numeric",
 };
 ---
 

@@ -1,10 +1,10 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "exclude": ["functions/**/*"],
-  "compilerOptions": {
-    "types": ["@astrojs/image/client"],
-    // Solid specific settings
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js"
-  }
+	"extends": "astro/tsconfigs/strict",
+	"exclude": ["functions/**/*"],
+	"compilerOptions": {
+		"types": ["@astrojs/image/client"],
+		// Solid specific settings
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js"
+	}
 }

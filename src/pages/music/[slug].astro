@@ -8,11 +8,11 @@ import { formatBytes } from "../../utils/conversions";
 import { Likes } from "../../components/islands/Likes";
 
 export async function getStaticPaths() {
-  const blogEntries = await getCollection("music");
-  return blogEntries.map((entry) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+	const blogEntries = await getCollection("music");
+	return blogEntries.map((entry) => ({
+		params: { slug: entry.slug },
+		props: { entry },
+	}));
 }
 
 const { entry } = Astro.props;
