@@ -5,17 +5,17 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort((a, b) => {
-	return b.data.from.getTime() - a.data.from.getTime();
+  return b.data.from.getTime() - a.data.from.getTime();
 });
 
 const projectsRendered = await Promise.all(
-	projects.map(async (project) => {
-		const { Content } = await project.render();
-		return {
-			...project,
-			Content,
-		};
-	}),
+  projects.map(async (project) => {
+    const { Content } = await project.render();
+    return {
+      ...project,
+      Content,
+    };
+  }),
 );
 ---
 

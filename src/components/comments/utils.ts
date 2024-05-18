@@ -1,24 +1,24 @@
 import { AppBskyFeedDefs } from "@atproto/api";
 import type {
-	BlockedPost,
-	NotFoundPost,
-	ThreadViewPost,
+  BlockedPost,
+  NotFoundPost,
+  ThreadViewPost,
 } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 
 export interface ThreadViewPostUI extends ThreadViewPost {
-	showParentReplyLine: boolean;
-	showChildReplyLine: boolean;
-	isHighlightedPost: boolean;
+  showParentReplyLine: boolean;
+  showChildReplyLine: boolean;
+  isHighlightedPost: boolean;
 }
 
 function isKnownType(
-	post: unknown,
+  post: unknown,
 ): post is BlockedPost | NotFoundPost | ThreadViewPost {
-	return [
-		AppBskyFeedDefs.isBlockedPost(post),
-		AppBskyFeedDefs.isNotFoundPost(post),
-		AppBskyFeedDefs.isThreadViewPost(post),
-	].some(Boolean);
+  return [
+    AppBskyFeedDefs.isBlockedPost(post),
+    AppBskyFeedDefs.isNotFoundPost(post),
+    AppBskyFeedDefs.isThreadViewPost(post),
+  ].some(Boolean);
 }
 
 /**
@@ -30,84 +30,84 @@ function isKnownType(
  * @returns A generator that yields all posts in the thread including blocked and not found posts
  */
 export function* flatten(
-	thread: ThreadViewPostUI,
+  thread: ThreadViewPostUI,
 ): Generator<ThreadViewPostUI, void> {
-	if (thread.parent) {
-		if (isKnownType(thread.parent)) {
-			if (AppBskyFeedDefs.isThreadViewPost(thread.parent)) {
-				yield* flatten(thread.parent as ThreadViewPostUI);
-			}
-		}
-	}
+  if (thread.parent) {
+    if (isKnownType(thread.parent)) {
+      if (AppBskyFeedDefs.isThreadViewPost(thread.parent)) {
+        yield* flatten(thread.parent as ThreadViewPostUI);
+      }
+    }
+  }
 
-	yield thread;
+  yield thread;
 
-	if (thread.replies && thread.replies.length > 0) {
-		for (const reply of thread.replies) {
-			if (isKnownType(reply)) {
-				if (AppBskyFeedDefs.isThreadViewPost(reply)) {
-					yield* flatten(reply as ThreadViewPostUI);
-				}
-			}
-		}
-	}
+  if (thread.replies && thread.replies.length > 0) {
+    for (const reply of thread.replies) {
+      if (isKnownType(reply)) {
+        if (AppBskyFeedDefs.isThreadViewPost(reply)) {
+          yield* flatten(reply as ThreadViewPostUI);
+        }
+      }
+    }
+  }
 }
 
 function addThreadUIData(
-	threadViewPost: ThreadViewPostUI,
-	walkChildren = true,
-	walkParent = true,
+  threadViewPost: ThreadViewPostUI,
+  walkChildren = true,
+  walkParent = true,
 ): ThreadViewPostUI {
-	let parent: ThreadViewPostUI | undefined = undefined;
-	if (walkParent && AppBskyFeedDefs.isThreadViewPost(threadViewPost.parent)) {
-		// Recursively add UI data to parent
-		parent = addThreadUIData(
-			{
-				...threadViewPost.parent,
-				showParentReplyLine: !!threadViewPost.parent?.parent,
-				showChildReplyLine: true,
-				isHighlightedPost: false,
-			},
-			false,
-			true,
-		);
-	}
+  let parent: ThreadViewPostUI | undefined = undefined;
+  if (walkParent && AppBskyFeedDefs.isThreadViewPost(threadViewPost.parent)) {
+    // Recursively add UI data to parent
+    parent = addThreadUIData(
+      {
+        ...threadViewPost.parent,
+        showParentReplyLine: !!threadViewPost.parent?.parent,
+        showChildReplyLine: true,
+        isHighlightedPost: false,
+      },
+      false,
+      true,
+    );
+  }
 
-	let replies: ThreadViewPostUI[] = [];
-	if (walkChildren && (threadViewPost.replies?.length ?? 0) > 0) {
-		replies = (threadViewPost.replies ?? [])
-			.map((reply) => {
-				if (AppBskyFeedDefs.isThreadViewPost(reply)) {
-					// Recursively add UI data to children
-					return addThreadUIData(
-						{
-							...reply,
-							showParentReplyLine: !threadViewPost?.isHighlightedPost,
-							showChildReplyLine: (reply?.replies?.length ?? 0) > 0,
-							isHighlightedPost: false,
-						} satisfies ThreadViewPostUI,
-						true,
-						false,
-					);
-				}
-			})
-			.filter((x): x is ThreadViewPostUI => x !== undefined);
-	}
+  let replies: ThreadViewPostUI[] = [];
+  if (walkChildren && (threadViewPost.replies?.length ?? 0) > 0) {
+    replies = (threadViewPost.replies ?? [])
+      .map((reply) => {
+        if (AppBskyFeedDefs.isThreadViewPost(reply)) {
+          // Recursively add UI data to children
+          return addThreadUIData(
+            {
+              ...reply,
+              showParentReplyLine: !threadViewPost?.isHighlightedPost,
+              showChildReplyLine: (reply?.replies?.length ?? 0) > 0,
+              isHighlightedPost: false,
+            } satisfies ThreadViewPostUI,
+            true,
+            false,
+          );
+        }
+      })
+      .filter((x): x is ThreadViewPostUI => x !== undefined);
+  }
 
-	return { ...threadViewPost, parent, replies };
+  return { ...threadViewPost, parent, replies };
 }
 
 export function enrichThreadWithUIData(
-	threadViewPost: ThreadViewPost,
+  threadViewPost: ThreadViewPost,
 ): ThreadViewPostUI {
-	return addThreadUIData(
-		{
-			...threadViewPost,
-			showParentReplyLine: false,
-			showChildReplyLine: false,
-			isHighlightedPost: true,
-		} satisfies ThreadViewPostUI,
-		true,
-		true,
-	);
+  return addThreadUIData(
+    {
+      ...threadViewPost,
+      showParentReplyLine: false,
+      showChildReplyLine: false,
+      isHighlightedPost: true,
+    } satisfies ThreadViewPostUI,
+    true,
+    true,
+  );
 }

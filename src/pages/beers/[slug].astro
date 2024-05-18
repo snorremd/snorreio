@@ -12,18 +12,18 @@ import { Icon } from "astro-icon/components";
 import { Likes } from "../../components/islands/Likes";
 
 export async function getStaticPaths() {
-	const beers = await getCollection("beers");
+  const beers = await getCollection("beers");
 
-	return beers.map((beer) => {
-		return {
-			params: {
-				slug: beer.data.slug,
-			},
-			props: {
-				beer: beer.data,
-			},
-		};
-	});
+  return beers.map((beer) => {
+    return {
+      params: {
+        slug: beer.data.slug,
+      },
+      props: {
+        beer: beer.data,
+      },
+    };
+  });
 }
 
 const { slug } = Astro.params;

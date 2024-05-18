@@ -6,20 +6,20 @@ import { parse } from "node-html-parser";
 import { Resvg } from "@resvg/resvg-js";
 
 interface OgImageTemplateProps {
-	site: string;
-	title: string;
-	author: string;
-	profilePic: string;
-	wavesSvg: string;
+  site: string;
+  title: string;
+  author: string;
+  profilePic: string;
+  wavesSvg: string;
 }
 
 function OgImageTemplate({
-	site,
-	title,
-	profilePic,
-	wavesSvg,
+  site,
+  title,
+  profilePic,
+  wavesSvg,
 }: OgImageTemplateProps) {
-	return html`
+  return html`
     <div class="bg-stone-900 text-stone-200 w-full h-full flex flex-col justify-start">
       <div class="flex flex-col justify-center items-center" style="font-family: shortstack;">
         <h1 class="text-7xl m-0 text-center px-16 py-32">
@@ -40,104 +40,104 @@ function OgImageTemplate({
 }
 
 interface GenerateOgImageProps {
-	site: string;
-	route: RouteData;
-	profilePic: string;
-	wavesSvg: string;
+  site: string;
+  route: RouteData;
+  profilePic: string;
+  wavesSvg: string;
 }
 
 /**
  * Generate an og:image for a given route
  */
 async function generateOgImage({
-	site,
-	route,
-	profilePic,
-	wavesSvg,
+  site,
+  route,
+  profilePic,
+  wavesSvg,
 }: GenerateOgImageProps) {
-	// First we get the html for the route and parse out the title and description
-	const html = await readFile(route.distURL ?? "", { encoding: "utf-8" });
-	const root = parse(html.toString());
-	const title =
-		root.querySelector("meta[name='title']")?.attributes.content ?? "";
-	const description =
-		root.querySelector("meta[name='description']")?.attributes.content ?? "";
-	const author = "Snorre Magnus Davøen";
+  // First we get the html for the route and parse out the title and description
+  const html = await readFile(route.distURL ?? "", { encoding: "utf-8" });
+  const root = parse(html.toString());
+  const title =
+    root.querySelector("meta[name='title']")?.attributes.content ?? "";
+  const description =
+    root.querySelector("meta[name='description']")?.attributes.content ?? "";
+  const author = "Snorre Magnus Davøen";
 
-	// Then we generate the URL for the og:image
-	const template = OgImageTemplate({
-		site,
-		title,
-		author,
-		profilePic,
-		wavesSvg,
-	});
+  // Then we generate the URL for the og:image
+  const template = OgImageTemplate({
+    site,
+    title,
+    author,
+    profilePic,
+    wavesSvg,
+  });
 
-	try {
-		const svg = await satori(template, {
-			width: 1200,
-			height: 600,
-			fonts: [
-				{
-					// Same font as used on the site headers
-					name: "shortstack",
-					data: await readFile("./public/fonts/shortstack-regular.woff"),
-					style: "normal",
-				},
-			],
-		});
+  try {
+    const svg = await satori(template, {
+      width: 1200,
+      height: 600,
+      fonts: [
+        {
+          // Same font as used on the site headers
+          name: "shortstack",
+          data: await readFile("./public/fonts/shortstack-regular.woff"),
+          style: "normal",
+        },
+      ],
+    });
 
-		// calculate write path by replacing index.html with index-og.svg
-		const writePath =
-			route.distURL?.pathname.replace("index.html", "index-og.png") ?? "";
+    // calculate write path by replacing index.html with index-og.svg
+    const writePath =
+      route.distURL?.pathname.replace("index.html", "index-og.png") ?? "";
 
-		// Convert svg to png
-		const resvg = new Resvg(svg, {});
-		const png = await resvg.render();
-		const pngBuffer = await png.asPng();
-		await writeFile(writePath, pngBuffer);
-	} catch (e) {
-		console.error("Could not generate og:image for route", route.route, e);
-	}
+    // Convert svg to png
+    const resvg = new Resvg(svg, {});
+    const png = await resvg.render();
+    const pngBuffer = await png.asPng();
+    await writeFile(writePath, pngBuffer);
+  } catch (e) {
+    console.error("Could not generate og:image for route", route.route, e);
+  }
 }
 
 /**
  * Satori plugin for Astro, returns Astro plugin
  */
 export function satoriPlugin(): AstroIntegration {
-	let astroConfig: AstroConfig;
-	return {
-		name: "satori-plugin",
-		hooks: {
-			"astro:config:done": ({ config }) => {
-				console.log("Store config for satori-plugin");
-				astroConfig = config;
-			},
-			"astro:build:done": async ({ routes }) => {
-				console.log("Build done, generate og:image for each route");
+  let astroConfig: AstroConfig;
+  return {
+    name: "satori-plugin",
+    hooks: {
+      "astro:config:done": ({ config }) => {
+        console.log("Store config for satori-plugin");
+        astroConfig = config;
+      },
+      "astro:build:done": async ({ routes }) => {
+        console.log("Build done, generate og:image for each route");
 
-				const profilePic = (
-					await readFile("./public/images/profile.jpeg")
-				).toString("base64");
-				const wavesSvg = (
-					await readFile("./public/graphics/layered-waves-dark.svg")
-				).toString("base64");
+        const profilePic = (
+          await readFile("./public/images/profile.jpeg")
+        ).toString("base64");
+        const wavesSvg = (
+          await readFile("./public/graphics/layered-waves-dark.svg")
+        ).toString("base64");
 
-				const ogImages = routes
-					.filter(
-						(route) => route.distURL?.pathname?.endsWith("index.html") ?? false,
-					)
-					.map((route) =>
-						generateOgImage({
-							route,
-							site: astroConfig.site ?? "",
-							profilePic,
-							wavesSvg,
-						}),
-					);
+        const ogImages = routes
+          .filter(
+            (route) => route.distURL?.pathname?.endsWith("index.html") ?? false,
+          )
+          .map((route) =>
+            generateOgImage({
+              route,
+              site: astroConfig.site ?? "",
+              profilePic,
+              wavesSvg,
+            }),
+          );
 
-				await Promise.all(ogImages);
-			},
-		},
-	};
+        await Promise.all(ogImages);
+      },
+    },
+  };
 }

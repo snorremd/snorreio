@@ -6,7 +6,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
 const recipes = (await getCollection("beers")).sort((a, b) => {
-	return b.data._timestamp_ms - a.data._timestamp_ms;
+  return b.data._timestamp_ms - a.data._timestamp_ms;
 });
 ---
 
