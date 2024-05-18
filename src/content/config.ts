@@ -125,20 +125,20 @@ const projectCollection = defineCollection({
         .union([z.string(), z.number(), z.date()])
         .transform((value) => (value === undefined ? value : new Date(value)))
         .refine((value) =>
-          value === undefined ? value : !isNaN(value.getTime()),
+          value === undefined ? value : !Number.isNaN(value.getTime()),
         ),
       to: z
         .union([z.string(), z.number(), z.date()])
         .transform((value) => (value === undefined ? value : new Date(value)))
         .refine((value) =>
-          value === undefined ? value : !isNaN(value.getTime()),
+          value === undefined ? value : !Number.isNaN(value.getTime()),
         )
         .optional(),
       pubDate: z
         .union([z.string(), z.number(), z.date()])
         .transform((value) => (value === undefined ? value : new Date(value)))
         .refine((value) =>
-          value === undefined ? value : !isNaN(value.getTime()),
+          value === undefined ? value : !Number.isNaN(value.getTime()),
         )
         .optional(),
     })

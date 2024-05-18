@@ -11,12 +11,12 @@ export interface Props {
     heroImage?: string;
     atprotoURI: string;
   };
-  url: string
+  url: string;
 }
 
 const {
   content: { title, description, pubDate, modDate, heroImage, atprotoURI },
-  url
+  url,
 } = Astro.props;
 
 const dateFormatConfig = {

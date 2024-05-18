@@ -6,7 +6,7 @@ export function createStoredSignal<T>(
   storage = localStorage,
 ): Signal<T> {
   const initialValue = storage.getItem(key)
-    ? (JSON.parse(storage.getItem(key)!) as T)
+    ? (JSON.parse(storage.getItem(key) ?? "") as T)
     : defaultValue;
 
   const [value, setValue] = createSignal<T>(initialValue);

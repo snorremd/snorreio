@@ -406,15 +406,18 @@ const srmToRgbMap: SRMtoRGBMap = {
   "40": "3,4,3",
 };
 
-
 export function convertEBCToSRM(ebc: number): number {
   return ebc * 0.508;
 }
 
 export function convertEBCToRGB(ebc: number): string {
+  let limitedEbc = ebc;
   if (ebc > 40) {
-    ebc = 40;
+    limitedEbc = 40;
   }
-  const srm = ebc.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 1});
-  return `rgb(${srmToRgbMap[srm]})`
+  const srm = limitedEbc.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  });
+  return `rgb(${srmToRgbMap[srm]})`;
 }

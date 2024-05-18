@@ -18,10 +18,10 @@ export const Header: Component<HeaderProps> = ({ agent, session, signOut }) => {
   const [profile, setProfile] = createSignal<ProfileViewDetailed>();
   createEffect(async () => {
     if (agent() && session()) {
-      const profile = await agent()!.getProfile({
-        actor: agent()!.session!.handle,
+      const profile = await agent()?.getProfile({
+        actor: agent()?.session?.handle ?? "",
       });
-      profile.success && setProfile(profile.data);
+      profile?.success && setProfile(profile.data);
     } else {
       setProfile(undefined);
     }
@@ -33,7 +33,11 @@ export const Header: Component<HeaderProps> = ({ agent, session, signOut }) => {
       <div>
         <Popover.Root>
           <Popover.Trigger class="ui-disabled:bg-slate-100">
-            <img class="w-16 rounded-full" src={profile()?.avatar} />
+            <img
+              class="w-16 rounded-full"
+              src={profile()?.avatar}
+              alt="avatar"
+            />
           </Popover.Trigger>
           <Popover.Content
             class={`
@@ -48,7 +52,9 @@ export const Header: Component<HeaderProps> = ({ agent, session, signOut }) => {
             `}
           >
             <span class="font-shortstack">{profile()?.displayName}</span>
-            <button onClick={signOut}>Sign out</button>
+            <button type="button" onClick={signOut}>
+              Sign out
+            </button>
           </Popover.Content>
         </Popover.Root>
       </div>

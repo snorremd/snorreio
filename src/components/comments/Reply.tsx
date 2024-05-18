@@ -1,4 +1,4 @@
-import { BskyAgent, RichText } from "@atproto/api";
+import { type BskyAgent, RichText } from "@atproto/api";
 import {
   type Accessor,
   type Setter,
@@ -28,7 +28,7 @@ export const Reply = ({
 
   createEffect(() => {
     if (showEditor()) {
-      dialog()!.showModal();
+      dialog()?.showModal();
       document.documentElement.style.overflow = "hidden";
     } else {
       document.documentElement.style.overflow = "auto";
@@ -67,18 +67,18 @@ export const Reply = ({
           onSubmit={async (e) => {
             e.preventDefault();
             if (agent() && showEditor() !== null) {
-              const post = showEditor()!;
+              const post = showEditor();
               await agent()?.post({
                 text: editorText().text,
                 langs: ["en"],
                 reply: {
                   parent: {
-                    cid: post.post.cid,
-                    uri: post.post.uri,
+                    cid: post?.post.cid ?? "",
+                    uri: post?.post.uri ?? "",
                   },
                   root: {
-                    cid: post.post.cid,
-                    uri: post.post.uri,
+                    cid: post?.post.cid ?? "",
+                    uri: post?.post.uri ?? "",
                   },
                 },
               });

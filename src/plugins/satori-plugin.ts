@@ -1,14 +1,9 @@
-import type {
-  AstroConfig,
-  AstroIntegration,
-  RouteData,
-} from "astro";
+import type { AstroConfig, AstroIntegration, RouteData } from "astro";
 import satori from "satori";
 import { html } from "satori-html";
-import { readFile, writeFile } from "fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { parse } from "node-html-parser";
-import { Resvg } from "@resvg/resvg-js"
-
+import { Resvg } from "@resvg/resvg-js";
 
 interface OgImageTemplateProps {
   site: string;
@@ -18,7 +13,12 @@ interface OgImageTemplateProps {
   wavesSvg: string;
 }
 
-function OgImageTemplate({ site, title, profilePic, wavesSvg }: OgImageTemplateProps) {
+function OgImageTemplate({
+  site,
+  title,
+  profilePic,
+  wavesSvg,
+}: OgImageTemplateProps) {
   return html`
     <div class="bg-stone-900 text-stone-200 w-full h-full flex flex-col justify-start">
       <div class="flex flex-col justify-center items-center" style="font-family: shortstack;">
@@ -49,19 +49,29 @@ interface GenerateOgImageProps {
 /**
  * Generate an og:image for a given route
  */
-async function generateOgImage({ site, route, profilePic, wavesSvg }: GenerateOgImageProps) {
+async function generateOgImage({
+  site,
+  route,
+  profilePic,
+  wavesSvg,
+}: GenerateOgImageProps) {
   // First we get the html for the route and parse out the title and description
-  const html = await readFile(route.distURL!, { encoding: "utf-8" });
+  const html = await readFile(route.distURL ?? "", { encoding: "utf-8" });
   const root = parse(html.toString());
   const title =
-    root.querySelector("meta[name='title']")?.attributes["content"] ?? "";
+    root.querySelector("meta[name='title']")?.attributes.content ?? "";
   const description =
-    root.querySelector("meta[name='description']")?.attributes["content"] ?? "";
+    root.querySelector("meta[name='description']")?.attributes.content ?? "";
   const author = "Snorre Magnus Davøen";
 
   // Then we generate the URL for the og:image
-  const template = OgImageTemplate({ site, title, author, profilePic, wavesSvg });
-
+  const template = OgImageTemplate({
+    site,
+    title,
+    author,
+    profilePic,
+    wavesSvg,
+  });
 
   try {
     const svg = await satori(template, {
@@ -78,15 +88,13 @@ async function generateOgImage({ site, route, profilePic, wavesSvg }: GenerateOg
     });
 
     // calculate write path by replacing index.html with index-og.svg
-    const writePath = route.distURL!.pathname.replace(
-      "index.html",
-      "index-og.png",
-    );
+    const writePath =
+      route.distURL?.pathname.replace("index.html", "index-og.png") ?? "";
 
-    // Convert svg to png 
-    const resvg = new Resvg(svg, {})
-    const png = await resvg.render()
-    const pngBuffer = await png.asPng()
+    // Convert svg to png
+    const resvg = new Resvg(svg, {});
+    const png = await resvg.render();
+    const pngBuffer = await png.asPng();
     await writeFile(writePath, pngBuffer);
   } catch (e) {
     console.error("Could not generate og:image for route", route.route, e);
@@ -108,14 +116,24 @@ export function satoriPlugin(): AstroIntegration {
       "astro:build:done": async ({ routes }) => {
         console.log("Build done, generate og:image for each route");
 
-        const profilePic = (await readFile("./public/images/profile.jpeg")).toString("base64");
-        const wavesSvg = (await readFile("./public/graphics/layered-waves-dark.svg")).toString("base64");
-        
+        const profilePic = (
+          await readFile("./public/images/profile.jpeg")
+        ).toString("base64");
+        const wavesSvg = (
+          await readFile("./public/graphics/layered-waves-dark.svg")
+        ).toString("base64");
 
         const ogImages = routes
-          .filter((route) => route.distURL?.pathname?.endsWith("index.html")?? false)
+          .filter(
+            (route) => route.distURL?.pathname?.endsWith("index.html") ?? false,
+          )
           .map((route) =>
-            generateOgImage({ route, site: astroConfig.site ?? "", profilePic, wavesSvg }),
+            generateOgImage({
+              route,
+              site: astroConfig.site ?? "",
+              profilePic,
+              wavesSvg,
+            }),
           );
 
         await Promise.all(ogImages);

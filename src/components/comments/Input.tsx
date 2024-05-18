@@ -18,8 +18,6 @@ export const Input: Component<InputProps> = (props) => {
         focus-visible:outline-stone-800 dark:focus-visible:outline-stone-100
         text-stone-800 dark:text-stone-100 
       `}
-    >
-      {props.children}
-    </input>
+    />
   );
 };

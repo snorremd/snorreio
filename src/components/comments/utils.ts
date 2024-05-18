@@ -12,7 +12,7 @@ export interface ThreadViewPostUI extends ThreadViewPost {
 }
 
 function isKnownType(
-  post: any,
+  post: unknown,
 ): post is BlockedPost | NotFoundPost | ThreadViewPost {
   return [
     AppBskyFeedDefs.isBlockedPost(post),
@@ -58,39 +58,41 @@ function addThreadUIData(
   walkChildren = true,
   walkParent = true,
 ): ThreadViewPostUI {
-  let parent
+  let parent: ThreadViewPostUI | undefined = undefined;
   if (walkParent && AppBskyFeedDefs.isThreadViewPost(threadViewPost.parent)) {
     // Recursively add UI data to parent
-    parent = addThreadUIData({
-      ...threadViewPost.parent,
-      showParentReplyLine: threadViewPost.parent?.parent? true : false,
-      showChildReplyLine: true,
-      isHighlightedPost: false,
-    }, false, true);
+    parent = addThreadUIData(
+      {
+        ...threadViewPost.parent,
+        showParentReplyLine: !!threadViewPost.parent?.parent,
+        showChildReplyLine: true,
+        isHighlightedPost: false,
+      },
+      false,
+      true,
+    );
   }
 
   let replies: ThreadViewPostUI[] = [];
-  if (walkChildren && (threadViewPost.replies?.length?? 0) > 0) {
-    replies = threadViewPost.replies!
+  if (walkChildren && (threadViewPost.replies?.length ?? 0) > 0) {
+    replies = (threadViewPost.replies ?? [])
       .map((reply) => {
         if (AppBskyFeedDefs.isThreadViewPost(reply)) {
           // Recursively add UI data to children
-          return addThreadUIData({
-            ...reply,
-            showParentReplyLine: threadViewPost?.isHighlightedPost
-              ? false
-              : true,
-            showChildReplyLine:
-              (reply?.replies?.length ?? 0) > 0 ? true : false,
-            isHighlightedPost: false,
-          } satisfies ThreadViewPostUI,
+          return addThreadUIData(
+            {
+              ...reply,
+              showParentReplyLine: !threadViewPost?.isHighlightedPost,
+              showChildReplyLine: (reply?.replies?.length ?? 0) > 0,
+              isHighlightedPost: false,
+            } satisfies ThreadViewPostUI,
             true,
-            false);
+            false,
+          );
         }
       })
       .filter((x): x is ThreadViewPostUI => x !== undefined);
   }
-
 
   return { ...threadViewPost, parent, replies };
 }

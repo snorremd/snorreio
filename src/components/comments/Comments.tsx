@@ -1,5 +1,5 @@
-import { Component, createEffect, createSignal, onMount } from "solid-js";
-import { AtpSessionData, BskyAgent } from "@atproto/api";
+import { type Component, createEffect, createSignal, onMount } from "solid-js";
+import { type AtpSessionData, BskyAgent } from "@atproto/api";
 
 import "solid-devtools";
 

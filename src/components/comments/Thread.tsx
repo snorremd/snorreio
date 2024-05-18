@@ -41,13 +41,13 @@ export const Thread: Component<ThreadProps> = ({
     () => highlightedPost(),
     async (uri) => {
       if (agent()) {
-        const threadResult = await agent()!.getPostThread({
+        const threadResult = await agent()?.getPostThread({
           uri,
           parentHeight: 20,
         });
 
         const enriched = enrichThreadWithUIData(
-          threadResult.data.thread as ThreadViewPost,
+          threadResult?.data.thread as ThreadViewPost,
         );
 
         const enrichedAndFlattened = [...flatten(enriched)];
@@ -116,20 +116,26 @@ const Post = ({
 
   return (
     <li
-      class={`flex flex-col`}
+      class="flex flex-col"
       classList={{
-        "border-t border-b pt-4 my-8 border-stone-400 dark:border-stone-600 mt-8": post.isHighlightedPost,
+        "border-t border-b pt-4 my-8 border-stone-400 dark:border-stone-600 mt-8":
+          post.isHighlightedPost,
       }}
     >
       {post.showParentReplyLine ? (
-        <div class="flex pt-8 ml-6 border-l-2 border-stone-400 dark:border-stone-600"></div>
+        <div class="flex pt-8 ml-6 border-l-2 border-stone-400 dark:border-stone-600" />
       ) : null}
       <div class="flex flex-col items-start">
         <button
+          type="button"
           class="flex flex-row items-center justify-center gap-2"
           onClick={() => setHighlightedPost(post.post.uri)}
         >
-          <img class="rounded-full w-12" src={post.post.author.avatar} />
+          <img
+            class="rounded-full w-12"
+            src={post.post.author.avatar}
+            alt="avatar"
+          />
           <span class="font-shortstack text-lg">
             {post.post.author.displayName}
           </span>
@@ -154,6 +160,7 @@ const Post = ({
           <p class="mt-0">{text}</p>
           <div class="flex flex-row gap-4 text-stone-600 dark:text-stone-400">
             <button
+              type="button"
               class="flex flex-row items-center"
               onClick={() => setShowEditor(post)}
               aria-label={`Reply to ${post.post.author.displayName}`}
@@ -162,14 +169,15 @@ const Post = ({
               <span class="ml-1 text-sm">{post.post.replyCount ?? 0}</span>
             </button>
             <button
+              type="button"
               class="flex flex-row items-center"
               aria-label="Like"
               onClick={async () => {
                 if (post.post.viewer?.like) {
-                  await agent()!.deleteLike(post.post.viewer.like);
+                  await agent()?.deleteLike(post.post.viewer.like);
                   await refetch();
                 } else {
-                  await agent()!.like(post.post.uri, post.post.cid);
+                  await agent()?.like(post.post.uri, post.post.cid);
                   await refetch();
                 }
               }}
@@ -193,6 +201,7 @@ const Post = ({
           {showContinueThread ? (
             <div>
               <button
+                type="button"
                 class="flex flex-row items-center justify-center gap-2 text-stone-600 dark:text-stone-400"
                 onClick={() => setHighlightedPost(post.post.uri)}
                 aria-label={`Reply to ${post.post.author.displayName}`}

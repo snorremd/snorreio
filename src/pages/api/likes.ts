@@ -65,8 +65,6 @@ export async function POST(context: APIContext) {
     collection?: string;
   };
 
-  console.log("Slug", slug, "Collection", collection);
-
   if (!context.cookies.has("sessionId")) {
     context.cookies.set("sessionId", crypto.randomUUID(), {
       httpOnly: true,
@@ -77,7 +75,7 @@ export async function POST(context: APIContext) {
     });
   }
 
-  const sessionId = context.cookies.get("sessionId")!.value;
+  const sessionId = context.cookies.get("sessionId")?.value ?? "";
 
   const liked =
     ((
