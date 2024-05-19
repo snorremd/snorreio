@@ -94,7 +94,10 @@ export async function POST(context: APIContext) {
       )
       .execute();
   } else {
-    await db.insert(likes).values({ slug, sessionId, collection, createdAt: new Date() }).execute();
+    await db
+      .insert(likes)
+      .values({ slug, sessionId, collection, createdAt: new Date() })
+      .execute();
   }
 
   return new Response(JSON.stringify({ success: true }));

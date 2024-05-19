@@ -7,14 +7,14 @@ const {
 } = process.env;
 
 export default LOCAL_DB_PATH
-  ? ({
+  ? {
       schema: "./src/db-schema/*.ts",
       driver: "better-sqlite",
       dialect: "sqlite",
       dbCredentials: {
         url: LOCAL_DB_PATH,
       },
-    })
+    }
   : ({
       schema: "./src/db-schema/*.ts",
       out: "./migrations",
