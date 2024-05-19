@@ -27,8 +27,6 @@ export async function GET(context: APIContext) {
   // Get the session ID from the cookie
   const sessionId = context.cookies.get("sessionId")?.value;
 
-  console.log("Slug", slug, "Collection", collection);
-
   const likesCount = (
     await db
       .select({ likes: count() })
@@ -55,7 +53,6 @@ export async function GET(context: APIContext) {
 }
 
 export async function POST(context: APIContext) {
-  console.log("Runtime", context);
   const runtime = context.locals.runtime;
   const d1 = runtime.env.DB;
   const db = drizzle(d1, { schema: { likes } });
@@ -97,7 +94,10 @@ export async function POST(context: APIContext) {
       )
       .execute();
   } else {
-    await db.insert(likes).values({ slug, sessionId, collection }).execute();
+    await db
+      .insert(likes)
+      .values({ slug, sessionId, collection, createdAt: new Date() })
+      .execute();
   }
 
   return new Response(JSON.stringify({ success: true }));

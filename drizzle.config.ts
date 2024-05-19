@@ -7,17 +7,19 @@ const {
 } = process.env;
 
 export default LOCAL_DB_PATH
-  ? ({
+  ? {
       schema: "./src/db-schema/*.ts",
       driver: "better-sqlite",
+      dialect: "sqlite",
       dbCredentials: {
         url: LOCAL_DB_PATH,
       },
-    } satisfies Config)
+    }
   : ({
       schema: "./src/db-schema/*.ts",
       out: "./migrations",
       driver: "d1",
+      dialect: "sqlite",
       dbCredentials: {
         wranglerConfigPath:
           new URL("wrangler.toml", import.meta.url).pathname +
