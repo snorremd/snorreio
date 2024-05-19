@@ -14,7 +14,7 @@ export const likes = sqliteTable(
     collection: text("collection"),
     slug: text("slug"),
     // Store the timestamp of when the like was created in JavaScript milliseconds
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
+    createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       // Default to epoch as alter table only supports constant default values
       .default(sql`0`),
