@@ -1,6 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
+  "id": "9c789583-0ed1-4ee8-8f13-ae2571702411",
+  "prevId": "3be41637-79a8-4f8b-871d-44a116d6a012",
   "tables": {
     "likes": {
       "name": "likes",
@@ -25,6 +27,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "0"
         }
       },
       "indexes": {},
@@ -44,9 +54,8 @@
   },
   "enums": {},
   "_meta": {
+    "schemas": {},
     "tables": {},
     "columns": {}
-  },
-  "id": "3be41637-79a8-4f8b-871d-44a116d6a012",
-  "prevId": "00000000-0000-0000-0000-000000000000"
+  }
 }
