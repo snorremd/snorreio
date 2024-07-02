@@ -1,0 +1,223 @@
+---
+pubDate: "2024-07-02"
+title: "Code Monkey Clash - A Code Competition Workshop Game"
+---
+
+import { Image } from "astro:assets";
+
+[Code Monkey Clash is an open source code competition workshop game](https://github.com/snorremd/code-monkey-clash) I've been working on.
+Many years ago I played the [Extreme Startup](https://github.com/rchatley/extreme_startup) workshop game.
+I also hosted an Extreme Startup workshop once during my time at university.
+Later a colleague hosted a session at work, and I started thinking it would be fun to renew the experience.
+Code Monkey Clash is my take on the concept with new questions and an implementation from scratch in TypeScript.
+
+## The concept and gameplay
+
+The game is a workshop where participants are challenged to solve questions by writing code.
+Each player creates an HTTP server that accepts a `GET` request with a question, and responds with the answer.
+The game master runs a server that sends questions to the players and evaluates the answers.
+Based on the answer, or the lack thereof, the game server assigns points to the players, and adjusts the question interval.
+The game is played in rounds, and the player with the most points at the end of the game wins.
+
+import AdminDashboard from "./admin-dashboard.png";
+
+<Image
+  src={AdminDashboard}
+  alt="Screenshot of the Code Monkey Clash admin dashboard"
+  widths={[400, 800, 1200, 1920]}
+/>
+
+The questions ranges from simpler word problems to more complex algorithmic challenges.
+They are expressed in a relatively natural language way requiring users to do some string parsing.
+The questions are designed to be solvable in a few minutes, but get progressively more difficult as the game progresses.
+The game randomizes the input to questions to avoid players hard-coding answers.
+A question might be something like:
+
+```
+What is the sum of the numbers: 1, 5, 12, 13
+```
+
+
+
+In order to keep the feel of the original Extreme Startup game I've borrowed two key algorithms:
+
+1. The sliding window algorithm for question selection
+1. The linear adjustment algorithm for question rate
+
+The sliding window algorithm is fairly simple:
+
+```typescript
+const windowEnd = round * 2 - 1;
+const windowStart = Math.max(windowEnd - 4, 0);
+```
+
+The algorithm produces this sequence of windows:
+
+| Round | Start | End |
+|-------|-------|-----|
+| 1     | 0     | 1   |
+| 2     | 0     | 3   |
+| 3     | 1     | 5   |
+| 4     | 3     | 7   |
+| 5     | 5     | 9   |
+
+This has some key benefits:
+1. The game starts slowly the first three questions, gradually increasing to four questions in the window.
+   After that it slides the window by two questions each round to not overwhelm the players and allow them to keep earning points.
+2. Players who lost out on a question in earlier rounds can still catch up in later rounds as the window slides.
+   Later rounds are worth more points, so it's possible to catch up even if you're behind.
+3. The game master can adjust the difficulty of the game by how fast each round progresses.
+   If the players are struggling, the game master can slow down the window progression to give them more time to catch up.
+
+### Question rate and difficulty
+
+The game loop for each player essentially consist of the following steps:
+
+1. Game server immediately schedules the next question (to avoid drift)
+1. Game server picks a random question from the window and gets random input
+1. Game server sends the question to the player
+1. The player responds with the answer, if they have one
+1. Based on the answer, or the lack thereof, the game server assigns points to the player
+1. Game server adjusts the question interval based on the player's answer
+1. When the next question is due, it starts from step 1.
+
+The question interval uses the linear adjustment algorithm from the original game.
+It adjusts the question rate by 100 ms deltas based on the player's last answer.
+Successful players will see their question rate increase, while struggling players will see it decrease.
+
+A more advanced technique looking at score averages were tried, but did not feel as good during simulation.
+The linear adjustment technique is simple and works well in practice.
+I might revisit the question interval adjustments in the future, but for now it's good enough.
+
+## The technology
+
+The Code Monkey Clash game is implemented from scratch as I did not want to just fork the original Extreme Startup game.
+My objective was to learn more about some of the new frontend technologies I had not used before.
+The game is essentially a clone of the original game, but with a new set of questions and a new implementation.
+
+### Bun - The all-in-one JavaScript runtime & toolkit
+
+[Bun](https://bun.sh) is "[...] an all-in-one JavaScript runtime & toolkit designed for speed, complete with a bundler, test runner, and Node.js-compatible package manager."
+As Bun supports TypeScript out of the box, it seemed like a nice fit for the project as I would not have to compile the code or use ts-node to run my code.
+It also supports bundling and minification which meant I could write client side code in TypeScript as well without having to worry about the build pipeline.
+
+### ElysiaJS - Ergonomic Framework for Humans
+
+As I was writing this project in TypeScript I wanted to use a web framework that supports TypeScript well.
+I had read a bit about [ElysiaJS](https://elysiajs.com/) and decided to give it a try.
+ElysiaJS' tagline is "Ergonomic Framework for Humans" and is developed by a single developer in Thailand.
+The framework somewhat resembles Express and Koa, but focuses on performance and TypeScript inference to improve developer experience.
+Where other frameworks often require manual typing for middleware and request data, Elysia infer types from your schemas and middleware handlers.
+If you structure the code correctly you don't have to typecast or manually type almost anything, which is a pretty big win!
+As an added benefit you also get a type-safe HTTP client library for free, but I did not use it in this project as I'm returning HTML.
+
+### HTMX - High power tools for HTML
+
+I've often used the RESTish backend paired with a single page application frontend pattern when developing web applications in the past.
+In the event that I needed server side rendering for SEO I would often use Next.js or my own custom React server side rendering.
+This works well for most applications, and having React at your fingertips in the client allows for some pretty dynamic applications.
+
+For this project I wanted to get away from the heavy client side frameworks and try a more traditional server side rendered application.
+I still needed some client side interactivity for the game, but I wanted to keep it as simple as possible.
+A buddy of mine was talking about [HTMX](https://htmx.org/) and how simple it made the mental model for web development.
+I decided to give it a try and I must say I'm pretty impressed.
+HTMX allows you to add dynamic behavior to your HTML with attributes.
+Your server only needs to return HTML or HTML fragments, and you mostly don't need to write any JavaScript.
+Instead HTMX uses the `hx-*` attributes to add behavior to your HTML elements, making server requests and updating the DOM as needed.
+
+import Signup from "./signup.png";
+
+<Image
+  src={Signup}
+  alt="Screenshot of the Code Monkey Clash signup form"
+  widths={[400, 800, 1200, 1920]} />
+
+In the signup form above, only the signup form HTML with errors would be returned in the event of a validation error.
+HTMX fetches the HTML fragment and replaces the form on the page with the new form without the browser having to do a page load.
+This makes the application feel very snappy and responsive, while keeping most of the logic on the server side.
+
+### Tailwind CSS and DaisyUI
+
+I've been using [Tailwind CSS](https://tailwindcss.com/) for a while now and I really like it.
+It's a utility-first CSS framework that allows you to build complex designs without having to write custom CSS.
+The utility-first approach feels like functional programming.
+Each utility composes neatly with other utilities, and you can build complex designs by combining simple utilities.
+I've not had this feeling with any other way of writing CSS, and I'm really happy with the results I've gotten using Tailwind CSS in the past.
+
+For this project I decided to try [DaisyUI](https://daisyui.com/), a plugin for Tailwind CSS that adds components and adjusts the default theme.
+By using DaisyUI I was able to quickly build a nice looking UI without having to write much custom CSS for buttons, and other native HTML elements.
+While I have been wary of using component libraries like Bootstrap, DaisyUI seems to fit well with the utility first approach of Tailwind CSS.
+Where you lack components you can quickly build them with Tailwind CSS utilities.
+And because DaisyUI is built on top of Tailwind CSS it is easily customizable with Tailwind's own configuration system.
+
+### Server sent events for live updates
+
+The nature of the game means that events happen pretty much all the time.
+Players sign up, questions are sent, answers are received, and points are assigned.
+I wanted to surface this liveness to the game master and players so that they did not have to refresh the page to see updates.
+In theory one could poll the backend for changes and have it re-render HTMX fragments.
+This however would have been unecessarily chatty, not to mention taxing on the server!
+
+Instead I decided to use [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) to push updates to the clients.
+Fortunately for me there is a [server sent events extension](https://v1.htmx.org/extensions/server-sent-events/) for HTMX that adds support.
+This allowed me to push updates to the clients as they happened, and the clients would update the UI as needed.
+As with everything else in HTMX, with SSE the HTML (fragments) are rendered on the server, and in this case pushed to the client as events.
+This way when a player joins the relevant player table row is rendered server side, then pushed to the client via the SSE connection.
+On the client HTMX inserts the row into the table and your UI is updated accordingly!
+
+For the Chart.js based scoreboard I needed to hack a bit as HTMX does not support updating the chart data directly.
+Instead I added a hidden span that initiates the SSE connection for the chart data, and then added client side logic to listen for that event.
+
+
+On the server side:
+```jsx
+// Use a hidden element to swap the chart data, don't actually swap json into the DOM
+<span 
+  class="hidden"
+  sse-swap={`player-chart-${player.nick}`}
+  hx-swap="none"
+/>
+```
+
+Then on the client:
+
+```typescript
+// On SSE messages do DOM-manipulation where necessary
+htmx.on("htmx:sseMessage", (evt) => {
+	// If the event is a player-chart event, update the chart with the new data
+	if (
+		evt instanceof CustomEvent &&
+		evt.detail.type.startsWith("player-chart-")
+	) {
+		const nick = evt.detail.type.replace("player-chart-", "");
+		const data = JSON.parse(evt.detail.data);
+		const dataset = chart.data.datasets.find((d) => d.label === nick);
+
+		if (dataset) {
+			dataset.data.push(data);
+			chart.update();
+		}
+	}
+});
+```
+
+In the end I was able to push updates to the clients as they happened, and the clients would update the UI as needed.
+The scoreboard looks really nice and Chart.js animates new data points as they are added.
+All in all it was a bit tricky to figure out how to do this, but once I got it working it was pretty neat!
+
+import Scoreboard from "./scoreboard.png";
+
+<Image
+  src={Scoreboard}
+  alt="Screenshot of the Code Monkey Clash scoreboard"
+  widths={[400, 800, 1200, 1920]} />
+
+
+## Conclusion
+
+I've had a lot of fun building Code Monkey Clash.
+The Bun, ElysiaJS, HTMX and Tailwind CSS stack has been a joy to work with.
+If you're familiar with TypeScript and JSX and want to build a server rendered application you can consider a similar stack.
+You might want to consider using a more supported framework than ElysiaJS, but it's been a fun experiment.
+In terms of developer experience I've been pretty happy with this stack.
+I've also had a lot of fun coming up with questions for the game, and I'm looking forward to hosting a workshop with my colleagues.

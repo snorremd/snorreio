@@ -122,13 +122,20 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data;
   }
 
 
-  ul {
+  ul, ol {
     max-width: 70ch;
-
   }
 
   li {
-    @apply list-disc ml-4;
+    @apply ml-4;
+  }
+
+  ol li {
+    @apply list-decimal;
+  }
+
+  ul li {
+    @apply list-disc;
   }
 
   blockquote {
@@ -138,6 +145,18 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data;
     }
   }
 
+  table {
+    @apply w-full my-4;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    @apply border-b border-stone-400 dark:border-stone-600 px-4 py-2;
+  }
+
+  th {
+    @apply bg-stone-100 dark:bg-stone-800 text-left;
+  }
 
 }
 </style>
