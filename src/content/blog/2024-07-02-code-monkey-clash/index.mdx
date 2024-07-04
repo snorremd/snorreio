@@ -6,10 +6,10 @@ title: "Code Monkey Clash - A Code Competition Workshop Game"
 import { Image } from "astro:assets";
 
 [Code Monkey Clash is an open source code competition workshop game](https://github.com/snorremd/code-monkey-clash) I've been working on.
-Many years ago I played the [Extreme Startup](https://github.com/rchatley/extreme_startup) workshop game.
-I also hosted an Extreme Startup workshop once during my time at university.
+A little more than a decade ago I first played the [Extreme Startup](https://github.com/rchatley/extreme_startup) workshop game.
+I liked it so much that I also hosted an Extreme Startup workshop of my own during my time at university.
 Later a colleague hosted a session at work, and I started thinking it would be fun to renew the experience.
-Code Monkey Clash is my take on the concept with new questions and an implementation from scratch in TypeScript.
+Code Monkey Clash is my take on the game with new questions and an implementation from scratch in TypeScript.
 
 ## The concept and gameplay
 
@@ -28,7 +28,7 @@ import AdminDashboard from "./admin-dashboard.png";
 />
 
 The questions ranges from simpler word problems to more complex algorithmic challenges.
-They are expressed in a relatively natural language way requiring users to do some string parsing.
+They are expressed in a relatively natural language way, requiring users to do some string parsing.
 The questions are designed to be solvable in a few minutes, but get progressively more difficult as the game progresses.
 The game randomizes the input to questions to avoid players hard-coding answers.
 A question might be something like:
@@ -36,8 +36,6 @@ A question might be something like:
 ```
 What is the sum of the numbers: 1, 5, 12, 13
 ```
-
-
 
 In order to keep the feel of the original Extreme Startup game I've borrowed two key algorithms:
 
@@ -62,7 +60,7 @@ The algorithm produces this sequence of windows:
 | 5     | 5     | 9   |
 
 This has some key benefits:
-1. The game starts slowly the first three questions, gradually increasing to four questions in the window.
+1. The game starts slowly the first three rounds, gradually increasing from two to four questions in the window.
    After that it slides the window by two questions each round to not overwhelm the players and allow them to keep earning points.
 2. Players who lost out on a question in earlier rounds can still catch up in later rounds as the window slides.
    Later rounds are worth more points, so it's possible to catch up even if you're behind.
@@ -85,7 +83,7 @@ The question interval uses the linear adjustment algorithm from the original gam
 It adjusts the question rate by 100 ms deltas based on the player's last answer.
 Successful players will see their question rate increase, while struggling players will see it decrease.
 
-A more advanced technique looking at score averages were tried, but did not feel as good during simulation.
+A more advanced technique looking at score averages were tried out, but did not feel as good during simulation.
 The linear adjustment technique is simple and works well in practice.
 I might revisit the question interval adjustments in the future, but for now it's good enough.
 
@@ -154,16 +152,16 @@ And because DaisyUI is built on top of Tailwind CSS it is easily customizable wi
 
 The nature of the game means that events happen pretty much all the time.
 Players sign up, questions are sent, answers are received, and points are assigned.
-I wanted to surface this liveness to the game master and players so that they did not have to refresh the page to see updates.
+I wanted to surface this liveness to the game master and players so that they do not have to refresh the page to see updates.
 In theory one could poll the backend for changes and have it re-render HTMX fragments.
 This however would have been unecessarily chatty, not to mention taxing on the server!
 
 Instead I decided to use [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) to push updates to the clients.
 Fortunately for me there is a [server sent events extension](https://v1.htmx.org/extensions/server-sent-events/) for HTMX that adds support.
-This allowed me to push updates to the clients as they happened, and the clients would update the UI as needed.
+This allowed me to push updates to the clients as they happen, and the clients would update the UI as needed.
 As with everything else in HTMX, with SSE the HTML (fragments) are rendered on the server, and in this case pushed to the client as events.
-This way when a player joins the relevant player table row is rendered server side, then pushed to the client via the SSE connection.
-On the client HTMX inserts the row into the table and your UI is updated accordingly!
+This way when a player joins, the relevant player table row is rendered server side, then pushed to the client's admin dashboard via the SSE connection.
+On the client HTMX inserts the row into the table and the UI is updated accordingly!
 
 For the Chart.js based scoreboard I needed to hack a bit as HTMX does not support updating the chart data directly.
 Instead I added a hidden span that initiates the SSE connection for the chart data, and then added client side logic to listen for that event.
