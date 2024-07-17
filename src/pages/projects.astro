@@ -3,6 +3,7 @@ import { Icon } from "astro-icon/components";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 import { getCollection } from "astro:content";
+import { Likes } from "../components/islands/Likes";
 
 const projects = (await getCollection("projects")).sort((a, b) => {
   return b.data.from.getTime() - a.data.from.getTime();
@@ -46,25 +47,33 @@ const projectsRendered = await Promise.all(
             >
               {data.title}
             </h2>
-            <div class="text-stone-700 dark:text-stone-300">
-              <time datetime={data.from.toDateString()}>
-                {new Date(data.from).toLocaleDateString("en-us", {
-                  year: "numeric",
-                  month: "short",
-                })}
-              </time>
-              {data.to && (
-                <>
-                  {" to "}
-                  <time datetime={data.to.toDateString()}>
-                    {new Date(data.to).toLocaleDateString("en-us", {
-                      year: "numeric",
-                      month: "short",
-                    })}
-                  </time>
-                </>
-              )}
-              {!data.to && <>{" to present"}</>}
+            <div class="text-stone-700 dark:text-stone-300 flex flex-row gap-4">
+              <div>
+                <time datetime={data.from.toDateString()}>
+                  {new Date(data.from).toLocaleDateString("en-us", {
+                    year: "numeric",
+                    month: "short",
+                  })}
+                </time>
+                {data.to && (
+                  <>
+                    {" to "}
+                    <time datetime={data.to.toDateString()}>
+                      {new Date(data.to).toLocaleDateString("en-us", {
+                        year: "numeric",
+                        month: "short",
+                      })}
+                    </time>
+                  </>
+                )}
+                {!data.to && <>{" to present"}</>}
+              </div>
+              <Likes
+                client:visible
+                client:only="solid-js"
+                collection="projects"
+                slug={slug}
+              />
             </div>
             <div class="project">
               <Content />

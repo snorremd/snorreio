@@ -1,7 +1,8 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
-import { getCollection } from "astro:content";
+import { Likes } from "../components/islands/Likes";
 
 const posts = (await getCollection("blog")).sort((a, b) => {
   return (b.data.pubDate?.getTime() ?? 0) - (a.data.pubDate?.getTime() ?? 0);
@@ -23,11 +24,11 @@ const posts = (await getCollection("blog")).sort((a, b) => {
     slot="content"
     class="w-full bg-stone-200 dark:bg-stone-800 flex flex-col items-center"
   >
-    <ul class="grid gap-2 max-w-6xl">
+    <ul class="grid gap-8 max-w-6xl">
       {
         posts.map(({data: post, slug}) => (
           <li
-            class={``}
+            class={`flex flex-col justify-center gap-2`}
           >
             <a
               href={`/blog/${slug}`}
@@ -35,7 +36,7 @@ const posts = (await getCollection("blog")).sort((a, b) => {
                 flex
                 min-w-full
                 flex-col
-                rounded-lg p-4
+                rounded-lg 
                 no-underline
                 focus:outline-none
                 [&>h2]:focus:underline`}
@@ -47,9 +48,18 @@ const posts = (await getCollection("blog")).sort((a, b) => {
               >
                 {post.title}
               </h2>
+            </a>
+            <div class="flex flex-row gap-4 text-stone-600 dark:text-stone-400">
+              <Likes
+                client:load
+                client:only="solid-js"
+                collection="blog"
+                isCollectionPage
+                slug={slug}
+              />
               <time
                 datetime={post.pubDate?.toISOString()}
-                class="text-stone-700 dark:text-stone-300"
+                class=""
               >
                 {post.pubDate?.toLocaleDateString(
                   "en-us",
@@ -60,10 +70,7 @@ const posts = (await getCollection("blog")).sort((a, b) => {
                   }
                 )}
               </time>
-              <p class="text-stone-800 dark:text-stone-100 max-w-[70ch]">
-                {post.description}
-              </p>
-            </a>
+            </div>
           </li>
         ))
       }

@@ -64,6 +64,12 @@ const { beer } = Astro.props;
         <dd class="mr-4">{beer?.color ?? "N/A"}</dd>
       </dl>
       <div class="flex flex-row gap-6">
+        <Likes
+          client:load
+          client:only="solid-js"
+          collection="beer"
+          slug={slug}
+        />
         <!-- Allow users to download the JSON -->
         <a
           href={`./${slug}.json`}
@@ -79,12 +85,6 @@ const { beer } = Astro.props;
         >
           Brewfather JSON <Icon class="ml-2 w-[1em]" name="mdi:download" />
         </a>
-        <Likes
-          client:load
-          client:only="solid-js"
-          collection="beers"
-          slug={slug}
-        />
       </div>
     </div>
   </section>

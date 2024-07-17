@@ -33,5 +33,6 @@ stats.html
 # Cloudflare
 .wrangler
 
-# Drizzle DB stuff
+# DB stuff
 .drizzle
+database.sql
