@@ -5,6 +5,7 @@ import BeerGlass from "../components/BeerGlass.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
 import { Icon } from "astro-icon/components";
 import { formatDate } from "date-fns";
+import { Likes } from "../components/islands/Likes";
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
 const music = (await getCollection("music")).sort((a, b) => {
@@ -37,19 +38,28 @@ const music = (await getCollection("music")).sort((a, b) => {
               <div class="flex flex-col">
                 <h2
                   class={`
-                font-shortstack underline-stone-900
-                dark:underline-stone-50 text-2xl
-                mb-2
-                underline
+                    font-shortstack underline-stone-900
+                    dark:underline-stone-50 text-2xl
+                    mb-2
+                    underline
                 `}
                 >
                   {data.title}
                 </h2>
-                <span class="flex flex-row gap-2 items-center text-sm opacity-70">
-                  <Icon name="material-symbols:copyright-outline" /> Copyright{" "}
-                  {formatDate(new Date(), "yyyy")} Snorre Magnus Davøen - All
-                  rights reserved
-                </span>
+                <div class="flex flex-row gap-4">
+                  <Likes
+                    client:load
+                    client:only="solid-js"
+                    collection="music"
+                    slug={slug}
+                    isCollectionPage
+                  />
+                  <span class="flex flex-row gap-2 items-center text-xs opacity-70">
+                    <Icon name="material-symbols:copyright-outline" /> Copyright{" "}
+                    {formatDate(new Date(), "yyyy")} Snorre Magnus Davøen - All
+                    rights reserved
+                  </span>
+                </div>
               </div>
             </a>
             <audio controls class="w-full pt-4" preload="none">

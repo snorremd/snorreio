@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BeerGlass from "../components/BeerGlass.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
+import { Likes } from "../components/islands/Likes";
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
 const recipes = (await getCollection("beers")).sort((a, b) => {
@@ -20,8 +21,8 @@ const recipes = (await getCollection("beers")).sort((a, b) => {
       This is a collection of beer recipes I've made the past few years. While
       my homebrewing career stretches back to around 2012, a lot of my recipes
       were lost to the sands of time. Now that I use
-      <a href="https://www.brewfather.app">Brewfather</a> to manage my recipes,
-      I can easily share them with you.
+      <a href="https://www.brewfather.app">Brewfather</a> to manage my recipes, I
+      can easily share them with you.
     </p>
   </section>
   <section
@@ -46,30 +47,39 @@ const recipes = (await getCollection("beers")).sort((a, b) => {
               <div class="flex flex-col">
                 <h2
                   class={`
-                font-shortstack underline-stone-900
-                dark:underline-stone-50 text-2xl
-                mb-2
-                underline
+                    font-shortstack underline-stone-900
+                    dark:underline-stone-50 text-2xl
+                    mb-2
+                    underline
                 `}
                 >
                   {recipe.name}
                 </h2>
-                <dl class="flex flex-row flex-wrap">
-                  <div class="w-full md:w-auto flex flex-row">
-                    <dt class="font-bold mr-2">Style</dt>
-                    <dd class="mr-4 whitespace-nowrap">
-                      {recipe?.style?.name ?? "N/A"}
-                    </dd>
-                  </div>
-                  <dt class="font-bold mr-2">ABV</dt>
-                  <dd class="mr-4">{recipe.abv ?? "N/A"}</dd>
+                <div class="flex flex-row gap-4">
+                  <Likes
+                    client:load
+                    client:only="solid-js"
+                    collection="beer"
+                    isCollectionPage
+                    slug={recipe.slug}
+                  />
+                  <dl class="flex flex-row flex-wrap">
+                    <div class="w-full md:w-auto flex flex-row">
+                      <dt class="font-bold mr-2">Style</dt>
+                      <dd class="mr-4 whitespace-nowrap">
+                        {recipe?.style?.name ?? "N/A"}
+                      </dd>
+                    </div>
+                    <dt class="font-bold mr-2">ABV</dt>
+                    <dd class="mr-4">{recipe.abv ?? "N/A"}</dd>
 
-                  <dt class="font-bold mr-2">IBU</dt>
-                  <dd class="mr-4">{recipe.ibu ?? "N/A"}</dd>
+                    <dt class="font-bold mr-2">IBU</dt>
+                    <dd class="mr-4">{recipe.ibu ?? "N/A"}</dd>
 
-                  <dt class="font-bold mr-2">EBC</dt>
-                  <dd class="mr-4">{recipe?.color ?? "N/A"}</dd>
-                </dl>
+                    <dt class="font-bold mr-2">EBC</dt>
+                    <dd class="mr-4">{recipe?.color ?? "N/A"}</dd>
+                  </dl>
+                </div>
               </div>
             </a>
           </li>
