@@ -55,5 +55,9 @@ const { title, description, dir = "ltr", page } = Astro.props;
       </div>
     </main>
     <Footer />
+    <script>
+      import { toggleFetchLikesOnNavigation } from "../components/islands/api/likes-api";
+      toggleFetchLikesOnNavigation()
+    </script>
   </body>
 </html>

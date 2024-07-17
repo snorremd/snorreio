@@ -44,8 +44,9 @@ function toggleFetchLikes() {
 // This is a somewhat hacky way to avoid fetching likes for all collections.
 // We match specifically on the path to avoid fetching likes for sub pages
 // If window is not undefined register a listener for document loads or location changes
-if (typeof window !== "undefined") {
+export function toggleFetchLikesOnNavigation() {
   toggleFetchLikes();
+  window.addEventListener("popstate", toggleFetchLikes);
   window.addEventListener("load", toggleFetchLikes);
   window.addEventListener("popstate", toggleFetchLikes);
 }
