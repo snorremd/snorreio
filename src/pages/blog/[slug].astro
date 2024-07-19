@@ -157,6 +157,31 @@ const { title, pubDate, description, modDate, atprotoURI } = entry.data;
     @apply bg-stone-100 dark:bg-stone-800 text-left;
   }
 
+  button {
+    @apply bg-stone-300 dark:bg-stone-700 text-stone-900 dark:text-stone-50 rounded-lg px-4 py-2 my-2;
+  
+    &:hover {
+      @apply bg-stone-400 dark:bg-stone-600;
+    }
+
+    &:focus {
+      @apply bg-stone-400 dark:bg-stone-600;
+    }
+
+    &:active {
+      @apply bg-stone-500 dark:bg-stone-500;
+    }
+  }
+
+  canvas {
+    @apply w-full border-2 border-stone-300 dark:border-stone-700 scroll-my-80;
+    aspect-ratio: 16/9;
+  }
+
+  input {
+    @apply bg-stone-100 dark:bg-stone-900 text-stone-600 dark:text-stone-300 rounded-lg px-4 py-2 w-fit;
+  }
+
 }
 </style>
 
