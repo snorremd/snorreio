@@ -53,8 +53,6 @@ export async function GET(context: APIContext) {
 
   const likesGroupedBySlug = groupLikes(await likesQuery.execute());
 
-  console.log("likesGroupedBySlug", likesGroupedBySlug);
-
   // Find the number of likes for session grouped by slug.
   // This way we can determine for each slug if the session has liked it or not.
   if (sessionId) {

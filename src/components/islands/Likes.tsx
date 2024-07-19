@@ -3,7 +3,7 @@
  * Only fetches the likes for the specific slug to avoid over-fetching.
  */
 import { type Component, createResource } from "solid-js";
-import { resources, type Collection } from "./api/likes-api";
+import { type Collection, fetchLikesByCollection } from "./api/likes-api";
 import { VsHeart, VsHeartFilled } from "solid-icons/vs";
 
 interface FetchProps {
@@ -40,7 +40,7 @@ export const Likes: Component<LikesProps> = ({
   const [
     likesByCollection,
     { mutate: mutateByCollection, refetch: refetchByCollection },
-  ] = resources[collection];
+  ] = createResource(collection, fetchLikesByCollection);
 
   // This is the resource for likes for a specific slug to be used
   // on specific pages, like blog posts, projects, etc. Allows us to
