@@ -1,0 +1,865 @@
+---
+pubDate: "2024-07-19"
+title: "Make some confetti with JavaScript and Canvas"
+---
+
+I have been working on [Code Monkey Clash](https://github.com/snorremd/code-monkey-clash) for a while now.
+It's a game where you compete against other players to write code as fast as possible.
+In one of the latest released I wanted to display a winner page with the top three players.
+A winner page deserves some cheerfulness and what's more cheerful than confetti?
+After searching for confetti libraries I decided I would try to implement it myself.
+
+Having not worked that much with animated graphics in the browser before I decided to search for some tutorials.
+I found a few, but most of them just used a library like [js-confetti](https://www.npmjs.com/package/js-confetti) to do the heavy lifting.
+So I decided to ask ChatGPT for help.
+I know using ChatGPT is a bit controversial, but for exploratory coding tasks like this it can be quite helpful.
+Rather than ask for the whole solution up front I tried prompting it for some ideas on how to get started.
+
+## All artists need a canvas
+
+Essentially the solution would require creating a canvas element and drawing on it.
+To get it out of the way lets make a reusable function for setting up the canvas and context.
+That way we don't need to repeat the same code in every example.
+
+```html
+<script>
+  function setupCanvas(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1600/2;
+    canvas.height = 900/2;
+    return { canvas, ctx };
+  }
+</script>
+```
+
+<script>
+{`
+function setupCanvas(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1600/2;
+    canvas.height = 900/2;
+    return { canvas, ctx };
+  }
+`}
+</script>
+
+## I dream of rectangles
+
+Say you wanted to draw a red square on position 0,0 with a size of 100x100.
+You would set the fill style to red and then call `fillRect(0, 0, 100, 100)` on the canvas context.
+
+```html
+<canvas id="canvas-rect"></canvas>
+<script>
+  function render() {
+    const { canvas, ctx } = setupCanvas('canvas-rect');
+    ctx.fillStyle = 'red';
+    ctx.fillRect(0, 0, 100, 100);
+  }
+  render();
+</script>
+```
+
+<canvas id="canvas-rect"  />
+<script>
+{`
+function render() {
+    const { canvas, ctx } = setupCanvas('canvas-rect');
+    ctx.fillStyle = 'red';
+    ctx.fillRect(0, 0, 100, 100);
+  }
+  render();
+`}
+</script>
+
+## Paths and strokes for confetti
+
+This is a good start, we have a canvas element and have drawn something on it.
+After some more prompting it seemed that drawing paths using strokes would be a good way to create the confetti.
+Mozilla Developer Network has [good documentation on strokes](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/stroke).
+The idea is that you configure the stroke style (width and color), and then start drawing a path.
+To make something a little more confetti like we can draw a slightly diagonal line.
+
+```html
+<canvas id="canvas-strokes"></canvas>
+<script>
+function render() {
+    const { canvas, ctx } = setupCanvas('canvas-strokes');
+    
+    // First we set up the stroke style
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 8;
+
+    ctx.moveTo(30, 30); // Move to where we want to start the line
+    ctx.lineTo(40, 50); // Draw a line to the new position
+    ctx.stroke(); // Fill the path according to the stroke style
+  }
+  render();
+</script>
+```
+
+<canvas id="canvas-strokes" />
+<script>
+{`
+function render() {
+    const { canvas, ctx } = setupCanvas('canvas-strokes');
+    
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 8;
+    
+    ctx.moveTo(30, 30);
+    ctx.lineTo(40, 50);
+    ctx.stroke();
+  }
+  render();
+`}
+</script>
+
+Now this is starting to look like confetti already!
+
+## Colors of the Tailwind rainbow
+
+But currently we're just drawing one line, and have hardcoded the color to red.
+Let us add some more colors to use in our examples!
+In Code Monkey Clash I use DaisyUI for styling, so I will use Daisy UI colors for the confetti.
+
+```html
+<script>
+  // For brevity I will only show a simplified example of the color function
+  // If you inspect my code I account for dark mode preference as my blog
+  // supports both light and dark mode
+  let colors = [
+    "#1fb2a6",
+    "#e879f9",
+    "#fcd34d",
+    "#f87171",
+    "#60a5fa",
+    "#34d399",
+    "#fb923c",
+    "#f87171",
+  ]
+</script>
+```
+
+<script>
+{`
+  let colors = []
+  const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  
+  function setColors(event) {
+    if(colorSchemeQuery.matches) {
+      colors = [
+        "#1fb2a6",
+        "#e879f9",
+        "#fcd34d",
+        "#f87171",
+        "#60a5fa",
+        "#34d399",
+        "#fb923c",
+        "#f87171",
+      ]
+    } else {
+      colors = [
+        "#10b981",
+        "#7c3aed",
+        "#fbbf24",
+        "#ef4444",
+        "#3b82f6",
+        "#22c55e",
+        "#f97316",
+        "#ef4444",
+      ]
+    }
+  }
+  setColors(colorSchemeQuery)
+  colorSchemeQuery.addEventListener('change', setColors);
+`}
+</script>
+
+With our new-found colors lets try to draw a few more confetti pieces.
+We can use the `colors` array to pick a random color for each piece.
+Drawing a row of confetti in various colors should just require a loop!
+
+```html
+<canvas id="canvas-colors"></canvas>
+<script>
+function render() {
+    const { canvas, ctx } = setupCanvas('canvas-colors');
+    ctx.lineWidth = 8;
+
+    for (let i = 0; i < 20; i++) {
+      ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.moveTo(30 + i * 30, 30); // For each iteration move further to the right
+      ctx.lineTo(40 + i * 30, 50); // Draw a line to the new position
+      ctx.stroke(); // Fill the path according to the stroke style
+    }
+  }
+  render();
+</script>
+```
+
+<canvas id="canvas-colors" />
+<script>
+{`
+function render() {
+    const { canvas, ctx } = setupCanvas('canvas-colors');
+    ctx.lineWidth = 8;
+
+    for (let i = 0; i < 10; i++) {
+      ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.moveTo(30 + i * 100, 30);
+      ctx.lineTo(40 + i * 100, 50);
+      ctx.stroke();
+    }
+  }
+  render();
+`}
+</script>
+
+But what the heck is this?!
+All our confetti pieces have the same color.
+As it turns out we've been drawing sub-paths on the same path for each iteration.
+So while the color changes for each iteration, it is set for all sub paths.
+Fortunately [beginPath](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/beginPath) is here to save the day!
+Now we have a row of confetti pieces in various colors!
+
+```html
+<canvas id="canvas-colors-fixed"></canvas>
+<script>
+function renderColors() {
+    const { canvas, ctx } = setupCanvas('canvas-colors-fixed');
+    ctx.lineWidth = 8;
+
+    for (let i = 0; i < 20; i++) {
+      ctx.beginPath(); // Start a new path
+      ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.moveTo(30 + i * 30, 30); // Move to where we want to start the line
+      ctx.lineTo(40 + i * 30, 50); // Draw a line to the new position
+      ctx.stroke(); // Fill the path according to the stroke style
+    }
+  }
+  renderColors();
+</script>
+```
+
+<canvas id="canvas-colors-fixed" />
+<button  onclick="renderColors()">Random colors!</button>
+<script>
+{`
+function renderColors() {
+    const { canvas, ctx } = setupCanvas('canvas-colors-fixed');
+    ctx.lineWidth = 8;
+    for (let i = 0; i < 10; i++) {
+      ctx.beginPath(); // Start a new path
+      ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.moveTo(30 + i * 100, 30);
+      ctx.lineTo(40 + i * 100, 50);
+      ctx.stroke();
+    }
+  }
+  renderColors();
+`}
+</script>
+
+## Randomness is the spice of life
+
+But what is confetti without some randomness?
+Right now all our confetti pieces are the same diagonal line.
+We can introduce some randomness by adding a random radius and tilt for each piece.
+This will simulate 3D space a bit as smaller pieces will appear further away.
+Tilting the pieces various directions will also make them look more natural and random.
+
+```html
+<canvas id="canvas-random"></canvas>
+<script>
+  function render() {
+    const { canvas, ctx } = setupCanvas('canvas-random');
+
+    for (let i = 0; i < 40; i++) {
+      // Make the radius of the path random so confetti are different sizes
+      const radius = Math.floor(Math.random() * 50) - 10
+      // Ensure the paths tilt in various directions
+      const tilt = Math.floor(Math.random() * 10) - 10
+
+      // Distribute the confetti randomly on the canvas
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      ctx.beginPath(); // Start a new path
+      ctx.lineWidth = radius / 2;
+      ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.moveTo(x + tilt + radius / 4, y);
+      ctx.lineTo(x + tilt, y + tilt + radius / 4);
+      ctx.stroke(); // Fill the path according to the stroke style
+    }
+  }
+  render();
+</script>
+```
+
+<canvas id="canvas-random" class="w-full border-2 border-stone-300 dark:border-stone-700" />
+<button onclick="render()">Generate new confetti</button>
+<script>
+{`
+function render() {
+    const { canvas, ctx } = setupCanvas('canvas-random');
+
+    for (let i = 0; i < 40; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      ctx.beginPath(); // Start a new path
+      ctx.lineWidth = radius / 2;
+      ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.moveTo(x + tilt + radius / 4, y);
+      ctx.lineTo(x + tilt, y + tilt + radius / 4);
+      ctx.stroke(); // Fill the path according to the stroke style
+    }
+  }
+  render();
+`}
+</script>
+
+## Weightless confetti is no fun
+
+Up until now the confetti has just been hanging in the air.
+No party is complete without some gravity!
+We can simulate some gravity by introducing some delta velocity for each piece.
+Then we need to update the position of the confetti pieces each frame.
+To do this we can use `requestAnimationFrame` to call a function that updates the position and redraws the canvas.
+We also need to clear the canvas each frame to avoid a mess of confetti pieces.
+
+```html
+<canvas id="canvas-gravity"></canvas>
+<script>
+  function renderFallingConfetti() {
+    const confetti = []
+    const start = performance.now() // To keep track of time
+    const { canvas, ctx } = setupCanvas('canvas-gravity');
+
+    for (let i = 0; i < 40; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        radius,
+        tilt,
+        velocity: Math.random() * 2 + 1
+      })
+    }
+
+    function update() {
+      // Run for at most 10 seconds
+      if (performance.now() - start > 10000) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece) => {
+        piece.y += piece.velocity;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+  renderFallingConfetti();
+</script>
+```
+
+<canvas id="canvas-gravity"/>
+<button onclick="renderFallingConfetti()">Make it rain!</button>
+<script>
+{`
+  function renderFallingConfetti() {
+    const confetti = []
+    const start = performance.now()
+    const { canvas, ctx } = setupCanvas('canvas-gravity');
+
+    for (let i = 0; i < 40; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        radius,
+        tilt,
+        velocity: Math.random() * 2 + 1,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      })
+    }
+
+    function update() {
+      if (performance.now() - start > 10000) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece) => {
+        piece.y += piece.velocity;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+  
+  // intersect observer to trigger the animation when the canvas is in view
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        renderFallingConfetti();
+        observer.disconnect();
+      }
+    });
+  });
+  observer.observe(document.getElementById('canvas-gravity'));
+`}
+</script>
+
+## Confetti don't fall straight down
+
+Right now our confetti animation is pretty boring.
+All the pieces just fall straight down as if there was no atmosphere.
+A party without some oxygen will quickly become a disaster!
+Usually confetti pieces will scatter a bit as they fall going every which way.
+
+Each confetti piece should thus have some random horizontal velocity as well as the vertical velocity.
+As gravity is mostly always pointing down the vertical velocity should be positive.
+However, the horizontal velocity can be both positive and negative as air resistance scatter the pieces.
+
+```html
+<canvas id="canvas-scattering"></canvas>
+<script>
+  function renderScatteringConfetti() {
+    const confetti = []
+    const start = performance.now() // To keep track of time
+    const { canvas, ctx } = setupCanvas('canvas-scattering');
+
+    for (let i = 0; i < 40; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        radius,
+        tilt,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        yVelocity: Math.random() * 3,
+        xVelocity: Math.random() * 2 - 1
+      })
+    }
+
+    function update() {
+      // Run for at most 10 seconds
+      if (performance.now() - start > 10000) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece) => {
+        piece.y += piece.yVelocity;
+        piece.x += piece.xVelocity;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+  renderScatteringConfetti();
+</script>
+```
+
+<canvas id="canvas-scattering" />
+<button onclick="renderScatteringConfetti()">Make it rain!</button>
+
+<script>
+{`
+  function renderScatteringConfetti() {
+    const confetti = []
+    const start = performance.now() // To keep track of time
+    const { canvas, ctx } = setupCanvas('canvas-scattering');
+
+    for (let i = 0; i < 40; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        radius,
+        tilt,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        yVelocity: Math.random() * 3 + 1,
+        xVelocity: Math.random() * 2 - 1
+      })
+    }
+
+    function update() {
+      // Run for at most 10 seconds
+      if (performance.now() - start > 10000) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece) => {
+        piece.y += piece.yVelocity;
+        piece.x += piece.xVelocity;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+  
+  // intersect observer to trigger the animation when the canvas is in view
+  const scatteringObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        renderScatteringConfetti();
+        scatteringObserver.disconnect();
+      }
+    });
+  });
+  scatteringObserver.observe(document.getElementById('canvas-scattering'));
+`}
+</script>
+
+## Flutter like a butterfly
+
+I still thought the confetti was a bit boring.
+How can we make it look more lively?
+Well, ChatGPT has a good suggestion:
+
+<blockquote>
+- Cosine for Vertical Movement:
+
+  When Math.cos is used for vertical movement, it creates a smooth oscillation that starts at a maximum value and goes through a complete cycle (down to a minimum value and back to the maximum).
+  This can simulate a fluttering effect where the object moves up and down smoothly.
+
+-	Sine for Horizontal Movement:
+
+	When Math.sin is used for horizontal movement, it creates a smooth oscillation that starts at zero and goes through a complete cycle (left and right movement).
+	This can simulate a swaying effect where the object moves side to side smoothly.
+</blockquote>
+
+So essentially because both the sine and cosine functions in JavaScript oscillate between -1 and 1 we can use them to create smooth movements.
+For each confetti piece we make a phase offset that is unique to the piece.
+Then we make a time counter to gradually increase the phase offset.
+The quickler the time counter increases the quicker the oscillation will be.
+We also introduce some speed constants for the x and y direction to control the speed and magnitude of the movement.
+
+```html
+<canvas id="canvas-fluttering"></canvas>
+<script>
+  
+  function renderFlutteringConfetti() {
+    const timeDelta = 0.05;
+    const xAmplitude = 0.5;
+    const yAmplitude = 1;
+
+    let time = 0;
+    const confetti = []
+    const start = performance.now() // To keep track of time
+    const { canvas, ctx } = setupCanvas('canvas-fluttering');
+
+    for (let i = 0; i < 40; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        radius,
+        tilt,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        phaseOffset: i, // Randomness from position in list
+      })
+    }
+
+    function update() {
+      // Run for at most 10 seconds
+      if (performance.now() - start > 10000) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece, i) => {
+        piece.y += (Math.cos(piece.phaseOffset + time) + 1) * yAmplitude;
+        piece.x += Math.sin(piece.phaseOffset + time) * xAmplitude;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      time += timeDelta;
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+  renderFlutteringConfetti();
+</script>
+```
+
+Feel free to play around with the amplitude and time delta to get different effects!
+
+
+<canvas id="canvas-fluttering" />
+
+<div class="flex flex-col md:flex-row gap-4 my-8">
+  <div>
+    <label>Horizontal amplitude</label>
+    <input type="number" id="xAmplitude" value="0.5" />
+  </div>
+  <div>
+    <label>Vertical amplitude</label>
+    <input type="number" id="yAmplitude" value="1" />
+  </div>
+  <div>
+    <label>Time delta</label>
+    <input type="number" id="timeDelta" value="0.05" />
+  </div>
+</div>
+<button onclick="renderFlutteringConfetti()">Make some flutter!</button>
+
+<script>
+{`  
+  function renderFlutteringConfetti() {
+    const timeDelta = parseFloat(document.getElementById('timeDelta').value);
+    const xAmplitude = parseFloat(document.getElementById('xAmplitude').value);
+    const yAmplitude = parseFloat(document.getElementById('yAmplitude').value);
+
+    let time = 0;
+    const confetti = []
+    const start = performance.now() // To keep track of time
+    const { canvas, ctx } = setupCanvas('canvas-fluttering');
+
+    for (let i = 0; i < 40; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        radius,
+        tilt,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        phaseOffset: i, // Randomness from position in list
+      })
+    }
+
+    function update() {
+      // Run for at most 10 seconds
+      if (performance.now() - start > 10000) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece, i) => {
+        piece.y += (Math.cos(piece.phaseOffset + time) + 1) * yAmplitude;
+        piece.x += Math.sin(piece.phaseOffset + time) * xAmplitude;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      time += timeDelta;
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+  const flutteringObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        renderFlutteringConfetti();
+        flutteringObserver.disconnect();
+      }
+    });
+  });
+  flutteringObserver.observe(document.getElementById('canvas-fluttering'));
+`}
+</script>
+
+## Tying up the pieces
+
+We have come a long way from a single red square to a fluttering confetti party!
+But we're not quite there yet.
+When adding the flutter we completely removed the sideways movement.
+On average the confetti pieces move straight down!
+And as you might have noticed, annoyingly the confetti pieces fall off the canvas.
+How about we re-introduce some sideways momentum and make the confetti pieces wrap around the canvas?
+
+```html
+<canvas id="canvas-wrapping"></canvas>
+<script>
+
+  const { canvas, ctx } = setupCanvas('canvas-wrapping'); 
+  function renderWrappingConfetti() {
+    const timeDelta = 0.05;
+    const xAmplitude = 0.5;
+    const yAmplitude = 1;
+    const xVelocity = 2;
+    const yVelocity = 3;
+
+    let time = 0;
+    const confetti = []
+
+    for (let i = 0; i < 100; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const xSpeed = Math.random() * xVelocity - xVelocity / 2
+      const ySpeed = Math.random() * yVelocity
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height - canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        xSpeed,
+        ySpeed,
+        radius,
+        tilt,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        phaseOffset: i, // Randomness from position in list
+      })
+    }
+
+    function update() {
+      // Run for at most 10 seconds
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece, i) => {
+        piece.y += (Math.cos(piece.phaseOffset + time) + 1) * yAmplitude + piece.ySpeed;
+        piece.x += Math.sin(piece.phaseOffset + time) * xAmplitude + piece.xSpeed;
+        // Wrap around the canvas
+        if (piece.x < 0) piece.x = canvas.width;
+        if (piece.x > canvas.width) piece.x = 0;
+        if (piece.y > canvas.height) piece.y = 0;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      time += timeDelta;
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+</script>
+```
+
+<canvas id="canvas-wrapping" />
+<button onclick="renderWrappingConfetti()">Make it wrap!</button>
+
+<script>
+{`
+  let runWrappingAnimation = false;
+  function renderWrappingConfetti() {
+    runWrappingAnimation = true;
+    const { canvas, ctx } = setupCanvas('canvas-wrapping'); 
+    const timeDelta = 0.05;
+    const xAmplitude = 0.5;
+    const yAmplitude = 1;
+    const xVelocity = 2;
+    const yVelocity = 3;
+
+    let time = 0;
+    const confetti = []
+
+    for (let i = 0; i < 100; i++) {
+      const radius = Math.floor(Math.random() * 50) - 10
+      const tilt = Math.floor(Math.random() * 10) - 10
+      const xSpeed = Math.random() * xVelocity - xVelocity / 2
+      const ySpeed = Math.random() * yVelocity
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height - canvas.height;
+
+      confetti.push({
+        x,
+        y,
+        xSpeed,
+        ySpeed,
+        radius,
+        tilt,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        phaseOffset: i, // Randomness from position in list
+      })
+    }
+
+    function update() {
+      if (!runWrappingAnimation) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((piece, i) => {
+        piece.y += (Math.cos(piece.phaseOffset + time) + 1) * yAmplitude + piece.ySpeed;
+        piece.x += Math.sin(piece.phaseOffset + time) * xAmplitude + piece.xSpeed;
+        // Wrap around the canvas
+        if (piece.x < 0) piece.x = canvas.width;
+        if (piece.x > canvas.width) piece.x = 0;
+        if (piece.y > canvas.height) piece.y = 0;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      time += timeDelta;
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+
+  const wrappingObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        renderWrappingConfetti();
+      } else {
+        runWrappingAnimation = false;
+      }
+    });
+  });
+  wrappingObserver.observe(document.getElementById('canvas-wrapping'));
+`}
+</script>
+
+## Conclusion
+
+If you made it this far I hope you have learned something new!
+With the help of Kagi Search, MDN documentation, and ChatGPT I was able to make quite the confetti party.
+The final result is quite lively and has some interesting movement!
+By using the sine and cosine functions we were able to create smooth oscillations for the confetti pieces.
+
+The confetti example can be extended even further.
+For example the pieces don't rotate as they fall.
+You could also make the confetti pieces have different shapes, and different colors on each side.
+There are tons of possibilities!
+Some libraries offer more advanced animation than what we have here. 
+For me though half the fun was in the exploration and learning.
+In any case, feel free to play around with the code and use it for your own needs.
