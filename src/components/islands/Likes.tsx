@@ -3,7 +3,11 @@
  * Only fetches the likes for the specific slug to avoid over-fetching.
  */
 import { type Component, createResource } from "solid-js";
-import { clearLikesCache, type Collection, fetchLikesByCollection } from "./api/likes-api";
+import {
+  clearLikesCache,
+  type Collection,
+  fetchLikesByCollection,
+} from "./api/likes-api";
 import { VsHeart, VsHeartFilled } from "solid-icons/vs";
 
 interface FetchProps {
