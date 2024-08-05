@@ -38,3 +38,11 @@ export async function fetchLikesByCollection(
   // biome-ignore lint/style/noNonNullAssertion: <explanation>
   return fetchCache.get(collection)!;
 }
+
+/**
+ * Clear the cache for a specific collection.
+ * @param collection the name of the collection
+ */
+export function clearLikesCache(collection: Collection) {
+  fetchCache.delete(collection);
+}
