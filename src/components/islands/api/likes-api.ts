@@ -1,68 +1,48 @@
 import { createResource, createSignal, type ResourceReturn } from "solid-js";
 
+/** Define types of collections we can fetch likes for */
 export type Collection = "blog" | "projects" | "music" | "beer";
 
-async function fetchLikes(collection: Collection) {
-  const res = await fetch(`/api/likes?collection=${collection}`);
-  const data = (await res.json()) as {
-    [slug: string]: { likes: number; liked?: boolean };
+type Likes = {
+  [slug: string]: {
+    likes: number;
+    liked?: boolean;
   };
-  return data;
-}
-
-// By creating empty signals we delay the fetch until the signal is set
-// thereby preventing early and unnecessary fetches. Only once you go to the
-// relevant page should we fetch the likes.
-const [fetchBlogLikes, setFetchBlogLikes] = createSignal<Collection>();
-const [fetchProjectLikes, setFetchProjectLikes] = createSignal<Collection>();
-const [fetchMusicLikes, setFetchMusicLikes] = createSignal<Collection>();
-const [fetchBeerLikes, setFetchBeerLikes] = createSignal<Collection>();
-
-const blogLikes = createResource(fetchBlogLikes, fetchLikes);
-
-const projectLikes = createResource(fetchProjectLikes, fetchLikes);
-
-const musicLikes = createResource(fetchMusicLikes, fetchLikes);
-
-const beerLikes = createResource(fetchBeerLikes, fetchLikes);
-
-function toggleFetchLikes() {
-  const path = window.location.pathname;
-  if (path === "/blog") {
-    console.log("Toggle fetch likes", window.location.pathname);
-    setFetchBlogLikes("blog");
-  } else if (path === "/projects") {
-    setFetchProjectLikes("projects");
-  } else if (path === "/music") {
-    setFetchMusicLikes("music");
-  } else if (path === "/beers") {
-    setFetchBeerLikes("beer");
-  }
-}
-
-// If browser is at /blog toggle the fetch for blog likes, etc.
-// This is a somewhat hacky way to avoid fetching likes for all collections.
-// We match specifically on the path to avoid fetching likes for sub pages
-// If window is not undefined register a listener for document loads or location changes
-if (typeof window !== "undefined") {
-  toggleFetchLikes();
-  window.addEventListener("load", toggleFetchLikes);
-  window.addEventListener("popstate", toggleFetchLikes);
-}
-
-export const resources: {
-  [coll in Collection]: ResourceReturn<
-    {
-      [slug: string]: {
-        likes: number;
-        liked?: boolean;
-      };
-    },
-    unknown
-  >;
-} = {
-  blog: blogLikes,
-  projects: projectLikes,
-  music: musicLikes,
-  beer: beerLikes,
 };
+
+/**
+ * Make a new map of requests for each collection to avoid each Like component
+ * having to fetch the likes for the collection. If the fetch has resolved, we
+ * can return the likes directly from the map. If not we can wait for the fetch
+ * to resolve before returning the likes.
+ */
+const fetchCache = new Map<Collection, Promise<Likes>>();
+
+/**
+ * Fetch likes for a specific collection.
+ * If we already have a fetch in progress, we reuse the promise.
+ * Otherwise we create a new fetch and store the promise in the cache.
+ * @param collection
+ * @returns
+ */
+export async function fetchLikesByCollection(
+  collection: Collection,
+): Promise<Likes> {
+  if (!fetchCache.has(collection)) {
+    const promise = fetch(`/api/likes?collection=${collection}`).then(
+      (res) => res.json() as Promise<Likes>,
+    );
+    fetchCache.set(collection, promise);
+  }
+
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
+  return fetchCache.get(collection)!;
+}
+
+/**
+ * Clear the cache for a specific collection.
+ * @param collection the name of the collection
+ */
+export function clearLikesCache(collection: Collection) {
+  fetchCache.delete(collection);
+}
