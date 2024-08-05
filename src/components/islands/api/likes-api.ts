@@ -1,6 +1,5 @@
 import { createResource, createSignal, type ResourceReturn } from "solid-js";
 
-
 /** Define types of collections we can fetch likes for */
 export type Collection = "blog" | "projects" | "music" | "beer";
 
@@ -9,7 +8,7 @@ type Likes = {
     likes: number;
     liked?: boolean;
   };
-}
+};
 
 /**
  * Make a new map of requests for each collection to avoid each Like component
@@ -23,12 +22,16 @@ const fetchCache = new Map<Collection, Promise<Likes>>();
  * Fetch likes for a specific collection.
  * If we already have a fetch in progress, we reuse the promise.
  * Otherwise we create a new fetch and store the promise in the cache.
- * @param collection 
- * @returns 
+ * @param collection
+ * @returns
  */
-export async function fetchLikesByCollection(collection: Collection): Promise<Likes> {
+export async function fetchLikesByCollection(
+  collection: Collection,
+): Promise<Likes> {
   if (!fetchCache.has(collection)) {
-    const promise = fetch(`/api/likes?collection=${collection}`).then(res => res.json() as Promise<Likes>);
+    const promise = fetch(`/api/likes?collection=${collection}`).then(
+      (res) => res.json() as Promise<Likes>,
+    );
     fetchCache.set(collection, promise);
   }
 
