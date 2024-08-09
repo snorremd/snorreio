@@ -23,6 +23,9 @@ const { title, description, image = "./index-og.png" } = Astro.props;
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
+<!-- Sitemap located on non-standard path -->
+<link rel="sitemap" href="/sitemap-index.xml" />
+
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
