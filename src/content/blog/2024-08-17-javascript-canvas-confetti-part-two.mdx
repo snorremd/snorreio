@@ -1,0 +1,959 @@
+---
+pubDate: "2024-08-17"
+title: "Make some confetti with JavaScript and Canvas - Part Two"
+---
+
+In a [previous post](/blog/2024-07-19-javascript-canvas-confetti) we started making some confetti using JavaScript and the canvas element.
+The implementation was quite simple, but the end result looked quite nice.
+In the conclusion I alluded to performance improvements.
+In this post we will explore how to improve peformance.
+
+{/* Some helper functions to use throughout the interative scripts/demos */}
+
+<script>
+{`
+function renderPerformanceMetrics(prefix, fps, timeToDrawFrame, particleCount) {
+  document.getElementById(prefix + 'FPS').innerText = 'FPS: ' + fps.toFixed(2);
+  document.getElementById(prefix + 'TTDF').innerText = 'Frame: ' + timeToDrawFrame.toFixed(2) + 'ms';
+  // Mesured in microseconds
+  document.getElementById(prefix + 'TPP').innerText = 'Particle: ' + (timeToDrawFrame * 1000 / particleCount).toFixed(4) + 'µs';
+}
+`}
+</script>
+
+## The old solution
+
+First I want to recap what the old solution looked like.
+We made a helper function to set up the canvas element.
+
+```html
+<script>
+  function setupCanvas(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1600/2;
+    canvas.height = 900/2;
+    return { canvas, ctx };
+  }
+</script>
+```
+
+<script>
+{`
+function setupCanvas(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1600/2;
+    canvas.height = 900/2;
+    return { canvas, ctx };
+  }
+`}
+</script>
+
+
+Then we added some colors:
+
+```html
+<script>
+  // For brevity I will only show a simplified example of the color function
+  // If you inspect my code I account for dark mode preference as my blog
+  // supports both light and dark mode
+  let colors = [
+    "#10b981",
+    "#7c3aed",
+    "#fbbf24",
+    "#ef4444",
+    "#3b82f6",
+    "#22c55e",
+    "#f97316",
+    "#ef4444",
+  ]
+</script>
+```
+
+<script>
+{`
+  let colors = []
+  const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  
+  function setColors(event) {
+    if(colorSchemeQuery.matches) {
+      colors = [
+        "#1fb2a6",
+        "#e879f9",
+        "#fcd34d",
+        "#f87171",
+        "#60a5fa",
+        "#34d399",
+        "#fb923c",
+        "#f87171",
+      ]
+    } else {
+      colors = [
+        "#10b981",
+        "#7c3aed",
+        "#fbbf24",
+        "#ef4444",
+        "#3b82f6",
+        "#22c55e",
+        "#f97316",
+        "#ef4444",
+      ]
+    }
+  }
+  setColors(colorSchemeQuery)
+  colorSchemeQuery.addEventListener('change', setColors);
+`}
+</script>
+
+
+This time around I'll add a helper function to set up the particles.
+That way we can easily change the number of particles as the animation is running.
+It takes a reference to an array of particles and the number of particles to create.
+If the number of particles is less than the length of the array it will remove particles from the end.
+If the number of particles is greater than the length of the array it will add particles to the end.
+
+```html
+<script>
+  function setupParticles(particles, numParticles) {
+    if(numParticles < particles.length) {
+      particles.length = numParticles;
+    } else if(numParticles > particles.length) {
+      for (let i = particles.length; i < numParticles; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          radius: Math.floor(Math.random() * 50) - 10,
+          tilt: Math.floor(Math.random() * 10) - 10,
+          xSpeed: Math.random() * 2 - 1,
+          ySpeed: Math.random() * 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          phase: i, // Randomness from position in list
+        })
+      }
+    }
+  }
+</script>
+```
+
+
+
+<script>
+{`
+  function setupParticles(canvas, particles, numParticles) {
+    if(numParticles < particles.length) {
+      particles.length = numParticles;
+    } else if(numParticles > particles.length) {
+      for (let i = particles.length; i < numParticles; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          radius: Math.floor(Math.random() * 50) - 10,
+          tilt: Math.floor(Math.random() * 10) - 10,
+          xSpeed: Math.random() * 2 - 1,
+          ySpeed: Math.random() * 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          phase: i, // Randomness from position in list
+        })
+      }
+    }
+  }
+`}
+</script>
+
+Now we can wire together all the parts to implement the old solution:
+
+
+```html
+<canvas id="canvas-slow"></canvas>
+<script>
+
+  const { canvas, ctx } = setupCanvas('canvas-slow'); 
+  const slowConfetti = [];
+
+  function renderSlow() {
+    const timeDelta = 0.05;
+    const xAmplitude = 0.5;
+    const yAmplitude = 1;
+    const xVelocity = 2;
+    const yVelocity = 3;
+
+    let time = 0;
+
+    setupParticles(canvas, slowConfetti, 100);
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      slowConfetti.forEach((piece, i) => {
+        piece.y += (Math.cos(piece.phase + time) + 1) * yAmplitude + piece.ySpeed;
+        piece.x += Math.sin(piece.phase + time) * xAmplitude + piece.xSpeed;
+        // Wrap around the canvas
+        if (piece.x < 0) piece.x = canvas.width;
+        if (piece.x > canvas.width) piece.x = 0;
+        if (piece.y > canvas.height) piece.y = 0;
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      time += timeDelta;
+      requestAnimationFrame(update);
+    }
+    update();
+  }
+</script>
+```
+
+<canvas id="canvas-slow" />
+
+<script>
+{`
+  const slowConfetti = [];
+  let slowNumConfetti = 100;
+  let runSlowAnimation = false;
+  let slowLastTime = 0;
+  let slowFPS = 0;
+  let slowTimeToDrawFrame = 0;
+
+  function renderSlow() {
+    runSlowAnimation = true;
+    const { canvas, ctx } = setupCanvas('canvas-slow');
+    const timeDelta = 0.05;
+    const xAmplitude = 0.5;
+    const yAmplitude = 1;
+    const xVelocity = 2;
+    const yVelocity = 3;
+
+    let time = 0;
+
+    setupParticles(canvas, slowConfetti, slowNumConfetti);
+
+    function update(animationTime) {
+      if(slowConfetti.length !== slowNumConfetti) {
+        setupParticles(canvas, slowConfetti, slowNumConfetti);
+      }
+      const deltaTime = animationTime - slowLastTime;
+      slowLastTime = animationTime;
+      slowFPS = 1000 / deltaTime;
+
+      
+      // Update FPS display once per second
+      if (animationTime % 10000 < deltaTime) {
+        renderPerformanceMetrics('slow', slowFPS, slowTimeToDrawFrame, slowNumConfetti);
+        timeCalculations = 0
+        timeDrawing = 0
+      }
+
+      if (!runSlowAnimation) return;
+      
+      slowTimeToDrawFrame = performance.now();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      slowConfetti.forEach((piece, i) => {
+        piece.y += (Math.cos(piece.phase + time) + 1) * yAmplitude + piece.ySpeed;
+        piece.x += Math.sin(piece.phase + time) * xAmplitude + piece.xSpeed;
+        // Wrap around the canvas
+        if (piece.x < 0) piece.x = canvas.width;
+        if (piece.x > canvas.width) piece.x = 0;
+        if (piece.y > canvas.height) piece.y = 0;
+        
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+
+      })
+      time += timeDelta;
+      slowTimeToDrawFrame = performance.now() - slowTimeToDrawFrame;
+
+      requestAnimationFrame(update);
+    }
+    update(0);
+  }
+`}
+</script>
+
+<div class='flex flex-row justify-between'>
+<div class='flex flex-col'>
+<label for="numConfetti">Number of confetti: <span id="slowNumConfettiLabel">100</span></label>
+<input type="range" min="0" max="250000" value="100" step="100" oninput="slowNumConfetti = this.value; document.getElementById('slowNumConfettiLabel').innerText = this.value" />
+</div>
+{/* Show FPS based on the value of the slowFPS value */}
+
+<span id="slowFPS">
+  FPS: 0
+</span>
+
+<span id="slowTTDF">
+  Frame: 0
+</span>
+
+<span id="slowTPP">
+  Particle: 0
+</span>
+
+</div>
+{/* Add button to start and stop animation */}
+<button onclick="runSlowAnimation ? runSlowAnimation = false : renderSlow()">Toggle Animation</button>
+
+As you increase the number of confetti you will notice the performance starts to degrade.
+My MacBook Pro with the M1 processor sees about these numbers:
+
+| Number of confetti | Time to draw frame | Frames per second |
+|---------------------|--------------------|-------------------|
+| 100                 | 0.1ms              | 120              |
+| 10 000              | 2.4ms              | 120              |
+| 100 000             | 25ms               | 40               |
+| 250 000             | 60ms               | 16               |
+
+As you can see the performance is good enough for practical purposes on powerful hardware.
+When rendering 100 000 confetti you can hardly tell where one particle ends and the next begins.
+However, slower hardware will likely struggle much earlier than this.
+And we're seeing significant dips in FPS when rendering 250 000 confetti, likely due to GC.
+So let us try to squeeze out some more performance!
+
+## Move computations out from the hot path
+
+As it turns out we're doing some expensive computations in the hot path.
+The `Math.cos` and `Math.sin` functions are called for each particle in each frame.
+These are only computed for each particle as the phase offsets are unique for each particle.
+Each particle also have a complete unique x and y velocity and amplitude.
+
+Let us try to instead make 100 unique combinations to compute for each frame.
+This should be much faster than computing 100 000+ unique combinations.
+At the start of the function we create arrays for each property:
+
+```html
+<script>
+  // Setup a helper function to create the phases
+  function particlePhases() {
+    return Array.from({ length: 500 }, (i) => {
+      return {
+        xPhase: Math.cos(i),
+        yPhase: Math.sin(i) + 1,
+        xAmplitude: Math.random() * 2 - 1,
+        yAmplitude: 1,
+        x: Math.cos(i) * 
+      }
+    });
+  }
+
+  // Before the animation loop we can build the phases
+  const phases = particlePhases();
+
+  // Then for each frame we can update the particles
+  for (let i = 0; i < phases.length; i++) {
+    phases[i].x = Math.sin(i + time) * phases[i].xAmplitude;
+    phases[i].y = Math.cos(i + time) + 1 * phases[i].yAmplitude;
+  }
+
+  // Inside the loop we can use the phases to update the particles
+  phaseConfetti.forEach((piece, i) => {
+    piece.y += phases[i % phases.length].y * piece.ySpeed;
+    piece.x += phases[i % phases.length].x * piece.xSpeed;
+  })  
+</script>
+```
+
+<script>
+{`
+  function particlePhases() {
+    return Array.from({ length: 500 }, (i) => {
+      return {
+        xAmplitude: Math.random() * 2 - 1,
+        yAmplitude: 1,
+        x: Math.sin(i),
+        y: Math.cos(i) + 1,
+      }
+    });
+  }
+`}
+</script>
+
+<canvas id="canvas-phase" />
+
+<script>
+{`
+  const phaseConfetti = [];
+  let phaseNumConfetti = 100;
+  let runPhaseAnimation = false;
+  let phaseLastTime = 0;
+  let phaseFPS = 0;
+  let phaseTimeToDrawFrame = 0;
+
+  function renderPhase() {
+    runPhaseAnimation = true;
+    const { canvas, ctx } = setupCanvas('canvas-phase');
+    
+    const timeDelta = 0.05;
+    
+    let time = 0;
+
+    setupParticles(canvas, phaseConfetti, phaseNumConfetti);
+
+    const phases = particlePhases();
+
+    function update(animationTime) {
+      if(phaseConfetti.length !== phaseNumConfetti) {
+        setupParticles(canvas, phaseConfetti, phaseNumConfetti);
+      }
+      const deltaTime = animationTime - phaseLastTime;
+      phaseLastTime = animationTime;
+      phaseFPS = 1000 / deltaTime;
+
+      
+      // Update FPS display once per second
+      if (animationTime % 10000 < deltaTime) {
+        renderPerformanceMetrics('phase', phaseFPS, phaseTimeToDrawFrame, phaseNumConfetti);
+        timeCalculations = 0
+        timeDrawing = 0
+      }
+
+      if (!runPhaseAnimation) return;
+      
+      phaseTimeToDrawFrame = performance.now();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < phases.length; i++) {
+        phases[i].x = Math.sin(i + time) * phases[i].xAmplitude;
+        phases[i].y = Math.cos(i + time) + 1 * phases[i].yAmplitude;
+      }
+
+      phaseConfetti.forEach((piece, i) => {
+        piece.y += phases[i % phases.length].y + piece.ySpeed;
+        piece.x += phases[i % phases.length].x + piece.xSpeed;
+        // Wrap around the canvas
+        if (piece.x < 0) piece.x = canvas.width;
+        if (piece.x > canvas.width) piece.x = 0;
+        if (piece.y > canvas.height) piece.y = 0;
+        
+        ctx.beginPath();
+        ctx.lineWidth = piece.radius / 2;
+        ctx.strokeStyle = piece.color;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+        ctx.stroke();
+      })
+      time += timeDelta;
+      phaseTimeToDrawFrame = performance.now() - phaseTimeToDrawFrame;
+
+      requestAnimationFrame(update);
+    }
+    update(0);
+  }
+`}
+</script>
+
+<div class='flex flex-row justify-between'>
+<div class='flex flex-col'>
+<label for="numConfetti">Number of confetti: <span id="phaseNumConfettiLabel">100</span></label>
+<input type="range" min="0" max="250000" value="100" step="100" oninput="phaseNumConfetti = this.value; document.getElementById('phaseNumConfettiLabel').innerText = this.value" />
+</div>
+
+<span id="phaseFPS">
+  FPS: 0
+</span>
+
+<span id="phaseTTDF">
+  Frame: 0
+</span>
+
+<span id="phaseTPP">
+  Particle: 0
+</span>
+
+</div>
+{/* Add button to start and stop animation */}
+<button onclick="runPhaseAnimation ? runPhaseAnimation = false : renderPhase()">Toggle Animation</button>
+
+With this new improvement we're already seeing significant performance improvements, but only at 250 000 confetti.
+The 250 000 confetti now runs closer to 20 frames per second, but with the same drops as before.
+
+| Number of confetti | Time to draw frame | Frames per second |
+|---------------------|--------------------|-------------------|
+| 100                 | 0.1ms              | ~120              |
+| 10 000              | 2.3ms              | ~120              |
+| 100 000             | 20ms               | ~40               |
+| 250 000 *           | 50ms               | ~20               |
+
+## Draw more efficiently
+
+One of the more expensive operations in the loop is drawing each particle.
+We start a new path for each particle and draw a line.
+If we can reduce the number of paths we start we can reduce the number of operations.
+Each path can only hold one color, so we need to group or sort the particles by color.
+
+I'm elliding most of the existing code for brevity, but the important part is the sorting and drawing of the particles.
+
+```html
+<script>
+    // Before we start the animation we can sort the particles by color 
+    pathConfetti.sort((a, b) => a.color.localeCompare(b.color));
+
+    // Then for each frame we can draw the particles in groups by color
+    let prevColor = ''
+
+    pathConfetti.forEach((piece, i) => {
+      if(piece.color !== prevColor) {
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = piece.color;
+        prevColor = piece.color;
+      }
+      ctx.lineWidth = piece.radius / 2;
+      ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+      ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+    })
+</script>
+```
+
+
+
+<canvas id="canvas-path" />
+
+<script>
+{`
+  const pathConfetti = [];
+  let pathNumConfetti = 100;
+  let runPathAnimation = false;
+  let pathLastTime = 0;
+  let pathFPS = 0;
+  let pathTimeToDrawFrame = 0;
+
+  function renderPath() {
+    runPathAnimation = true;
+    const { canvas, ctx } = setupCanvas('canvas-path');
+    
+    const timeDelta = 0.05;
+    
+    let time = 0;
+
+
+    setupParticles(canvas, pathConfetti, pathNumConfetti)
+    pathConfetti.sort((a, b) => a.color.localeCompare(b.color));
+
+    const phases = particlePhases();
+
+    function update(animationTime) {
+      if(pathConfetti.length !== pathNumConfetti) {
+        setupParticles(canvas, pathConfetti, pathNumConfetti);
+        pathConfetti.sort((a, b) => a.color.localeCompare(b.color));
+      }
+      const deltaTime = animationTime - pathLastTime;
+      pathLastTime = animationTime;
+      pathFPS = 1000 / deltaTime;
+
+      
+      // Update FPS display once per second
+      if (animationTime % 10000 < deltaTime) {
+        renderPerformanceMetrics('path', pathFPS, pathTimeToDrawFrame, pathNumConfetti);
+        timeCalculations = 0
+        timeDrawing = 0
+      }
+
+      if (!runPathAnimation) return;
+      
+      pathTimeToDrawFrame = performance.now();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < phases.length; i++) {
+        phases[i].x = Math.sin(i + time) * phases[i].xAmplitude;
+        phases[i].y = Math.cos(i + time) + 1 * phases[i].yAmplitude;
+      }
+
+      ctx.beginPath();
+
+      let prevColor = ''
+      pathConfetti.forEach((piece, i) => {
+        piece.x += phases[i % phases.length].x + piece.xSpeed;
+        piece.y += phases[i % phases.length].y + piece.ySpeed;
+        // Wrap around the canvas
+        if (piece.x < 0) piece.x = canvas.width;
+        if (piece.x > canvas.width) piece.x = 0;
+        if (piece.y > canvas.height) piece.y = 0;
+
+        if(piece.color !== prevColor) {
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = piece.color;
+          prevColor = piece.color;
+        }
+        ctx.lineWidth = piece.radius / 2;
+        ctx.moveTo(piece.x + piece.tilt + piece.radius / 4, piece.y);
+        ctx.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.radius / 4);
+
+      })
+      time += timeDelta;
+      pathTimeToDrawFrame = performance.now() - pathTimeToDrawFrame;
+
+      requestAnimationFrame(update);
+    }
+    update(0);
+  }
+`}
+</script>
+
+<div class='flex flex-row justify-between'>
+<div class='flex flex-col'>
+<label for="numConfetti">Number of confetti: <span id="pathNumConfettiLabel">100</span></label>
+<input type="range" min="0" max="250000" value="100" step="100" oninput="pathNumConfetti = this.value; document.getElementById('pathNumConfettiLabel').innerText = this.value" />
+</div>
+
+<span id="pathFPS">
+  FPS: 0
+</span>
+
+<span id="pathTTDF">
+  Frame: 0
+</span>
+
+<span id="pathTPP">
+  Particle: 0
+</span>
+
+</div>
+{/* Add button to start and stop animation */}
+<button onclick="runPathAnimation ? runPathAnimation = false : renderPath()">Toggle Animation</button>
+
+
+Now we're getting somewhere!
+The 250 000 confetti now runs at about 40 frames per second, twice as fast as before.
+There are still occasional drops in FPS, but they are less severe.
+At 100 000 confetti it jumps between 60 and 120 frames per second.
+You'll notice now that with such a high number of confetti the canvas appears almost uniformly colored.
+This is because the particles are sorted by color and drawn in groups.
+For this post though we're mostly interested in testing performance, not making pretty pictures.
+
+| Number of confetti | Time to draw frame | Frames per second |
+|---------------------|--------------------|-------------------|
+| 100                 | 0ms                | ~120              |
+| 10 000              | 2ms                | ~120              |
+| 100 000             | 12ms               | ~60               |
+| 250 000             | 27ms               | ~30               |
+
+
+## Typed arrays
+
+Up until now we've been using plain JavaScript objects and arrays to represent the particles.
+These are often sufficient for everyday UIs and APIs that push small amounts of data around.
+When you have a lot of data, like 250 000 particles, you might want to consider using something more efficient.
+JavaScript arrays are actually objects with some special properties.
+Thus they are always stored on the heap and you potentially miss out on some performance benefits.
+
+Let us see if we can improve performance by using typed arrays.
+[Typed arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) are arrays where each element is of the same type.
+This allows them to be stored in a contiguous block of memory and cached in CPU cache.
+This can lead to faster access times and fewer cache misses
+
+Because this is a larger change I will show the entire implementation.
+This time we will use a `Float32Array` to store the particles.
+We don't need the full precision of double precision floating point numbers to animate confetti.
+
+As before we keep the phases in a separate list to avoid recomputing them for all particles.
+7 properties at 1 byte each means each confetti particle is 7 bytes.
+With 250 000 particles that's 1.75MB of data which is well within most L2 caches.
+
+```html
+<script>
+  // Setup a helper function to create the phases
+  function linearTransform(value, inMin, inMax, outMin, outMax) {
+    return Math.round((value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin);
+  }
+
+  // Setup a helper function to create the phases
+  function setupTypedPhases() {
+    const phases = new Float32Array(500 * 4);
+    for (let i = 0; i < 10; i++) {
+      phases[i] = Math.random() * 2 - 1;       // xAmplitudes
+      phases[500 + i] = 1;                      // yAmplitudes
+      phases[1000 + i] = Math.sin(i);            // xPhases
+      phases[1500 + i] = Math.cos(i) + 1;        // yPhases
+    }
+    return phases;
+  }
+
+  function setupTypedParticles(canvas, numParticles) {
+    const numProperties = 7; // x, y, radius, tilt, xSpeed, ySpeed, color
+    const particles = new Float32Array(numParticles * numProperties);
+    const numColors = colors.length;
+
+    // Initialize particles
+    for (let i = 0; i < numParticles; i++) {
+      const index = i * numProperties;
+      particles[index] = Math.random() * canvas.width;       // x
+      particles[index + 1] = Math.random() * canvas.height - canvas.height; // y
+      particles[index + 2] = Math.floor(Math.random() * 50) - 10;        // radius
+      particles[index + 3] = Math.floor(Math.random() * 10) - 10;        // tilt
+      particles[index + 4] = Math.random() * 2 - 1;          // xSpeed
+      particles[index + 5] = Math.random() * 3;              // ySpeed
+      particles[index + 6] = linearTransform(i, 0, numParticles, 0, numColors); // color
+    }
+
+    return { particles, numProperties };
+  }
+</script>
+```
+
+<script>
+{`
+  function linearTransform(value, inMin, inMax, outMin, outMax) {
+    return Math.round((value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin);
+  }
+  
+  function setupTypedParticles(canvas, numParticles) {
+    const numProperties = 7; // x, y, radius, tilt, xSpeed, ySpeed, color
+    const particles = new Float32Array(numParticles * numProperties);
+    const numColors = colors.length;
+
+    // Initialize particles
+    for (let i = 0; i < numParticles; i++) {
+      const index = i * numProperties;
+      particles[index] = Math.random() * canvas.width;                          // x
+      particles[index + 1] = Math.random() * canvas.height - canvas.height;     // y
+      particles[index + 2] = Math.floor(Math.random() * 50) - 10;               // radius
+      particles[index + 3] = Math.floor(Math.random() * 10) - 10;               // tilt
+      particles[index + 4] = Math.random() * 2 - 1;                             // xSpeed
+      particles[index + 5] = Math.random() * 3;                                 // ySpeed
+      particles[index + 6] = linearTransform(i, 0, numParticles, 0, numColors); // color
+    }
+
+    return { particles, numProperties };
+  }
+
+  function setupTypedPhases() {
+    const phases = new Float32Array(500 * 4);
+    for (let i = 0; i < 500; i++) {
+      phases[i] = Math.random() * 2 - 1;  // xAmplitudes
+      phases[500 + i] = 1;                // yAmplitudes
+      phases[1000 + i] = Math.sin(i);     // xPhases
+      phases[1500 + i] = Math.cos(i) + 1; // yPhases
+    }
+    return phases;
+  }
+
+`}
+</script>
+
+With the helper functions to build typed arrays of particles and phases we can now implement the animation loop.
+
+```html
+<canvas id="canvas-typed"></canvas>
+<script>
+  let typedNumConfetti = 100;
+
+  function renderTyped() {
+    const { canvas, ctx } = setupCanvas('canvas-typed');
+    let time = 0;
+    let typedConfetti = setupTypedParticles(canvas, typedNumConfetti);
+    const phases = setupTypedPhases();
+
+    function update(animationTime) {
+      const {particles, numProperties} = typedConfetti;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Calculate the phase values for the frame
+      for (let i = 0; i < 500; i++) {
+        phases[1000 + i] = Math.sin(i + time) * phases[i];
+        phases[1500 + i] = (Math.cos(i + time) + 1) * phases[500 + i]; // yPhases updated with yAmplitudes
+      }
+
+
+      ctx.beginPath();
+
+      let prevColor = -1
+      
+      for (let i = 0; i < typedNumConfetti; i++) {
+
+        const index = i * numProperties;
+        
+        particles[index] += phases[20 + (i % 10)] + particles[index + 4];  // x + xSpeed
+        particles[index + 1] += phases[30 + (i % 10)] + particles[index + 5]; // y + ySpeed
+
+        // Wrap around the canvas
+        if (particles[index] < 0) particles[index] = canvas.width;
+        if (particles[index] > canvas.width) particles[index] = 0;
+        if (particles[index + 1] > canvas.height) particles[index + 1] = 0;
+
+        const radius = particles[index + 2];
+        const tilt = particles[index + 3];
+        const colorIndex = particles[index + 6];
+
+        if (colorIndex !== prevColor) {
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = colors[colorIndex];
+          prevColor = colorIndex;
+        }
+
+        ctx.lineWidth = radius / 2;
+        ctx.moveTo(particles[index] + tilt + radius / 4, particles[index + 1]);
+        ctx.lineTo(particles[index] + tilt, particles[index + 1] + tilt + radius / 4);
+      }
+
+      ctx.stroke();
+
+      time += timeDelta;
+      typedTimeToDrawFrame = performance.now() - typedTimeToDrawFrame;
+
+      requestAnimationFrame(update);
+    }
+      
+    update(0);
+  }
+</script>
+```
+
+<canvas id="canvas-typed"></canvas>
+<script>
+{`
+  let typedNumConfetti = 100;
+  let runTypedAnimation = false;
+  let typedLastTime = 0;
+  let typedFPS = 0;
+  let typedTimeToDrawFrame = 0;
+
+  function renderTyped() {
+    runTypedAnimation = true;
+    const { canvas, ctx } = setupCanvas('canvas-typed');
+    
+    const timeDelta = 0.05;
+    const xAmplitude = 0.5;
+    const yAmplitude = 1;
+    const xVelocity = 2;
+    const yVelocity = 3;
+    
+    let time = 0;
+    let typedConfetti = setupTypedParticles(canvas, typedNumConfetti);
+    const phases = setupTypedPhases();
+
+    function update(animationTime) {
+      if(typedConfetti.particles.length / typedConfetti.numProperties !== typedNumConfetti) {
+
+        console.log('typeof typedNumConfetti', typeof typedNumConfetti)
+        typedConfetti = setupTypedParticles(canvas, typedNumConfetti);
+      }
+
+      const {particles, numProperties} = typedConfetti;
+
+      const deltaTime = animationTime - typedLastTime;
+      typedLastTime = animationTime;
+      typedFPS = 1000 / deltaTime;
+
+      // Update FPS display once per second
+      if (animationTime % 10000 < deltaTime) {
+        renderPerformanceMetrics('typed', typedFPS, typedTimeToDrawFrame, typedNumConfetti);
+        timeCalculations = 0
+        timeDrawing = 0
+      }
+
+      if (!runTypedAnimation) return;
+      
+      typedTimeToDrawFrame = performance.now();
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < 10; i++) {
+        phases[1000 + i] = Math.sin(i + time) * phases[i];     // xPhases updated with xAmplitudes
+        phases[1500 + i] = (Math.cos(i + time) + 1) * phases[500 + i]; // yPhases updated with yAmplitudes
+      }
+
+
+      ctx.beginPath();
+
+      let prevColor = -1
+      
+      for (let i = 0; i < typedNumConfetti; i++) {
+
+        const index = i * numProperties;
+        
+        particles[index] += phases[20 + (i % 10)] + particles[index + 4];  // x + xSpeed
+        particles[index + 1] += phases[30 + (i % 10)] + particles[index + 5]; // y + ySpeed
+
+        // Wrap around the canvas
+        if (particles[index] < 0) particles[index] = canvas.width;
+        if (particles[index] > canvas.width) particles[index] = 0;
+        if (particles[index + 1] > canvas.height) particles[index + 1] = 0;
+
+        const radius = particles[index + 2];
+        const tilt = particles[index + 3];
+        const colorIndex = particles[index + 6];
+
+        if (colorIndex !== prevColor) {
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = colors[colorIndex];
+          prevColor = colorIndex;
+        }
+
+        ctx.lineWidth = radius / 2;
+        ctx.moveTo(particles[index] + tilt + radius / 4, particles[index + 1]);
+        ctx.lineTo(particles[index] + tilt, particles[index + 1] + tilt + radius / 4);
+      }
+
+      ctx.stroke();
+
+      time += timeDelta;
+      typedTimeToDrawFrame = performance.now() - typedTimeToDrawFrame;
+
+      requestAnimationFrame(update);
+    }
+      
+    update(0);
+  }
+`}
+</script>
+
+<div class='flex flex-row justify-between'>
+<div class='flex flex-col'>
+<label for="numTypedConfetti">Number of confetti: <span id="typedNumConfettiLabel">100</span></label>
+<input type="range" min="0" max="250000" value="100" step="100" oninput="typedNumConfetti = parseInt(this.value); document.getElementById('typedNumConfettiLabel').innerText = this.value" />
+</div>
+
+<span id="typedFPS">
+  FPS: 0
+</span>
+
+<span id="typedTTDF">
+  Frame: 0
+</span>
+
+<span id="typedTPP">
+  Particle: 0
+</span>
+
+</div>
+{/* Add button to start and stop animation */}
+<button onclick="runTypedAnimation ? runTypedAnimation = false : renderTyped()">Toggle Animation</button>
+
+We managed to eek out just a bit more performance, but at this point we're starting to hit the limits of what we can do with CPU and Canvas.
+The 250 000 confetti now runs at above 40 frames per second, a good improvement over the previous implementation.
+Rendering up to 50 000 confetti should be no problem on most hardware with this implementation.
+
+| Number of confetti | Time to draw frame | Frames per second |
+|---------------------|--------------------|-------------------|
+| 100                 | 0ms                | ~120              |
+| 10 000              | 2ms                | ~120              |
+| 100 000             | 9ms                | ~90               |
+| 250 000             | 22ms               | ~40               |
+
+There are further room for improvements.
+One could conceivably parallellise the computation of the phases and the particle updates, but I won't cover that here.
+Also the Canvas is not the most efficient way to render large amounts of particles.
+For that you might want to look into WebGL or WebGPU.
+
+## Conclusion
+
+We started with a simple implementation of confetti animation and iterated on it to improve performance.
+Moving expensive computations out of the hot path provided a significant performance boost.
+Drawing particles in groups by color also improved performance as we could reduce the number of paths we started.
+Finally we used typed arrays to store the particles and phases to improve memory locality and cache performance.
+
+The final implementation can render 250 000 confetti particles at 40 frames per second on my M1 MacBook Pro.
+This is a significant improvement over the original implementation which struggled at 100 000 particles.
+While you should really consider using WebGL or WebGPU for this many particles, the Canvas API can still be performant with some clever optimizations.
+
+I hope you found this post interesting and maybe even learned something new.
