@@ -43,12 +43,12 @@ export const LoginForm: Component<LoginFormProps> = ({
       >
         {/* Insert nice looking input */}
 
-        <label class="flex flex-col">
+        <label class="flex flex-col" for="handle">
           Handle
           <Input name="handle" type="text" />
         </label>
 
-        <label class="flex flex-col">
+        <label class="flex flex-col" for="password">
           App password
           <Input name="password" type="password" />
         </label>
