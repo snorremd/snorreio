@@ -1,5 +1,5 @@
 import { type Component, createEffect, createSignal, onMount } from "solid-js";
-import { type AtpSessionData, BskyAgent } from "@atproto/api";
+import { type AtpSessionData, AtpAgent } from "@atproto/api";
 
 import "solid-devtools";
 
@@ -14,13 +14,13 @@ interface CommentsProps {
 
 export const Comments: Component<CommentsProps> = ({ atprotoURI, handle }) => {
   const [session, setSession] = createSignal<AtpSessionData>();
-  const [agent, setAgent] = createSignal<BskyAgent>();
+  const [agent, setAgent] = createSignal<AtpAgent>();
 
   onMount(() => {
     const session = localStorage.getItem("atpSession");
-    const agent = new BskyAgent({
+    const agent = new AtpAgent({
       service: "https://bsky.social",
-      persistSession: (evt, session) => {
+      persistSession: (_, session) => {
         if (session) {
           localStorage.setItem("atpSession", JSON.stringify(session));
         }

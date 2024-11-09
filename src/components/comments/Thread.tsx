@@ -1,4 +1,4 @@
-import type { BskyAgent } from "@atproto/api";
+import type { AtpAgent } from "@atproto/api";
 import type { ThreadViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import {
   createSignal,
@@ -7,7 +7,6 @@ import {
   type Setter,
   createResource,
   For,
-  onMount,
 } from "solid-js";
 import { formatDistance } from "date-fns";
 import { VsComment, VsHeart, VsHeartFilled, VsLink } from "solid-icons/vs";
@@ -19,16 +18,12 @@ import {
 import { Reply } from "./Reply";
 
 interface ThreadProps {
-  agent: Accessor<BskyAgent | undefined>;
+  agent: Accessor<AtpAgent | undefined>;
   atprotoURI: string;
   handle: string;
 }
 
-export const Thread: Component<ThreadProps> = ({
-  atprotoURI,
-  handle,
-  agent,
-}) => {
+export const Thread: Component<ThreadProps> = ({ atprotoURI, agent }) => {
   const [showEditor, setShowEditor] = createSignal<ThreadViewPostUI>();
   const [highlightedPost, setHighlightedPost] =
     createSignal<string>(atprotoURI);
@@ -98,7 +93,7 @@ const Post = ({
   setShowEditor,
   setHighlightedPost,
 }: {
-  agent: Accessor<BskyAgent | undefined>;
+  agent: Accessor<AtpAgent | undefined>;
   post: ThreadViewPostUI;
   refetch: () => void;
   setShowEditor: Setter<ThreadViewPostUI | undefined>;
@@ -175,10 +170,10 @@ const Post = ({
               onClick={async () => {
                 if (post.post.viewer?.like) {
                   await agent()?.deleteLike(post.post.viewer.like);
-                  await refetch();
+                  refetch();
                 } else {
                   await agent()?.like(post.post.uri, post.post.cid);
-                  await refetch();
+                  refetch();
                 }
               }}
             >

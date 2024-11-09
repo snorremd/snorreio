@@ -1,4 +1,4 @@
-import type { AtpSessionData, BskyAgent } from "@atproto/api";
+import type { AtpSessionData, AtpAgent } from "@atproto/api";
 import type { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import { Popover } from "@kobalte/core";
 import {
@@ -9,7 +9,7 @@ import {
 } from "solid-js";
 
 interface HeaderProps {
-  agent: Accessor<BskyAgent | undefined>;
+  agent: Accessor<AtpAgent | undefined>;
   session: Accessor<AtpSessionData | undefined>;
   signOut: () => void;
 }

@@ -14,7 +14,6 @@ interface OgImageTemplateProps {
 }
 
 function OgImageTemplate({
-  site,
   title,
   profilePic,
   wavesSvg,
@@ -60,8 +59,6 @@ async function generateOgImage({
   const root = parse(html.toString());
   const title =
     root.querySelector("meta[name='title']")?.attributes.content ?? "";
-  const description =
-    root.querySelector("meta[name='description']")?.attributes.content ?? "";
   const author = "Snorre Magnus Davøen";
 
   // Then we generate the URL for the og:image
@@ -93,8 +90,8 @@ async function generateOgImage({
 
     // Convert svg to png
     const resvg = new Resvg(svg, {});
-    const png = await resvg.render();
-    const pngBuffer = await png.asPng();
+    const png = resvg.render();
+    const pngBuffer = png.asPng();
     await writeFile(writePath, pngBuffer);
   } catch (e) {
     console.error("Could not generate og:image for route", route.route, e);

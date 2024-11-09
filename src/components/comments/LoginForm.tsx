@@ -1,10 +1,10 @@
-import type { BskyAgent } from "@atproto/api";
+import type { AtpAgent } from "@atproto/api";
 import type { Accessor, Component } from "solid-js";
 import { Button } from "./Button";
 import { Input } from "./Input";
 
 interface LoginFormProps {
-  agent: Accessor<BskyAgent | undefined>;
+  agent: Accessor<AtpAgent | undefined>;
   handle: string;
   atprotoURI: string;
 }
@@ -34,7 +34,7 @@ export const LoginForm: Component<LoginFormProps> = ({
           const handle = formData.get("handle");
           const password = formData.get("password");
           if (handle && password) {
-            const res = await agent()?.login({
+            await agent()?.login({
               identifier: handle.toString(),
               password: password.toString(),
             });
@@ -43,12 +43,12 @@ export const LoginForm: Component<LoginFormProps> = ({
       >
         {/* Insert nice looking input */}
 
-        <label class="flex flex-col">
+        <label class="flex flex-col" for="handle">
           Handle
           <Input name="handle" type="text" />
         </label>
 
-        <label class="flex flex-col">
+        <label class="flex flex-col" for="password">
           App password
           <Input name="password" type="password" />
         </label>

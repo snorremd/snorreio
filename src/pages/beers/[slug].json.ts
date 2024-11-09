@@ -16,7 +16,7 @@ export async function getStaticPaths() {
   });
 }
 
-export const GET: APIRoute = ({ params, props, request }) => {
+export const GET: APIRoute = ({ props }) => {
   const beer = props.beer;
   return new Response(JSON.stringify(beer, null, 2), {
     status: 200,
