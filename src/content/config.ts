@@ -148,9 +148,29 @@ const projectCollection = defineCollection({
     })),
 });
 
+const talkCollection = defineCollection({
+  type: "content",
+  schema: ({ image }) =>
+    rssSchema.extend({
+      eventName: z.string(),
+      eventDate: z
+        .union([z.string(), z.number(), z.date()])
+        .transform((value) => (value === undefined ? value : new Date(value)))
+        .refine((value) =>
+          value === undefined ? value : !Number.isNaN(value.getTime()),
+        ),
+      eventLink: z.string().optional().nullable(),
+      eventDescription: z.string().optional().nullable(),
+      presentationLink: z.string().optional().nullable(),
+      eventImage: image(),
+      eventImageAlt: z.string().optional().nullable(),
+    }),
+});
+
 export const collections = {
   blog: blogCollection,
   beers: beerRecipesCollection,
   music: musicCollection,
   projects: projectCollection,
+  talks: talkCollection,
 };

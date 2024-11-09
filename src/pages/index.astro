@@ -52,7 +52,7 @@ import FrontPageFeatured from "../components/FrontPageFeatured.astro";
   </div>
   <div
     slot="content"
-    class="w-full max-w-6xl grid grid-flow-row lg:grid-flow-col auto-cols-fr gap-8 -mt-16"
+    class="w-full max-w-6xl flex flex-col md:flex-row md:flex-wrap md:justify-center gap-4 -mt-8"
   >
     <FrontPageFeatured
       title="Blog"
@@ -63,6 +63,11 @@ import FrontPageFeatured from "../components/FrontPageFeatured.astro";
       title="Projects"
       description="I have a few projects I'm working on. Some are open source and some are not."
       href="/projects"
+    />
+    <FrontPageFeatured
+    title="Talks"
+    description="I've held a few talks, this is a collection of the most important ones."
+    href="/talks"
     />
     <FrontPageFeatured
       title="Beers"

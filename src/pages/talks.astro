@@ -1,0 +1,146 @@
+---
+import { Icon } from "astro-icon/components";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
+import { getCollection } from "astro:content";
+import { Likes } from "../components/islands/Likes";
+import { Image } from "astro:assets";
+
+const talks = (await getCollection("talks")).sort((a, b) => {
+  return b.data.eventDate.getTime() - a.data.eventDate.getTime();
+});
+
+const talksRendered = await Promise.all(
+  talks.map(async (project) => {
+    const { Content } = await project.render();
+    return {
+      ...project,
+      Content,
+    };
+  }),
+);
+---
+
+<BaseLayout title={`Talks - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+  <section
+    slot="top"
+    class="w-full flex flex-col items-center text-center text-gray-900 dark:text-gray-50"
+  >
+    <h1 class="pb-4 text-6xl font-shortstack">Talks</h1>
+    <p class="max-w-2xl">
+      I've held a few talks, this is a collection of the most important ones.
+    </p>
+  </section>
+  <section
+    slot="content"
+    class="w-full bg-stone-200 dark:bg-stone-800 flex flex-col items-center"
+  >
+    <ul class="grid gap-12 max-w-6xl auto-cols-auto">
+      {
+        talksRendered.map(({ slug, data, Content }) => {
+          return <li class={`max-w-2xl text-stone-900 dark:text-stone-50 flex flex-col gap-4`}>
+            <h2
+              class={`
+                font-shortstack underline-stone-900
+                dark:underline-stone-50 text-4xl
+                `}
+            >
+              {data.title}
+            </h2>
+            <div class="text-stone-700 dark:text-stone-300 flex flex-row gap-4">
+              <div>
+                <time datetime={data.eventDate.toDateString()}>
+                  {new Date(data.eventDate).toLocaleDateString("en-us", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </time>
+              </div>
+              <Likes
+                client:visible
+                client:only="solid-js"
+                collection="talks"
+                slug={slug}
+              />
+              <a href={data.eventLink}
+              class="flex flex-row items-center gap-1">
+                <Icon class="w-[1em]" name="mdi:link-variant" />
+                {data.eventName}
+              </a>
+            </div>
+            <div class="project flex flex-col">
+              <Image
+                src={data.eventImage}
+                alt={data.eventImageAlt?? ''}
+                class="w-full rounded-lg drop-shadow"
+              />
+              <Content />
+            </div>
+            
+          </li>
+        })
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .project {
+    @apply w-full text-stone-900 dark:text-stone-50;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply font-shortstack;
+      margin: 1em 0 0.5em;
+    }
+
+    h2 {
+      @apply text-4xl;
+    }
+
+    h3 {
+      @apply text-3xl;
+    }
+
+    h4 {
+      @apply text-2xl;
+    }
+
+    h5 {
+      @apply text-xl;
+    }
+
+    p {
+      margin: 1em 0 0.5em;
+    }
+
+    pre {
+      @apply mx-0 my-4 max-w-full self-center rounded-lg px-4 py-8 drop-shadow;
+    }
+
+    img {
+      @apply inline-flex self-center rounded-lg drop-shadow;
+    }
+
+    Image {
+      @apply w-fit justify-self-center;
+    }
+
+    a {
+      @apply underline underline-offset-2;
+    }
+
+    ul {
+      max-width: 70ch;
+    }
+
+    li {
+      @apply ml-4 list-disc;
+    }
+  }
+</style>
