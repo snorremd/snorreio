@@ -23,10 +23,7 @@ interface ThreadProps {
   handle: string;
 }
 
-export const Thread: Component<ThreadProps> = ({
-  atprotoURI,
-  agent,
-}) => {
+export const Thread: Component<ThreadProps> = ({ atprotoURI, agent }) => {
   const [showEditor, setShowEditor] = createSignal<ThreadViewPostUI>();
   const [highlightedPost, setHighlightedPost] =
     createSignal<string>(atprotoURI);
