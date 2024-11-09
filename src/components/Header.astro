@@ -25,16 +25,18 @@ import { Icon } from "astro-icon/components";
     </h2>
     </a>
     <nav class="flex flex-row flex-wrap justify-center items-center gap-x-6 md:gap-x-8 gap-y-4 font-shortstack text-xl">
-      <HeaderLink href="/">Home</HeaderLink>
       <HeaderLink href="/blog">Blog</HeaderLink>
       <HeaderLink href="/projects">Projects</HeaderLink>
+      <HeaderLink href="/talks">Talks</HeaderLink>
       <HeaderLink href="/beers">Beers</HeaderLink>
       <HeaderLink href="/music">Music</HeaderLink>
       <HeaderLink href="/about">About</HeaderLink>
       <HeaderLink href="/privacy">Privacy</HeaderLink>
-      <HeaderLink href="https://github.com/snorremd" title="GitHub" target="_blank" ><Icon class="-mx-2 w-[1em]" name="fa6-brands:github" /></HeaderLink>
-      <HeaderLink href="https://bsky.app/profile/snorre.io" title="Bluesky" target="_blank" ><Icon class="-mx-2 w-[1em]" name="fa6-brands:bluesky" /></HeaderLink>
-      <HeaderLink href="/rss.xml" title="RSS Feed"><Icon class="-mx-2 w-[1em]" name="fa6-solid:square-rss" /></HeaderLink>
+      <div class="flex flex-row flex-nowrap gap-8">
+        <HeaderLink href="https://github.com/snorremd" title="GitHub" target="_blank" ><Icon class="-mx-2 w-[1em]" name="fa6-brands:github" /></HeaderLink>
+        <HeaderLink href="https://bsky.app/profile/snorre.io" title="Bluesky" target="_blank" ><Icon class="-mx-2 w-[1em]" name="fa6-brands:bluesky" /></HeaderLink>
+        <HeaderLink href="/rss.xml" title="RSS Feed"><Icon class="-mx-2 w-[1em]" name="fa6-solid:square-rss" /></HeaderLink>
+      </div>
     </nav>
   </div>
 </header>
