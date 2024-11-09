@@ -1,4 +1,4 @@
-import { type BskyAgent, RichText } from "@atproto/api";
+import { type AtpAgent, RichText } from "@atproto/api";
 import {
   type Accessor,
   type Setter,
@@ -13,7 +13,7 @@ import { Button } from "./Button";
 interface DialogProps {
   showEditor: Accessor<ThreadViewPostUI | undefined>;
   setShowEditor: Setter<ThreadViewPostUI | undefined>;
-  agent: Accessor<BskyAgent | undefined>;
+  agent: Accessor<AtpAgent | undefined>;
   refetch: () => void;
 }
 
@@ -82,7 +82,7 @@ export const Reply = ({
                   },
                 },
               });
-              await refetch();
+              refetch();
               setShowEditor(undefined);
             }
           }}
@@ -104,7 +104,7 @@ export const Reply = ({
             onkeypress={(e) =>
               setEditorText(new RichText({ text: e.currentTarget.value }))
             }
-            onCut={(e) => setEditorText(new RichText({ text: "" }))}
+            onCut={() => setEditorText(new RichText({ text: "" }))}
           />
           <div class="flex flex-row gap-2 w-full justify-between">
             <Button type="button" onClick={() => setShowEditor(undefined)}>

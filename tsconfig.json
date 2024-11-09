@@ -1,6 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "exclude": ["functions/**/*"],
+  "exclude": ["functions/**/*", "dist"],
   "compilerOptions": {
     "types": ["@astrojs/image/client"],
     // Solid specific settings

@@ -5,7 +5,7 @@
  * We use Drizzle ORM on top to get some query building and type safety.
  */
 
-import type { APIContext, AstroConfig } from "astro";
+import type { APIContext } from "astro";
 import { Kysely } from "kysely";
 import { D1Dialect } from "kysely-d1";
 import type { DB } from "kysely-codegen";

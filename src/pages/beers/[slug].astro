@@ -152,7 +152,7 @@ const { beer } = Astro.props;
         <h2>Mash steps</h2>
         <ul>
           {
-            beer.mash.steps.map(({ name, stepTemp, stepTime }) => (
+            beer.mash.steps.map(({ stepTemp, stepTime }) => (
               <li>
                 {stepTemp}°C for {stepTime}m
               </li>

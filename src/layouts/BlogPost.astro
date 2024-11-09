@@ -15,15 +15,8 @@ export interface Props {
 }
 
 const {
-  content: { title, description, pubDate, modDate, heroImage, atprotoURI },
-  url,
+  content: { title, description, pubDate, modDate, atprotoURI },
 } = Astro.props;
-
-const dateFormatConfig = {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-};
 ---
 
 <BaseLayout title={title} description={description}>

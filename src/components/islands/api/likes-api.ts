@@ -1,5 +1,3 @@
-import { createResource, createSignal, type ResourceReturn } from "solid-js";
-
 /** Define types of collections we can fetch likes for */
 export type Collection = "blog" | "projects" | "music" | "beer" | "talks";
 
