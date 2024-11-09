@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, squooshImageService } from "astro/config";
 import mdx from "@astrojs/mdx";
 import solid from "@astrojs/solid-js";
 import sitemap from "@astrojs/sitemap";
@@ -44,6 +44,7 @@ export default defineConfig({
   prefetch: true,
   output: "hybrid",
   adapter: cloudflare({
+    imageService: "compile", // Use sharp for static routes
     platformProxy: {
       enabled: true,
       persist: true,
