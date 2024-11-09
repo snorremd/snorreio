@@ -73,6 +73,7 @@ const talksRendered = await Promise.all(
               <Image
                 src={data.eventImage}
                 alt={data.eventImageAlt?? ''}
+                widths={[400, 800, 1200, 1920]}
                 class="w-full rounded-lg drop-shadow"
               />
               <Content />
