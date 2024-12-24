@@ -1,0 +1,168 @@
+---
+title: "Ansible - An elegant provisioning tool for a more civilized age"
+pubDate: "2024-12-24"
+---
+
+import { Image } from "astro:assets";
+
+import CivilizedWeapon from "./civilized-weapon.jpg";
+
+It has been a while since I've written a blog post.
+Life's been busy, and so time has sort of slipped away.
+These past few weeks I've been setting up some new servers and wanted to standardise the setup.
+I recalled the old, trusty CLI tool Ansible and decided to give it a try.
+
+<Image
+    src={CivilizedWeapon}
+    alt="Star Wars - A more civilized weapon"
+    widths={[400, 800, 1200, 1920]}
+/>
+
+## Server provisioning
+
+So before the advent of serverless computing, people would manage and host applications on physical or virtual servers.
+Now there is something about the feeling of ssh-ing into a server and getting your hands dirty that I really like.
+You can `apt install` stuff, manage services with `systemctl`, shoot your own foot with `rm -rf /`, and generally just have full control over your own little corner of the internet.
+But with great power comes great responsibility.
+If you don't want your server to be a target for hackers, you need to configure the `sshd` service, set up a firewall, add intrusion detection, and so on.
+You also might want to monitor the resource usage of your servers and much more.
+Doing this manually for each new server is a pain, and remembering what you've done previously is even worse.
+
+## Server provisioning tools
+
+But fret not, for the system administrators of old did not sit around doing this manually!
+Initially sysadmins would write shell scripts to automate the setup of servers, but this was not scalable.
+So they started writing tools to manage the setup of servers.
+Generally there are two models of server provisioning tools:
+
+1. The pull model
+2. The push model
+
+In the pull model, you install an agent on each server you want to manage, and the agent will pull the configuration from a central server.
+The agent then applies any changes required to the server it is running on.
+This models incurs some overhead on each server, and as soon as you update the configuration on the central server, the agents will pull the new configuration and apply it.
+
+In the push model, you run a central server that pushes the configuration to the servers you want to manage.
+This model negates the need for an agent on each server reducing the overhead.
+However, as the central server or machine have to apply the configuration on each server, this model is often slower to apply.
+Further more you need to occassionally check the configuration on target servers to detect any drift that might have occurred.
+
+## Ansible
+
+Ansible is a tool that implements the push model, sending python scripts to the servers you want to manage.
+Each python script runs on the target server and can be used to install packages, configure services, and so on.
+The only requirement for each server is thus a python interpreter, which is generally available on most Linux distributions.
+
+The tool was released way back in February 2012, and has since then become a very popular tool for server provisioning.
+Some might argue that running servers and provisioning them is a bit of an old-school thing to do.
+Why not just use managed cloud services?
+Well, managed cloud services are great, but they can be expensive, and you don't have full control over your own infrastructure.
+
+So what does it look like to provision a server with Ansible?
+
+### The inventory
+
+First you want to define an inventory of servers you want to manage.
+This can be done in a file called `inventory.yml`:
+
+```yaml
+db-servers:
+  hosts:
+    server1.example.com:
+      ansible_host: 192.168.1.100
+      ansible_user: hunter
+    server2.example.com:
+      ansible_host: 192.168.1.101
+      ansible_user: hunter
+```
+
+This inventory file defines two servers, `server1.example.com` and `server2.example.com`, that we want to manage, their respective IP addresses, and the user we want to use to ssh into them.
+They are both grouped under the `db-servers` group which we can reference in our playbooks.
+
+
+### Modules
+
+Modules are the building blocks of Ansible.
+They are small reusable python modules that can be used to perform specific tasks.
+For example, the `package` module is used to install and remove packages on a server using the distribution's package manager.
+Another example is the `shell` module, which allows you to run shell commands on a server.
+
+
+### Actions
+
+Actions are the tasks that are executed on the target server(s).
+They are defined in the playbooks and are executed by the Ansible agent on the target server(s).
+
+### Roles
+
+Roles are a way to organize tasks into reusable units.
+The Ansible community has created a lot of roles for common tasks, such as installing and configuring specific services like [Docker](hhttps://galaxy.ansible.com/ui/standalone/roles/geerlingguy/docker/) and [CrowdSec](https://galaxy.ansible.com/ui/standalone/roles/alf149/crowdsec/).
+
+You can also define your own roles, which can be reused in multiple playbooks.
+
+### The playbook
+
+With modules, actions, roles and inventories defined we can finally get into the fun part: writing playbooks.
+A playbook is a yaml file that describes one or more _plays_, which are a set of tasks and/or roles that are executed on the target server(s).
+Each task defines some provisioning logic to be executed on the target server(s).
+
+For example, to install a package on a server, you can use the built-in `package` module:
+
+```yaml
+- name: Install packages
+  hosts: db-servers
+  tasks:
+    - name: Install ufw
+      package:
+        name: ufw
+        state: present
+```
+
+Simple, right?
+
+If you want to do more than just install packages, you can run multiple tasks in a playbook.
+
+```yaml
+- name: Install packages
+  hosts: db-servers
+  become: true
+  tasks:
+    - name: Install ufw
+      package:
+        name: ufw
+        state: present
+    - name: Enable ufw
+      shell:
+        cmd: echo "y" | ufw enable
+```
+
+
+Let say you want to install and configure a PostgreSQL server on your db servers.
+You can use the `geerlingguy.postgresql` role to do this.
+
+
+```yaml
+# site.yml
+- name: Provision postgresql on db-servers
+  hosts: db-servers
+  roles:
+    - role: geerlingguy.postgresql
+      become: yes
+      vars:
+        postgresql_unix_socket_directories:
+            - /var/run/postgresql
+        postgresql_service_state: started
+        postgresql_service_enabled: true
+```
+
+
+You can of course combine roles and tasks in a playbook.
+But I won't go into details here.
+
+
+## Conclusion
+
+Ansible is a powerful tool for provisioning servers.
+It allows you to standardise the setup of your servers, and to automate the provisioning of new servers.
+It is a bit of a learning curve, but once you get the hang of it, you'll wonder how you ever managed servers without it.
+Not only does it help automate the provisioning of new servers, your playbooks also act as documentation as code for your server setup.
