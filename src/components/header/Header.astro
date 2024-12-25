@@ -1,0 +1,147 @@
+---
+import HeaderLink from "./HeaderLink.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<header class={`
+  bg-stone-50
+  dark:bg-stone-900
+  text-stone-900
+  dark:text-stone-50
+  w-full
+  font-shortstack
+  flex flex-row
+  justify-center
+  px-8 py-4 lg:py-8`}>
+  <div class={`
+    w-full
+    max-w-6xl
+    flex sm:flex-row lg:flex-row md:flex-col
+    sm:align-middle
+    justify-between items-center 
+  `}>
+    <a href="/" class="no-underline focus:underline md:mb-4 sm:mb-0 lg:mb-0">
+      <h2 class="center text-xl">
+      Snorre.io
+    </h2>
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav class="hidden md:flex flex-row flex-wrap justify-center items-center gap-x-6 md:gap-x-8 gap-y-4 font-shortstack text-xl">
+      <HeaderLink href="/blog">Blog</HeaderLink>
+      <HeaderLink href="/projects">Projects</HeaderLink>
+      <HeaderLink href="/talks">Talks</HeaderLink>
+      <HeaderLink href="/beers">Beers</HeaderLink>
+      <HeaderLink href="/music">Music</HeaderLink>
+      <HeaderLink href="/about">About</HeaderLink>
+      <HeaderLink href="/privacy">Privacy</HeaderLink>
+      <div class="flex flex-row flex-nowrap gap-8">
+        <button 
+          id="theme-toggle"
+          class="flex items-center mr-4"
+          aria-label="Toggle theme">
+          <Icon class="hidden dark:block w-[1em]" name="material-symbols:light-mode" />
+          <Icon class="block dark:hidden w-[1em]" name="material-symbols:dark-mode" />
+        </button>
+        <HeaderLink href="https://github.com/snorremd" title="GitHub" target="_blank"><Icon class="-mx-2 w-[1em]" name="fa6-brands:github" /></HeaderLink>
+        <HeaderLink href="https://bsky.app/profile/snorre.io" title="Bluesky" target="_blank"><Icon class="-mx-2 w-[1em]" name="fa6-brands:bluesky" /></HeaderLink>
+        <HeaderLink href="/rss.xml" title="RSS Feed"><Icon class="-mx-2 w-[1em]" name="fa6-solid:square-rss" /></HeaderLink>
+      </div>
+    </nav>
+
+
+
+    <!-- Mobile navigation -->
+    <div class="md:hidden relative w-fit ml-auto">
+      <button 
+        id="mobile-nav-toggle" 
+        popovertarget="mobile-nav"
+        class="p-2 hover:bg-stone-200 dark:hover:bg-stone-800 rounded-drawn-sm transition-colors"
+        aria-label="Menu">
+        <Icon name="material-symbols:menu" class="w-6 h-6" />
+      </button>
+      
+      <nav popover id="mobile-nav"
+        class={`
+        fixed
+        top-0
+        !left-auto
+        right-4
+        mt-12
+        popover-open:flex
+        hidden
+        flex-col
+        rounded-drawn
+        p-8
+        bg-stone-200
+        dark:bg-stone-800
+        text-stone-900
+        dark:text-stone-50
+        border
+        border-stone-300
+        dark:border-stone-700
+        shadow-[0_4px_12px_rgba(0,0,0,0.1)]
+        dark:shadow-[0_4px_12px_rgba(0,0,0,0.5)]
+        gap-y-4
+        font-shortstack
+        text-xl
+        min-w-[200px]
+        max-h-[calc(100vh-5rem)]
+        overflow-y-auto
+        scrollbar-thin
+        scrollbar-track-stone-300
+        dark:scrollbar-track-stone-700
+        scrollbar-thumb-stone-400
+        dark:scrollbar-thumb-stone-600
+        `}>
+          <div class="flex justify-between items-center border-b border-stone-300 dark:border-stone-700 pb-4 mb-2">
+            <h3 class="text-xl font-shortstack">Menu</h3>
+            <button 
+              popovertarget="mobile-nav"
+              popovertargetaction="hide"
+              class="p-2 hover:bg-stone-300 dark:hover:bg-stone-700 rounded-drawn-sm transition-colors"
+              aria-label="Close menu">
+              <Icon name="material-symbols:close" class="w-6 h-6" />
+            </button>
+          </div>
+          <HeaderLink href="/blog">Blog</HeaderLink>
+          <HeaderLink href="/projects">Projects</HeaderLink>
+          <HeaderLink href="/talks">Talks</HeaderLink>
+          <HeaderLink href="/beers">Beers</HeaderLink>
+          <HeaderLink href="/music">Music</HeaderLink>
+          <HeaderLink href="/about">About</HeaderLink>
+          <HeaderLink href="/privacy">Privacy</HeaderLink>
+          
+          <div class="flex flex-row gap-4 pt-4 mt-2 border-t border-stone-300 dark:border-stone-700">
+            <button 
+              id="theme-toggle-mobile"
+              class="flex items-center"
+              aria-label="Toggle theme">
+              <Icon class="hidden dark:block w-[1em]" name="material-symbols:light-mode" />
+              <Icon class="block dark:hidden w-[1em]" name="material-symbols:dark-mode" />
+            </button>
+            <HeaderLink href="https://github.com/snorremd" title="GitHub" target="_blank"><Icon class="w-[1em]" name="fa6-brands:github" /></HeaderLink>
+            <HeaderLink href="https://bsky.app/profile/snorre.io" title="Bluesky" target="_blank"><Icon class="w-[1em]" name="fa6-brands:bluesky" /></HeaderLink>
+            <HeaderLink href="/rss.xml" title="RSS Feed"><Icon class="w-[1em]" name="fa6-solid:square-rss" /></HeaderLink>
+          </div>
+        </nav>
+    </div>
+  </div>
+</header>
+
+<script>
+  function setupThemeToggle(buttonId: string) {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+
+    button.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+  }
+
+  // Setup both desktop and mobile theme toggles
+  setupThemeToggle('theme-toggle');
+  setupThemeToggle('theme-toggle-mobile');
+</script>

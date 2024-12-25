@@ -28,9 +28,16 @@ export default defineConfig({
     mdx(),
     icon({
       include: {
-        // Include only three `mdi` icons in the bundle
-        mdi: ["twitter", "github", "link-variant", "download"],
-        "material-symbols": ["download", "copyright-outline", "rss-feed"],
+        mdi: ["link-variant", "download"],
+        "material-symbols": [
+          "menu",
+          "close",
+          "dark-mode",
+          "light-mode",
+          "copyright-outline",
+          "download",
+          "rss-feed",
+        ],
         "fa6-brands": ["soundcloud", "github", "bluesky"],
         "fa6-solid": ["square-rss"],
       },
