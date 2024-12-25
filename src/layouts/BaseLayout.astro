@@ -1,5 +1,5 @@
 ---
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/header/Header.astro";
@@ -11,7 +11,7 @@ const { title, description } = Astro.props;
 <html lang="en" class='min-h-full'>
   <head>
     <BaseHead title={title} description={description} />
-    <ViewTransitions />
+    <ClientRouter />
     <link
       rel="preload"
       href="/fonts/shortstack-regular.woff2"
@@ -19,25 +19,32 @@ const { title, description } = Astro.props;
       type="font/woff2"
       crossorigin
     />
-    <script is:inline>
-      // Initialize theme before page renders
-      const theme = (() => {
-        if (typeof localStorage !== 'undefined') {
-          const stored = localStorage.getItem('theme');
-          if (stored) {
-            return stored;
-          }
-        }
-        // If no stored preference, use system default
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      })();
-      
-      // Only add class if dark
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-    </script>
+
     <slot name="head" />
+    <script is:inline>
+
+      function getTheme() {
+        if (localStorage && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        
+        // Check user preference
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        
+        return 'light';
+      }
+
+      const theme = getTheme();
+      document.documentElement.classList.add(theme);
+
+      document.addEventListener('astro:after-swap', () => {
+        const theme = getTheme();
+        document.documentElement.classList.add(theme);
+      }, { once: false });
+
+    </script>
   </head>
   <body class={`
     min-h-screen
@@ -75,3 +82,4 @@ const { title, description } = Astro.props;
     <Footer />
   </body>
 </html>
+

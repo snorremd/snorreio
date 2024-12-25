@@ -129,19 +129,32 @@ import { Icon } from "astro-icon/components";
   </div>
 </header>
 
-<script>
-  function setupThemeToggle(buttonId: string) {
-    const button = document.getElementById(buttonId);
-    if (!button) return;
+<script is:inline>
+  const toggleTheme = () => {
+    console.log('toggleTheme');
+    const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    // Remove current theme and add new theme
+    document.documentElement.classList.remove(currentTheme);
+    document.documentElement.classList.add(newTheme);
+    
+    // Store the preference
+    localStorage.setItem('theme', newTheme);
+  };
 
-    button.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      const isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  const registerThemeToggles = () => {
+    ['theme-toggle', 'theme-toggle-mobile'].forEach(id => {
+      console.log('Register theme toggle', id);
+      const button = document.getElementById(id);
+      if (button) {
+        button.addEventListener('click', toggleTheme);
+      }
     });
   }
 
-  // Setup both desktop and mobile theme toggles
-  setupThemeToggle('theme-toggle');
-  setupThemeToggle('theme-toggle-mobile');
+  document.addEventListener('astro:page-load', registerThemeToggles);
+
+  registerThemeToggles();
+
 </script>
