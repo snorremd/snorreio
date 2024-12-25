@@ -3,7 +3,7 @@ title: Ajanottaja - A time tracking app built with Supabase
 pubDate: "2024-12-24"
 eventName: "Bergen, Norway - LW13 Supabase Meetup"
 eventDate: "2024-12-05"
-eventLink: "https://boskonf.no"
+eventLink: "https://lu.ma/l4rrn3y5"
 eventLocation: "Bergen, Norway"
 eventImage: "./snorre-kraftlauget-supabase-meetup.jpg"
 eventImageAlt: "Snorre presenting at the Bergen, Norway - LW13 Supabase Meetup"
