@@ -1,0 +1,344 @@
+---
+title: Config-Based Bluesky Feeds
+pubDate: 2025-02-23
+---
+
+I've been building [Norsky](https://github.com/snorremd/norsky), a Bluesky feed generator server, for a while now.
+Norsky is a golang based server that can generate feeds based on a config file, allowing you build many flavors of feeds without having to write any code.
+
+## The beginning
+
+When I first got access to Bluesky back in the invite-only phase, I was quickly hooked.
+I had read a lot about the Authenticated Protocol and how Bluesky would enable federation of user content.
+The first stage of this federation journey was enabling users to build their own feed generator servers to serve feeds of their own.
+A feed generator server essentially subscribes to, or fetches content from, the Bluesky/ATProto relay server, and presents a subset of available posts in one or more feeds.
+Thus users in the Bluesky network can subscribe to feeds that present content that they're interested in, such as cat pictures, or tech blogs, or whatever else you'd like.
+
+As a Norwegian I was of course very interested in seeing what Norwegian content was available in the network!
+So I started building Norsky, a feed generator server that would subscribe to the firehose and filter down the content to posts tagged as Bokmål, Nynorsk, or Sami.
+The server was essentially hardcoded to only check for these languages and serving four feeds from this content:
+
+- `bokmaal`: Bokmål content
+- `nynorsk`: Nynorsk content
+- `sami`: Sami content
+- `all`: All of the above
+
+## Language detection
+
+It quickly became apparent from user feedback that I was not capturing very much of the Norwegian content.
+As it turns out people don't really tag their posts with the correct language, so I needed to come up with a better way to detect the language of a post.
+I started using [lingua-go](https://github.com/pemistahl/lingua-go) to detect the language of a post with some success.
+
+I quickly realized that I was not the only one who wanted to perhaps host language specific feeds.
+My server could easily be extended to support feeds with different lists of languages to include.
+So I started building configuration options where users could specify a list of feeds to serve and for each feed a list of languages to include.
+
+The config file is a TOML file that contained a list of feeds and for each feed a list of languages to include.
+
+```toml
+[[feeds]]
+name = "bokmaal"
+languages = ["nb", "no"]
+```
+
+This flexibility was great and I was able to quickly move my hardcoded feeds to the config file system.
+[In my code](https://github.com/snorremd/norsky/blob/9c95821a0356c97a941c755849edec7b4708745d/db/reader.go#L28) I just had to pass in the configured languages to my SQL building function and it would generate a query for the correct languages.
+
+```go
+func (reader *Reader) GetFeed(langs []string, limit int, postId int64) ([]models.FeedPost, error) {
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select("DISTINCT posts.id", "posts.uri").From("posts")
+
+	if postId != 0 {
+		sb.Where(sb.LessThan("posts.id", postId))
+	}
+
+	if len(langs) > 0 {
+		sb.Join("post_languages", "posts.id = post_languages.post_id")
+		// Build OR conditions for each language
+		conditions := make([]string, len(langs))
+		for i, lang := range langs {
+			conditions[i] = sb.Equal("post_languages.language", lang)
+		}
+		sb.Where(sb.Or(conditions...))
+	}
+
+	sb.OrderBy("posts.id").Desc()
+	sb.Limit(limit)
+
+	sql, args := sb.BuildWithFlavor(sqlbuilder.Flavor(sqlbuilder.SQLite))
+
+	// Execute query and read rows
+}
+```
+
+## Moving beyond languages
+
+Bluesky was flurishing and a buddy of mine suggested I build a feed with Norwegian posts about movies and TV shows called [fjernsyn](https://bsky.app/profile/did:plc:o34f4av7ed7szx24dqm4x3g6/feed/fjernsyn).
+I was happy to oblige and set out to extend my feed generator server to support keyword based feeds.
+This feature required two important changes:
+
+1. Add text and full text search capabilities to the database.
+2. Add a new config option to specify the keywords for a feed.
+
+The first change was a bit involved requiring some research on how to properly set up full text search in SQLite.
+It turned out FTS5 (a full text search extension for SQLite) was available in the go port of SQLite I was using.
+FTS5 worked by creating a virtual table that would then contain the full text search index and be queriedable for the keywords.
+
+
+
+```toml
+[[feeds]]
+name = "fjernsyn"
+languages = ["nb", "no"]
+keywords = ["fjernsyn", "tv", "film"]
+```
+
+With the config in place I just needed [a simple branch in the SQL building logic](https://github.com/snorremd/norsky/blob/e5ff7cb294921d7a0f1c82cf438a93c3064c9a0b/db/reader.go) to build a query using the FTS5 virtual table.
+
+```go
+func (reader *Reader) GetFeed(langs []string, queries []string, limit int, postId int64, excludeReplies bool) ([]models.FeedPost, error) {
+	sb := sqlbuilder.NewSelectBuilder()
+
+	// Start with posts table as base
+	if len(queries) > 0 {
+		// When using FTS, we need to start from the FTS table and join to posts
+		sb.Select("DISTINCT posts.id", "posts.uri").From("posts_fts")
+		sb.Join("posts", "posts.id = posts_fts.rowid")
+	} else {
+		sb.Select("DISTINCT posts.id", "posts.uri").From("posts")
+	}
+
+	// Language and exclude replies conditions ellided for brevity
+
+	// Use FTS search for queries if specified
+	if len(queries) > 0 {
+		var validQueries []string
+		for _, query := range queries {
+			// Skip empty queries
+			if strings.TrimSpace(query) == "" {
+				continue
+			}
+
+			// Escape single quotes in the query
+			safeQuery := strings.ReplaceAll(query, "'", "''")
+
+			// If query contains spaces or special characters, wrap in quotes
+			if strings.ContainsAny(safeQuery, " +-") {
+				safeQuery = fmt.Sprintf(`"%s"`, safeQuery)
+			}
+
+			validQueries = append(validQueries, safeQuery)
+		}
+
+		if len(validQueries) > 0 {
+			// Join with OR operator explicitly
+			matchQuery := strings.Join(validQueries, " OR ")
+			sb.Where(fmt.Sprintf("posts_fts MATCH '%s'", matchQuery))
+		}
+	}
+
+	sb.OrderBy("posts.id").Desc()
+	sb.Limit(limit)
+
+	// Print the generated SQL
+	sql, args := sb.BuildWithFlavor(sqlbuilder.Flavor(sqlbuilder.SQLite))'
+
+    // Execute query and read rows
+```
+
+As you can see from the code above it was still basically building the SQL query using some branching logic to determine how to filter results.
+
+
+## Scaling features with code patterns
+
+So I wanted to extend the feature set of the feed generator even more to support more complex feeds.
+For example it would make sense to build feeds that only include certain useers.
+I also wanted to support a more flexible sorting system, attributting weight to posts based on keyword matches, user weights, or other criteria.
+The simple branching logic I was using to build queries up until now would not be able to support these features well!
+
+So I started using AI for the one thing it really can do well, asking it about possible code patterns to use for this kind of flexible feed setup.
+I didn't want to limit the feed generator to specific feed patterns, so I could not just have N different SQL building functions for N types of feeds.
+In theory one could imagine having all of these patterns for the various options:
+
+- Language x user x keyword
+- Language x keyword
+- User x keyword
+- Language x user
+- Language
+- User
+- Keyword
+
+And this is not including options such as excluding replies or any future features I wanted to add!
+It was clear that I needed an approach where filters and sorting could be applied in an extremely flexible way.
+After some prompting the AI suggested an application of the [builder pattern](https://en.wikipedia.org/wiki/Builder_pattern) that seemed to fit the bill.
+
+Essentially there would be two interfaces:
+
+- `FilterStrategy` - Defines how to add WHERE conditions the feed SQL query
+- `ScoringStrategy` - Defines how to calculate a score for ranking posts to be used in a computed select column
+
+
+### FilterStrategy
+
+The `FilterStrategy` interface would have a method to apply the filter conditions to the query builder.
+
+```go
+type FilterStrategy interface {
+	// ApplyFilter adds filter conditions to the query builder
+	ApplyFilter(sb sqlbuilder.SelectBuilder)
+}
+```
+
+For example we might apply a language filter like this:
+
+```go
+type LanguageFilter struct {
+	Languages []string
+}
+
+func (f LanguageFilter) ApplyFilter(sb sqlbuilder.SelectBuilder) {
+	if len(f.Languages) > 0 {
+		sb.Where(fmt.Sprintf("languages && %s", sb.Args.Add(pq.Array(f.Languages))))
+	}
+}
+```
+
+The keyword filter would implement the same interface:
+
+```go
+
+type KeywordFilter struct {
+	IncludeKeywords string
+	ExcludeKeywords string
+}
+
+func (f *KeywordFilter) ApplyFilter(sb *sqlbuilder.SelectBuilder) {
+	// Add include keywords condition if specified
+	if f.IncludeKeywords != "" {
+		sb.Where(fmt.Sprintf(
+			"ts_vector @@ websearch_to_tsquery('simple', '%s')",
+			f.IncludeKeywords,
+		))
+	}
+
+	// Add exclude keywords condition if specified
+	if f.ExcludeKeywords != "" {
+		sb.Where(fmt.Sprintf(
+			"NOT (ts_vector @@ websearch_to_tsquery('simple', '%s'))",
+			f.ExcludeKeywords,
+		))
+	}
+}
+```
+
+### ScoringStrategy
+
+The `ScoringStrategy` interface is quite similar to the `FilterStrategy` interface.
+Notice however that it uses a `strings.Builder` to write the scoring expression.
+This is because we're composing multiple scoring calculations that will eventually be joined together as a single select column.
+
+```go
+type ScoringStrategy interface {
+	// ApplyScoring writes the scoring expression to the builder
+	ApplyScoring(sb *strings.Builder)
+}
+```
+
+For example we might apply a keyword score like this:
+
+```go
+type KeywordScoring struct {
+	Keywords string
+}
+
+func (s *KeywordScoring) ApplyScoring(sb *strings.Builder) {
+	sb.WriteString(fmt.Sprintf(
+		`ts_rank(ts_vector, websearch_to_tsquery('simple', '%s'))/(1 + ts_rank(ts_vector, websearch_to_tsquery('simple', '%s')))`,
+		s.Keywords, s.Keywords,
+	))
+}
+```
+
+And a time decay score could be implemented like this:
+
+```go
+type TimeDecayScoring struct{}
+
+func (s *TimeDecayScoring) ApplyScoring(sb *strings.Builder) {
+	sb.WriteString("(1.0 + (EXTRACT(EPOCH FROM (NOW() - created_at)) / 86400.0))^(-0.5)")
+}
+```
+
+## Feed builder
+
+Now that we have the `FilterStrategy` and `ScoringStrategy` interfaces we can build a `FeedBuilder` that can be used to build feeds based on the configuration file.
+First we define the feed builder struct and how to create an empty feed builder:
+
+```go
+type FeedQueryBuilder struct {
+	scoringLayers []scoringLayer
+	filters       []query.FilterStrategy
+}
+
+type scoringLayer struct {
+	strategy query.ScoringStrategy
+	weight   float64
+}
+
+func NewFeedQueryBuilder() *FeedQueryBuilder {
+	return &FeedQueryBuilder{
+		scoringLayers: make([]scoringLayer, 0),
+		filters:       make([]query.FilterStrategy, 0),
+	}
+}
+```
+
+You will notice we wrap the scoring layer with a weight to be able to apply different weights to different scoring strategies.
+Next we need to define the methods for adding filters and scoring strategies to the feed builder:
+
+```go
+func (b *FeedQueryBuilder) AddScoringLayer(strategy query.ScoringStrategy, weight float64) {
+	b.scoringLayers = append(b.scoringLayers, scoringLayer{
+		strategy: strategy,
+		weight:   weight,
+	})
+}
+
+func (b *FeedQueryBuilder) AddFilter(filter query.FilterStrategy) {
+	b.filters = append(b.filters, filter)
+}
+```
+
+Finally the interesting part, the `Build` receiver method that will build the final query!
+We can start with the following skeleton for building the query:
+
+```go 
+func (b *FeedQueryBuilder) Build(limit int, cursor int64) (string, []interface{}) {
+	sb := sqlbuilder.PostgreSQL.NewSelectBuilder()
+
+	// Add base columns
+	sb.Select("posts.id", "posts.uri")
+
+	// Add scoring here
+
+	// Add filters here
+	
+	// Add cursor condition
+	if cursor != 0 {
+		sb.Where(sb.LessThan("posts.id", cursor))
+	}
+
+	// Always order by score (which will be 1.0 for unscored feeds) and then by ID
+	sb.OrderBy("score DESC", "posts.id DESC")
+
+	sb.Limit(limit)
+
+	return sb.Build()
+}
+```
+
+We create a new postgres query builder and add the base columns we want to select.
+Then we need some scoring and filtering logic to be applied to the query based on the scoring and filter strategies we added to the feed builder.
+To finish the query we add the cursor (pagination) condition, sort order, and limit.
+Finally we build the query and return the SQL and arguments to whatever function is calling the `Build` method.
