@@ -12,7 +12,7 @@
     "clientKind": "git"
   },
   "files": {
-    "includes": ["**", "!**/.astro/**/*", "!**/dist/**/*"]
+    "includes": ["**", "!**/.astro/**/*", "!**/dist/**/*", "!**/.wrangler/**/*", "!**/src/**/*.astro"]
   },
   "formatter": {
     "indentStyle": "space",
