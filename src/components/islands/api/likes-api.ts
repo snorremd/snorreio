@@ -33,7 +33,7 @@ export async function fetchLikesByCollection(
     fetchCache.set(collection, promise);
   }
 
-  // biome-ignore lint/style/noNonNullAssertion: <explanation>
+  // biome-ignore lint/style/noNonNullAssertion: Don't care if the collection is in the cache
   return fetchCache.get(collection)!;
 }
 

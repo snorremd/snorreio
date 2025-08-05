@@ -129,7 +129,7 @@ export async function POST(context: APIContext) {
         collection,
         // SQLite works with time as seconds since epoch, so we need to convert it to seconds
         // Should probably make this a plugin for Kysely so it's easier to work with dates
-        created_at: Math.round(new Date().getTime() / 1000),
+        created_at: Math.round(Date.now() / 1000),
       })
       .execute();
   }

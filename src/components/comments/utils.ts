@@ -58,7 +58,7 @@ function addThreadUIData(
   walkChildren = true,
   walkParent = true,
 ): ThreadViewPostUI {
-  let parent: ThreadViewPostUI | undefined = undefined;
+  let parent: ThreadViewPostUI | undefined;
   if (walkParent && AppBskyFeedDefs.isThreadViewPost(threadViewPost.parent)) {
     // Recursively add UI data to parent
     parent = addThreadUIData(
