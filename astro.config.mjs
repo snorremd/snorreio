@@ -14,10 +14,13 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
   site: "https://snorre.io",
   vite: {
-    plugins: [devtools({
-      /* features options - all disabled by default */
-      autoname: true, // e.g. enable autoname
-    }), tailwindcss()],
+    plugins: [
+      devtools({
+        /* features options - all disabled by default */
+        autoname: true, // e.g. enable autoname
+      }),
+      tailwindcss(),
+    ],
     optimizeDeps: {
       exclude: ["@resvg/resvg-js"],
     },
