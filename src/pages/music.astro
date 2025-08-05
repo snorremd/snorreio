@@ -79,6 +79,9 @@ const music = (await getCollection("music")).sort((a, b) => {
 </BaseLayout>
 
 <style is:global>
+  @reference "tailwindcss";
+  @reference "../styles/global.css";
+
   .project {
     @apply w-full text-stone-900 dark:text-stone-50;
 

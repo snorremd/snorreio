@@ -104,6 +104,9 @@ const projectsRendered = await Promise.all(
 </BaseLayout>
 
 <style is:global>
+  @reference "tailwindcss";
+  @reference "../styles/global.css";
+
   .project {
     @apply w-full text-stone-900 dark:text-stone-50;
 

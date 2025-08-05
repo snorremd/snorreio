@@ -275,6 +275,9 @@ const { beer } = Astro.props;
 </BaseLayout>
 
 <style is:global>
+  @reference "tailwindcss";
+  @reference "../../styles/global.css";
+
   .recipe {
     @apply text-stone-900 dark:text-stone-50;
 
@@ -339,6 +342,9 @@ const { beer } = Astro.props;
 </style>
 
 <style>
+  @reference "tailwindcss";
+  @reference "../../styles/global.css";
+
   .recipe-steps {
     @apply grid;
     grid-template-columns: 1fr;
