@@ -1,20 +1,28 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@config "../../tailwind.config.cjs";
+
 
 @font-face {
-  font-family: "shortstack";
-  src: url("/fonts/shortstack-regular.woff2") format("woff2");
+  font-family: 'shortstack';
+  src: url('/fonts/shortstack-regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
-/* Box sizing border box all containers */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+
+@theme {
+  --font-shortstack: 'shortstack', sans-serif;
+}
+
+@layer utilities {
+
+  /* Box sizing border box all containers */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 }
 
 @layer utilities {
