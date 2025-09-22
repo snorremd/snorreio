@@ -1,0 +1,265 @@
+---
+pubDate: "2025-09-22"
+title: "Running Bluesky PDS with Traefik proxy on Scaleway"
+---
+
+[Bluesky](https://bsky.app) is a decentralized social network built on the [AT Protocol](https://atproto.com/).
+If you've followed me for a while you probably know I'm a big fan.
+While most users sign up on the main bsky.social PDS, you can run your own PDS instance to maintain full control over your data.
+I decided to self-host my PDS to keep my social data sovereign and experiment with the protocol's decentralized nature.
+This post walks through my setup hosting a PDS on Scaleway using Traefik as a reverse proxy.
+
+## Part 1: Personal Data Servers
+
+The AT Protocol Personal Data Server (PDS for short) is the service that stores user records and file uploads (blobs).
+Whenever you post or repost, like a post, follow a user, or do anything else on the network you create a record on your PDS.
+As of this writing (February 2025) almost every user in the ATProto network is on a Bluesky PDS.
+[Are we decentralized yet](https://arewedecentralizedyet.online/) is a useful tracker that measures user concentration on different federated social networks.
+
+I am a big believer in the AT Protocol, even having built a [Feed Generator server](/blog/2023-10-01-bluesky-feed-generators-giving-users-algorithmic-choice).
+But as long as the vast majority users remain on the official PDSs the decentralized nature of Bluesky is only theoretical.
+To help the network move in a more decentralized direction you can host your own Personal Data Server, and that is exactly what I did (pun not intended).
+
+I did a bit of research and decided to go with the [official PDS](https://github.com/bluesky-social/pds) which runs on Node.js on top of SQLite.
+
+## Part 2: Choosing a hosting provider
+
+Part of the reason for hosting my own PDS was to move my data away from the US and closer to home.
+My apartment isn't really equipped for running a home lab, so I needed to find a hosting provider.
+I decided to go with a hosting provider I was familiar with, [Scaleway](https://www.scaleway.com/).
+There are a couple of reasons for this:
+
+1. They are european and have servers in Amsterdam, not too far away from Norway
+1. They offer cheap small VPS instances with unlimited traffic
+1. Storage is networked and can easily be scaled up or down
+1. You can easily scale up to a more powerful instance if needed
+1. You can create snapshots of your instance-attached storage and restore them
+1. They have a good S3-compatible block storage offering for hosting files
+
+I ended up going with the [DEV1-S](https://www.scaleway.com/en/pricing/virtual-instances/) instance which is a 2 vCPU, 2GB RAM, 20GB block storage, and 200Mbps bandwidth.
+This instance is quite cheap while allowing me to run the PDS, a reverse proxy, and some supporting services.
+
+
+## Part 3: Setting up the PDS
+
+The official repository is pretty opinionated on how to run the PDS.
+It provides an install script that:
+
+1. Installs Docker
+1. Sets up environment variables in specific location
+1. Creates a Caddy proxy config
+1. Installs a unit file for systemd to run Caddy and the PDS
+1. Starts the services
+
+Now I like Docker, but I feel Caddy perhaps is a bit too commercial these days.
+Also I'd like to have some say over how everything is set up.
+The official installer assumes you use disk storage for the PDS blobs.
+I'd rather use the S3-compatible block storage offered by Scaleway.
+So I decided to take a step back and do the configuration myself, after all how hard could it be?
+
+## Part 4: Docker setup
+
+I mostly run everything I do in [Docker](https://www.docker.com/).
+It allows me to easily set up and tear down services without worrying about dependencies and lingering config and files.
+One of the easier ways to expose Docker services I've found is to use [Traefik](https://traefik.io/).
+They support connecting to a Docker daemon and automatically set up a reverse proxy for labeled Docker Compose services.
+
+Before we look at the services you need to configure some networks and volumes.
+I prefer to use docker volumes over bind mounts for data, but using bind mounts is also possible.
+Observe that we only need one network, `traefik`, as the PDS will only be accessed via the Traefik proxy.
+
+```yaml
+volumes:
+  bluesky-pds:
+  letsencrypt:
+
+networks:
+  traefik:
+    name: traefik
+```
+
+Let's start with the Traefik service.
+
+```yaml
+services:
+  traefik:
+    image: "traefik:v3"
+    container_name: "traefik"
+    restart: always
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik"
+      # Web sites entrypoint
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http3.advertisedport=443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      # Certificate/ACME stuff
+      - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
+      - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.cloudflare.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
+    environment:
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - "letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+```
+
+Traefik is configured to listen on port 80 and 443 for http and https requests.
+We configure the Traefik to redirect http requests to https, a simple security measure.
+Usually when running Traefik I use the http challenge for ACME, but this does not work for wildcard certificates.
+Instead we have to use a DNS challenge, in my case via Cloudflare DNS.
+Traefik supports automatic handling of DNS challenges for lots of DNS providers.
+We also need to map the docker socket to the Traefik container to allow it to read from the Docker daemon socket.
+
+
+Now let's take a look at the Bluesky PDS service.
+
+```yaml
+  bluesky-pds:
+    container_name: bluesky-pds
+    image: ghcr.io/bluesky-social/pds:0.4
+    restart: unless-stopped
+    networks:
+      - bluesky-pds
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.bluesky-pds-header.headers.customrequestheaders.Host="{host}"
+      - traefik.http.routers.bluesky-pds.rule=Host(`pds.snorre.io`) || HostRegexp(`[a-zA-Z0-9-]+.pds.snorre.io`)
+      - traefik.http.routers.bluesky-pds.entrypoints=web,websecure
+      - traefik.http.routers.bluesky-pds.tls=true
+      - traefik.http.routers.bluesky-pds.tls.certresolver=cloudflare
+      - traefik.http.routers.bluesky-pds.tls.domains[0].main=pds.snorre.io
+      - traefik.http.routers.bluesky-pds.tls.domains[0].sans=*.pds.snorre.io
+      - traefik.http.routers.bluesky-pds.middlewares=bluesky-pds-header 
+      - traefik.http.services.bluesky-pds.loadbalancer.server.port=3000
+      - traefik.docker.network=traefik
+    env_file:
+      - ./pds/pds.env
+    volumes:
+      - bluesky-pds:/pds
+
+```
+
+You'll probably notice the many labels on the PDS service.
+These are used to configure Traefik to request SSL certificates from Cloudflare and to proxy requests to the PDS service.
+The `traefik.http.middlewares.bluesky-pds-header.headers.customrequestheaders.Host="{host}"` label is especially important.
+It allows the PDS to know the original hostname of the request which tells it which user the request was made for.
+
+The PDS service expects configuration in the form of environment variables.
+However the `pdsadmin` helper scripts expects the configuration to be in a .env file.
+To keep things simple we can reuse the same `.env` file for both by using the `env_file` option in Docker Compose.
+The `.env` file looks like this:
+
+```
+# PDS specific variables
+PDS_HOSTNAME=pds.snorre.io
+PDS_JWT_SECRET=<my-jwt-secret>
+PDS_ADMIN_PASSWORD=<my-admin-password>
+PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX=<my-plc-rotation-key>
+PDS_DATA_DIRECTORY=/pds
+#PDS_BLOBSTORE_DISK_LOCATION=/pds/blocks
+
+PDS_BLOBSTORE_S3_BUCKET=<my-s3-bucket-name>
+PDS_BLOBSTORE_S3_REGION=<my-s3-region>
+PDS_BLOBSTORE_S3_ENDPOINT=<my-s3-endpoint>
+PDS_BLOBSTORE_S3_FORCE_PATH_STYLE=false
+PDS_BLOBSTORE_S3_ACCESS_KEY_ID=<my-s3-access-key-id>
+PDS_BLOBSTORE_S3_SECRET_ACCESS_KEY=<my-s3-secret-access-key>
+
+PDS_BLOB_UPLOAD_LIMIT=52428800
+PDS_DID_PLC_URL=https://plc.directory
+PDS_BSKY_APP_VIEW_URL=https://api.bsky.app
+PDS_BSKY_APP_VIEW_DID=did:web:api.bsky.app
+PDS_REPORT_SERVICE_URL=https://mod.bsky.app
+PDS_REPORT_SERVICE_DID=did:plc:ar7c4by46qjdydhdevvrndac
+PDS_CRAWLERS=https://bsky.network
+
+# SMTP for mail sending
+PDS_EMAIL_SMTP_URL=smtps://<my-smtp-user>:<my-smtp-password>@<my-smtp-domain>/
+PDS_EMAIL_FROM_ADDRESS=<my-smtp-user>@<my-smtp-domain>
+
+# Logging
+LOG_ENABLED=true
+```
+
+As you can see I'm configuring the PDS to use S3 storage for blobs.
+This is not officially documented in the PDS repository, but it seems to work.
+Using S3 storage means I don't need to worry about disk storage running out too fast.
+The S3 bucket should be created before running the PDS and should be configured as private.
+The PDS handles requests for blobs so they don't need to be publicly accessible by default.
+
+With all this out of the way I could start the services, no systemd unit files needed.
+
+```bash
+docker compose up -d
+```
+
+### Part 5: Running admin commands
+
+As we've forgone the whole official installer we need to download the psdadmin scripts.
+The pdsadmin script is not bundled in the PDS Docker image.
+Thus we need to clone the PDS repository to get access to it.
+
+```bash
+git clone https://github.com/bluesky-social/pds
+cd pds
+chmod +x pdsadmin.sh
+```
+
+Then we can run the pdsadmin script.
+
+```bash
+sudo ./pdsadmin.sh help
+```
+
+For some reason they require sudo to run every command, even if only the `update` command needs it depending on which permissions you've set on the `env` file.
+If you wanted to create an invite code you can do so with the `create-invite-code` command.
+Because it expects the environment file to be under `/pds/pds.env` we need to override the path to the environment file.
+You can forgo that if you've put the environment file in the expected location.
+
+```bash
+sudo su
+PDS_ENV_FILE=<path-to>/pds.env ./pdsadmin.sh create-invite-code
+```
+
+You can then use the invite code to create a new account on the PDS.
+
+### Part 6: Being discovered by Bluesky Relay
+
+The Bluesky Relay is the service that actually makes content on PDSs discoverable on the Bluesky network/app.
+To make your new PDS discoverable you need to register it with the Bluesky Relay.
+
+```bash
+sudo su
+PDS_ENV_FILE=<path-to>/pds.env ./pdsadmin.sh request-crawl bsky.network
+```
+
+Hurray, you're now discoverable on the Bluesky network!
+
+### Part 7: Migrating your Bluesky account to the new PDS
+
+Now this part was the most scary part for me.
+[The documentation](https://github.com/alexclassroom/bluesky-pds/blob/main/ACCOUNT_MIGRATION.md) makes it out to be a bit scary:
+
+> Account migration is a potentially destructive operation. Part of the operation involves signing away your old PDS's ability to make updates to your DID. If something goes wrong, you could be permanently locked out of your account, and Bluesky will not be able to help you recover it.
+
+Fortunately I found that Bluesky has a tool that among other things can migrate your account to a new PDS.
+It is called [goat](https://github.com/bluesky-social/goat).
+I won't go into too many details here, instead I'll just link to [this excellent guide](https://whtwnd.com/bnewbold.net/3l5ii332pf32u) by bryan newbold.
+It lists all the relevant steps and commands you need to follow.
+Suffice to say [my account](https://bsky.app/profile/snorre.io) is now on my new PDS!
+I hope this post can inspire you to host your own PDS and take back control of your social data.
