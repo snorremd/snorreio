@@ -1,0 +1,102 @@
+---
+pubDate: "2025-12-21"
+title: "EU Sovereign Chat: Mattermost on Scaleway"
+---
+
+I'm part of an aging group of nerds called [Pils & Programmering](https://pilsprog.no/).
+We formed in University back in 2012 with the goal of gathering like-minded students and professionals to drink beer and do some programming.
+While the group was quite active in real life back then, we gradually became more of a chat group as people got families and jobs.
+From 2012 to 2025 we used the free hosted version of [Slack](https://slack.com/) for our chat.
+This worked quite well.
+But with political polarization and events happening, and Slack becoming more profit oriented, it was clear that free American services was no longer a good bet.
+It was time to move on to something more sovereign.
+
+## Part 0: Choosing a chat application
+
+So what chat application should we use?
+IRC is a classic and has been around since the early days of the internet.
+XMPP based chat servers like [ejabberd](https://www.ejabberd.im/) also have a long history.
+But to be honest we wanted something that kind of mirrored the experience of using Slack.
+[Mattermost](https://mattermost.com/) seemed like a good fit as it is a self-hosted Slack alternative.
+It is open source (well, sort of), has a nice web interface, and is relatively easy to set up.
+My only gripes with Mattermost is that is seems more like an Open Core product than a true open source project.
+But for now it seems to be the best option available.
+
+
+## Part 1: Choosing a hosting provider
+
+Initially I set up the chat server on a dedicated server hosted by [Gigahost](https://gigahost.no/) in Norway.
+This had some benefits, among them being that the server was in the same country as us.
+But it was increasingly clear I did not have the time to manage a self-hosted Postgres and backup setup.
+
+So I started looking for a hosting provider in Europe and quickly settled on the familiar [Scaleway](https://www.scaleway.com/).
+Scaleway is a french subsidiary of the [Iliad](https://www.iliad.fr/en/) group.
+With European owners, and a drive to build a European sovereign cloud, it was a natural choice.
+
+
+## Part 2: Choosing Scaleway setup
+
+Considering Mattermost wants to run quite continuously I figured we wanted to host it on a VM rather than their serverless container offering.
+Scaleway offers a variety of instances, but for our tiny chat group a pretty small [DEV1-S](https://www.scaleway.com/en/pricing/virtual-instances/) instance was more than enough.
+This instance is approximately €6.5 per month before IPV4 address, which is quite affordable for our group.
+While you can get cheaper hardware with Scaleway's dedicated servers, it was nice to have the option to snapshot and restore the instance if needed.
+
+For the database I wanted something managed as I did not want to deal with the hassle of setting up backups and restore procedures.
+Scaleway offers a managed PostgreSQL service called [Scaleway PostgreSQL](https://www.scaleway.com/en/managed-postgresql-mysql/) which is a good fit for our use case.
+As we're a tiny group and uptime isn't all that important, I decided to go with the cheapest possible option.
+You can select the old instance type `DB-DEV-S`, standlone mode (no high availability), and `5K` IOPS block storage for €12.38 per month.
+All in all a pretty good deal for a managed database.
+
+On the old Gigahost server I had just configured Mattermost to use local file storage.
+For the new setup I noticed both Mattermost and Scaleway offered S3.
+So I decided to use the S3 storage for the chat server.
+This allows me to easily migrate to a different hosting provider if needed as the only thing stored on disk is the config.
+
+
+## The Setup
+
+Here's a diagram of the final architecture:
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                      Scaleway (Amsterdam)                     │
+│                                                               │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │  DEV1-S Instance (~€6.5/mo)                            │   │
+│  │  ┌──────────────────────────────────────────────────┐  │   │
+│  │  │         Mattermost Server                        │  │   │
+│  │  │         (config on disk)                         │  │   │
+│  │  └──────────────────────────────────────────────────┘  │   │
+│  │                    │                     │             │   │
+│  └────────────────────┼─────────────────────┼─────────────┘   │
+│                       │                     │                 │
+│                       │                     │                 │
+│         ┌─────────────▼──────────┐   ┌──────▼──────────┐      │
+│         │  Managed PostgreSQL    │   │   S3 Storage    │      │
+│         │  DB-DEV-S (€12.38/mo)  │   │  (files, media) │      │
+│         │  - Standalone mode     │   │                 │      │
+│         │  - 5K IOPS storage     │   │                 │      │
+│         └────────────────────────┘   └─────────────────┘      │
+│                                                               │
+└───────────────────────────────────▲───────────────────────────┘
+                                    │
+                                    │
+                          ┌─────────┴──────────┐
+                          │   Users/Clients    │
+                          │  (web, desktop,    │
+                          │     mobile)        │
+                          └────────────────────┘
+```
+
+Total cost: ~€20/month for a fully managed, EU-sovereign chat setup (not inluding a domain and SMTP).
+Note that the price will increase as your storage increases.
+But this setup should scale well for at least 50 people.
+
+## Conclusion
+
+In this post I've taken you through the setup we used to migrate our chat to a EU-sovereign, partially managed setup.
+Scaleway is a great provider and I'm happy to support them in their quest to build a European sovereign cloud.
+If you are looking to migrate away from American tech giants, Scaleway is a great option.
+All of our users are in Europe, so it makes sense to host the chat server in Europe.
+This post did not cover the exact config and setup, but I trust self-hosters to figure it out.
+
